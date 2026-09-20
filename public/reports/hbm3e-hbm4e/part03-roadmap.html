@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试数据智能 · PART 03 蓝图与落地路线</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #faf7f2; --color-paper-2: #ffffff;
+      --color-ink: #1c1917; --color-muted: #57534e; --color-soft: #6f665f;
+      --color-rule: rgba(28,25,23,0.12);
+      --color-accent: #c2410c; --color-accent-tint: rgba(194,65,12,0.12);
+      --color-link: #4e6e81; --color-mustard: #a16207;
+      --color-sage: #5c7444; --color-dusty: #4e6e81;
+      --font-sans: 'Geist', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+      --font-serif: 'Instrument Serif', 'Noto Serif SC', 'Songti SC', serif;
+      --font-mono: 'Geist Mono', 'PingFang SC', ui-monospace, Menlo, monospace;
+      --motion-fast: 160ms; --motion-step: 480ms; --motion-hold: 720ms;
+      --motion-total: 3600ms; --motion-ease: cubic-bezier(.2,.8,.2,1);
+    }
+    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink); min-height: 100vh; padding: 3rem 2rem 4rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 2.5rem; }
+    .header-eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.75rem; }
+    .crumb { color: var(--color-soft); }
+    h1 { font-family: var(--font-serif); font-size: clamp(1.9rem, 3vw + 1rem, 2.75rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 0.75rem; }
+    .subtitle { font-size: 0.95rem; line-height: 1.65; color: var(--color-muted); max-width: 62ch; }
+    .metrics { display: grid; grid-template-columns: 1fr 1.15fr 0.9fr 1fr; gap: 1rem; margin-bottom: 3.5rem; }
+    .metric { min-width: 0; background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: 6px; padding: 1.1rem 1.25rem 1rem; }
+    .metric .m-eyebrow { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-soft); margin-bottom: 0.6rem; }
+    .metric .m-value { font-family: var(--font-serif); font-size: 1.6rem; line-height: 1.15; margin-bottom: 0.35rem; }
+    .metric .m-value em { font-style: normal; color: var(--color-accent); }
+    .metric .m-note { font-size: 0.75rem; color: var(--color-soft); line-height: 1.5; }
+    section { margin-bottom: 3.5rem; }
+    .sec-eyebrow { font-family: var(--font-mono); font-size: 0.64rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-soft); margin-bottom: 0.5rem; }
+    section h2 { font-family: var(--font-serif); font-size: clamp(1.35rem, 1.6vw + 0.7rem, 1.75rem); font-weight: 400; letter-spacing: -0.01em; margin-bottom: 0.6rem; }
+    .sec-intro { font-size: 0.875rem; line-height: 1.7; color: var(--color-muted); max-width: 70ch; margin-bottom: 1.5rem; }
+    .sec-intro strong { color: var(--color-ink); font-weight: 600; }
+    svg { display: block; width: 100%; }
+    .diagram-container { overflow-x: auto; }
+    .diagram-container svg { min-width: 900px; }
+    .cards { display: grid; gap: 1rem; margin-top: 1.25rem; }
+    .cards.three { grid-template-columns: 1fr 1.05fr 1.12fr; }
+    .cards.five { grid-template-columns: repeat(5, 1fr); }
+    .card { min-width: 0; background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: 6px; padding: 1.1rem 1.2rem 1.15rem; }
+    .card.focal { border-color: rgba(194,65,12,0.55); }
+    .card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
+    .card-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .card-dot.ink { background: var(--color-ink); } .card-dot.muted { background: var(--color-muted); }
+    .card-dot.coral { background: var(--color-accent); } .card-dot.link { background: var(--color-link); }
+    .card-dot.must { background: var(--color-mustard); } .card-dot.sage { background: var(--color-sage); }
+    .card-dot.dusty { background: var(--color-dusty); }
+    .card h3 { font-size: 0.9rem; font-weight: 600; letter-spacing: -0.005em; }
+    .card h3 .h3-mono { font-family: var(--font-mono); font-weight: 500; font-size: 0.68rem; color: var(--color-soft); letter-spacing: 0.08em; }
+    .card ul { list-style: none; color: var(--color-muted); font-size: 0.8rem; line-height: 1.6; }
+    .card ul li { margin-bottom: 0.35rem; padding-left: 0.9rem; position: relative; }
+    .card ul li::before { content: '—'; position: absolute; left: 0; color: rgba(28,25,23,0.28); font-size: 0.72rem; }
+    .card ul li strong { color: var(--color-ink); font-weight: 600; }
+    .callout { border-left: 2px solid var(--color-accent); padding: 0.35rem 0 0.35rem 1rem; margin-top: 1.25rem; font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.6; color: var(--color-muted); max-width: 62ch; }
+    .cred { display: grid; grid-template-columns: 1fr 1.35fr; gap: 1rem; margin-top: 1.25rem; }
+    .footer { margin-top: 2.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(28,25,23,0.10); font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--color-soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+    .motion-ready [data-motion-item] { opacity: .12; transform: translateY(8px); transform-box: fill-box; transform-origin: center; transition: opacity var(--motion-step) var(--motion-ease), transform var(--motion-step) var(--motion-ease); }
+    .motion-ready [data-motion-item].is-visible,
+    .motion-ready[data-frame="end"] [data-motion-item],
+    .motion-ready[data-frame="static"] [data-motion-item] { opacity: 1; transform: none; }
+    [data-motion-controls] { display: none; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-rule); }
+    .motion-ready [data-motion-controls] { display: flex; }
+    [data-motion-controls][hidden] { display: none !important; }
+    [data-motion-controls] button { min-width: 44px; min-height: 44px; padding: 8px 12px; border: 1px solid rgba(28,25,23,0.30); border-radius: 4px; color: var(--color-ink); background: var(--color-paper-2); font: 600 12px/1 var(--font-sans); cursor: pointer; }
+    [data-motion-controls] button:hover { border-color: var(--color-accent); }
+    [data-motion-controls] button:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+    [data-motion-controls] button:disabled { cursor: not-allowed; opacity: .45; }
+    [data-motion-status-visible] { margin-left: auto; color: var(--color-muted); font: 500 12px/1.4 var(--font-mono); }
+    .keyboard-help { color: var(--color-soft); font: 500 11px/1.4 var(--font-mono); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    noscript p { margin: 12px 0 0; color: var(--color-muted); font: 500 12px/1.4 var(--font-mono); }
+    html[data-motion="static"] [data-motion-controls], html[data-motion="static"] [data-motion-decorative] { display: none !important; }
+    html[data-motion="static"] [data-motion-item] { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; }
+    html[data-motion="step"] [data-motion-controls], html[data-motion="step"] [data-motion-decorative] { display: none !important; }
+    html[data-motion="step"] [data-motion-item] { animation: none !important; transition: none !important; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+      [data-motion-item] { opacity: 1 !important; transform: none !important; }
+      [data-motion-decorative] { display: none !important; }
+      [data-motion-controls] { display: none !important; }
+    }
+    @media print {
+      [data-motion-controls], [data-motion-decorative] { display: none !important; }
+      [data-motion-item] { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; }
+    }
+    @media (max-width: 960px) {
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .cards.three, .cards.five { grid-template-columns: 1fr 1fr; }
+      .cred { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="header">
+      <p class="header-eyebrow">Test Data Intelligence · Part 03 · Blueprint &amp; Roadmap <span class="crumb">/ 全系列 04 篇 · 论证底座《立项论证》(PART 00) · 上接《组织架构》《系统架构》</span></p>
+      <h1>未来蓝图与落地路线</h1>
+      <p class="subtitle">能力演进蓝图、18 个月四阶段落地甘特、里程碑与 KPI 兑现。起始时间、周期、KPI 幅度均为<strong style="color:var(--color-ink)">设计假设</strong>，
+        组织与平台口径分别见 PART 01 / PART 02。</p>
+    </header>
+
+    <div class="metrics">
+      <div class="metric">
+        <p class="m-eyebrow">能力演进</p>
+        <p class="m-value">L1 <em>→ L5</em> 级</p>
+        <p class="m-note">统计基线 → 平台化 → ML 规模化 → 自适应闭环 → 自主优化</p>
+      </div>
+      <div class="metric">
+        <p class="m-eyebrow">落地周期（设计假设）</p>
+        <p class="m-value">18 <em>个月</em> 四阶段</p>
+        <p class="m-note">2026-10 启动 → 2028-03 全面推广</p>
+      </div>
+      <div class="metric">
+        <p class="m-eyebrow">甘特任务</p>
+        <p class="m-value">12 <em>项</em> · 6 里程碑</p>
+        <p class="m-note">四阶段泳道，关键路径末端为灰度放行</p>
+      </div>
+      <div class="metric">
+        <p class="m-eyebrow">KPI 主线（设计假设）</p>
+        <p class="m-value">DPPM <em>−30%</em></p>
+        <p class="m-note">逃逸下降为北极星；测试时长 −20%；误杀不劣化</p>
+      </div>
+    </div>
+
+    <!-- ═══ FIG 01 · 能力演进蓝图 ═══ -->
+    <section id="fig-blueprint" data-motion-root data-motion-mode="reveal" data-step-count="5" data-step-current="0" data-frame="static" data-static-frame="complete">
+      <p class="sec-eyebrow">Fig.01 · Capability Blueprint</p>
+      <h2>能力演进蓝图：五级阶梯</h2>
+      <p class="sec-intro">阶梯的横轴是时间与投入，纵轴是能力等级。<strong>L4 自适应闭环是 18 个月的承诺边界</strong>（焦点标注）；
+        L5 自主优化是 2028 年之后的北极星——用虚线表达「方向而非承诺」。</p>
+
+      <div class="diagram-container">
+        <svg viewBox="0 0 1120 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="bp-title bp-desc">
+          <title id="bp-title">五级能力演进阶梯</title>
+          <desc id="bp-desc">L1 统计基线、L2 平台化、L3 ML 规模化、L4 自适应闭环四级阶梯逐级升高，L5 自主优化以虚线表示 2028 年后的北极星方向。</desc>
+          <rect width="1120" height="520" fill="#ffffff"/>
+
+          <line x1="24" y1="456" x2="1096" y2="456" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+
+          <!-- L1 -->
+          <g data-motion-item data-step="1" aria-label="Step 1: L1 统计基线">
+            <rect x="28" y="368" width="200" height="88" rx="6" fill="#ffffff"/>
+            <rect x="28" y="368" width="200" height="88" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <text x="44" y="394" fill="#6f665f" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.12em">L1 · M1–M6</text>
+            <text x="44" y="418" fill="#1c1917" font-size="13" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">统计基线</text>
+            <text x="44" y="440" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">PAT/DPAT 落标 · 数据全接入</text>
+          </g>
+          <!-- L2 -->
+          <g data-motion-item data-step="2" aria-label="Step 2: L2 平台化">
+            <rect x="244" y="320" width="200" height="136" rx="6" fill="#ffffff"/>
+            <rect x="244" y="320" width="200" height="136" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <text x="260" y="346" fill="#6f665f" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.12em">L2 · M4–M12</text>
+            <text x="260" y="370" fill="#1c1917" font-size="13" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">平台化</text>
+            <text x="260" y="392" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">湖仓 + 宽表 + 看板</text>
+            <text x="260" y="406" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">T+1 SLO 达成（PART 02）</text>
+          </g>
+          <!-- L3 -->
+          <g data-motion-item data-step="3" aria-label="Step 3: L3 ML 规模化">
+            <rect x="460" y="272" width="200" height="184" rx="6" fill="#ffffff"/>
+            <rect x="460" y="272" width="200" height="184" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <text x="476" y="298" fill="#6f665f" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.12em">L3 · M10–M15</text>
+            <text x="476" y="322" fill="#1c1917" font-size="13" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">ML 规模化</text>
+            <text x="476" y="344" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">晶圆图识别 · 异常检测</text>
+            <text x="476" y="358" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">虚拟量测试点 · MRB 门槛</text>
+            <text x="476" y="372" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">WM-811K 基线 ≥98%</text>
+          </g>
+          <!-- L4（焦点） -->
+          <g data-motion-item data-step="4" aria-label="Step 4: L4 自适应闭环">
+            <rect x="676" y="224" width="200" height="232" rx="6" fill="#ffffff"/>
+            <rect x="676" y="224" width="200" height="232" rx="6" fill="rgba(194,65,12,0.12)" stroke="#c2410c" stroke-width="1"/>
+            <text x="692" y="250" fill="#c2410c" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.12em">L4 · M13–M18</text>
+            <text x="692" y="274" fill="#1c1917" font-size="13" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">自适应闭环</text>
+            <text x="692" y="296" fill="#57534e" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">双预测器试点（Pan 2024 路线）</text>
+            <text x="692" y="310" fill="#57534e" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">参数回写 ATE · 灰度放行</text>
+            <text x="692" y="324" fill="#57534e" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">品质 MRB 把关 · 可回退</text>
+            <text x="692" y="346" fill="#c2410c" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">18 个月承诺边界</text>
+          </g>
+          <!-- L5（北极星，虚线） -->
+          <g data-motion-item data-step="5" aria-label="Step 5: L5 自主优化北极星">
+            <rect x="892" y="176" width="204" height="280" rx="6" fill="#ffffff"/>
+            <rect x="892" y="176" width="204" height="280" rx="6" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.35)" stroke-width="1" stroke-dasharray="5,4"/>
+            <text x="908" y="202" fill="#6f665f" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.12em">L5 · 2028+</text>
+            <text x="908" y="226" fill="#57534e" font-size="13" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">自主优化（北极星）</text>
+            <text x="908" y="248" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">跨厂区联邦学习</text>
+            <text x="908" y="262" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">生成式 AI 分析助手</text>
+            <text x="908" y="276" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">测试流程自主调优</text>
+            <text x="908" y="298" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">方向而非承诺 · 不入 KPI</text>
+          </g>
+
+          <line x1="24" y1="484" x2="1096" y2="484" stroke="rgba(28,25,23,0.12)" stroke-width="0.8"/>
+          <text x="24" y="506" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.1em">阶梯示意：横轴为时间与投入走向，纵轴高度为能力等级（非等比例尺）· 每级定义与任务见下方甘特</text>
+        </svg>
+      </div>
+
+      <div data-motion-controls role="group" aria-label="蓝图播放控制">
+        <button type="button" data-motion-action="prev">上一步</button>
+        <button type="button" data-motion-action="play" aria-pressed="false">播放</button>
+        <button type="button" data-motion-action="pause" aria-pressed="true">暂停</button>
+        <button type="button" data-motion-action="next">下一步</button>
+        <button type="button" data-motion-action="replay">重播</button>
+        <span class="keyboard-help">←/→ 逐步 · Space 播放/暂停 · R 重播</span>
+        <span data-motion-status-visible aria-hidden="true">Step <span data-motion-step-label>0</span> of 5</span>
+      </div>
+      <p class="sr-only" data-motion-status role="status" aria-live="polite" aria-atomic="true"></p>
+      <noscript><p>播放控制需要 JavaScript。上方为完整的静态蓝图。</p></noscript>
+    </section>
+
+    <!-- ═══ FIG 02 · 落地甘特 ═══ -->
+    <section id="fig-gantt">
+      <p class="sec-eyebrow">Fig.02 · Landing Gantt</p>
+      <h2>落地甘特图：18 个月 · 12 项任务</h2>
+      <p class="sec-intro">四阶段泳道，月份为<strong>设计假设</strong>的项目月（M1 = 2026-10）。阶段间有意重叠：
+        平台建设（P2）在统计基线收尾前启动，ML 任务（P3）在湖仓可用后立即进场。<strong>灰度放行是关键路径末端</strong>（焦点条）。</p>
+
+      <div class="diagram-container">
+        <svg viewBox="0 0 1120 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="gantt-title gantt-desc">
+          <title id="gantt-title">18 个月四阶段落地甘特图</title>
+          <desc id="gantt-desc">四个阶段泳道共十二项任务，横轴为 2026 年 10 月至 2028 年 3 月，灰度放行任务以强调色标出。</desc>
+          <rect width="1120" height="640" fill="#ffffff"/>
+
+          <!-- 时间轴 -->
+          <g fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">
+            <text x="200" y="56">2026-10</text><text x="335" y="56">2027-01</text><text x="470" y="56">2027-04</text>
+            <text x="605" y="56">2027-07</text><text x="740" y="56">2027-10</text><text x="875" y="56">2028-01</text><text x="1010" y="56">2028-03</text>
+          </g>
+          <g stroke="rgba(28,25,23,0.08)" stroke-width="0.8">
+            <line x1="200" y1="64" x2="200" y2="560"/><line x1="335" y1="64" x2="335" y2="560"/><line x1="470" y1="64" x2="470" y2="560"/>
+            <line x1="605" y1="64" x2="605" y2="560"/><line x1="740" y1="64" x2="740" y2="560"/><line x1="875" y1="64" x2="875" y2="560"/><line x1="1010" y1="64" x2="1010" y2="560"/>
+          </g>
+          <line x1="200" y1="64" x2="200" y2="560" stroke="rgba(28,25,23,0.25)" stroke-width="1"/>
+
+          <!-- 阶段分区 -->
+          <rect x="24" y="72" width="1072" height="120" rx="6" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.10)" stroke-width="0.8"/>
+          <text x="32" y="88" fill="#6f665f" font-size="7" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">P1 摸底与基线 · M1–M6</text>
+          <rect x="24" y="196" width="1072" height="120" rx="6" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.10)" stroke-width="0.8"/>
+          <text x="32" y="212" fill="#6f665f" font-size="7" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">P2 平台化 · M4–M12</text>
+          <rect x="24" y="320" width="1072" height="120" rx="6" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.10)" stroke-width="0.8"/>
+          <text x="32" y="336" fill="#6f665f" font-size="7" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">P3 ML 规模化 · M10–M15</text>
+          <rect x="24" y="444" width="1072" height="120" rx="6" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.10)" stroke-width="0.8"/>
+          <text x="32" y="460" fill="#6f665f" font-size="7" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">P4 自适应闭环 · M13–M18</text>
+
+          <!-- P1 任务 -->
+          <rect x="200" y="88" width="135" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="208" y="105" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">数据源盘点</text>
+          <rect x="245" y="128" width="135" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="253" y="145" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">接入管道</text>
+          <rect x="335" y="168" width="135" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="343" y="185" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">PAT 基线落标</text>
+
+          <!-- P2 任务 -->
+          <rect x="380" y="212" width="225" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="388" y="229" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">湖仓与计算底座</text>
+          <rect x="425" y="252" width="225" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="433" y="269" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">数据治理与分级</text>
+          <rect x="515" y="292" width="225" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="523" y="309" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">die 级宽表与看板</text>
+
+          <!-- P3 任务 -->
+          <rect x="605" y="336" width="135" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="613" y="353" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">特征仓上线</text>
+          <rect x="650" y="376" width="180" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="658" y="393" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">晶圆图识别上线</text>
+          <rect x="695" y="416" width="180" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="703" y="433" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">异常检测 / VM 试点</text>
+
+          <!-- P4 任务 -->
+          <rect x="740" y="460" width="135" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="748" y="477" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">预测器试点</text>
+          <rect x="830" y="500" width="180" height="24" rx="4" fill="rgba(194,65,12,0.15)" stroke="#c2410c" stroke-width="1"/>
+          <text x="838" y="517" fill="#c2410c" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">灰度放行与评测</text>
+          <rect x="920" y="540" width="90" height="24" rx="4" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="928" y="557" fill="#1c1917" font-size="10" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">全面推广</text>
+
+          <!-- 图例 -->
+          <line x1="24" y1="584" x2="1096" y2="584" stroke="rgba(28,25,23,0.12)" stroke-width="0.8"/>
+          <text x="24" y="612" fill="#6f665f" font-size="8" font-weight="500" font-family="'Geist Mono',monospace" letter-spacing="0.14em">LEGEND</text>
+          <rect x="96" y="602" width="16" height="12" rx="3" fill="rgba(87,83,78,0.15)" stroke="#57534e" stroke-width="1"/>
+          <text x="120" y="612" fill="#57534e" font-size="9" font-family="'Geist','PingFang SC',sans-serif">任务（起止为项目月，设计假设）</text>
+          <rect x="352" y="602" width="16" height="12" rx="3" fill="rgba(194,65,12,0.15)" stroke="#c2410c" stroke-width="1"/>
+          <text x="376" y="612" fill="#57534e" font-size="9" font-family="'Geist','PingFang SC',sans-serif">关键路径末端 · 灰度放行</text>
+          <text x="568" y="612" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">阶段有意重叠：平台在基线收尾前启动，ML 在湖仓可用后进场</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ═══ FIG 03 · 里程碑时间线 ═══ -->
+    <section id="fig-milestone">
+      <p class="sec-eyebrow">Fig.03 · Milestones &amp; KPI</p>
+      <h2>里程碑与 KPI 兑现</h2>
+      <p class="sec-intro">六个里程碑等距落在项目月 M3/M6/M9/M12/M15/M18，每个里程碑绑定一条可验收的 KPI 口径；
+        <strong>M3 平台上线与 M6 全面推广为主要里程碑</strong>（放大标注）。KPI 幅度为设计假设，正式立项时以基线实测重校。</p>
+
+      <div class="diagram-container">
+        <svg viewBox="0 0 1120 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ms-title ms-desc">
+          <title id="ms-title">里程碑与 KPI 时间线</title>
+          <desc id="ms-desc">2026 年 10 月至 2028 年 3 月的时间线上，M1 至 M6 六个里程碑交替标注于轴上下，M3 与 M6 为主要里程碑。</desc>
+          <rect width="1120" height="400" fill="#ffffff"/>
+
+          <line x1="96" y1="200" x2="1024" y2="200" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+          <g stroke="rgba(28,25,23,0.25)" stroke-width="1">
+            <line x1="96" y1="194" x2="96" y2="206"/><line x1="251" y1="194" x2="251" y2="206"/><line x1="405" y1="194" x2="405" y2="206"/>
+            <line x1="560" y1="194" x2="560" y2="206"/><line x1="715" y1="194" x2="715" y2="206"/><line x1="869" y1="194" x2="869" y2="206"/><line x1="1024" y1="194" x2="1024" y2="206"/>
+          </g>
+          <g fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">
+            <text x="96" y="228">2026-10</text><text x="251" y="228">2027-01</text><text x="405" y="228">2027-04</text>
+            <text x="560" y="228">2027-07</text><text x="715" y="228">2027-10</text><text x="869" y="228">2028-01</text><text x="1024" y="228">2028-03</text>
+          </g>
+
+          <!-- M1 上 -->
+          <circle cx="251" cy="200" r="4" fill="#57534e"/>
+          <line x1="251" y1="196" x2="251" y2="140" stroke="rgba(28,25,23,0.18)" stroke-width="1"/>
+          <text x="251" y="92" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">M1 · 数据全接入</text>
+          <text x="251" y="110" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">M3 · 2027-01 · 源覆盖率 100%</text>
+
+          <!-- M2 下 -->
+          <circle cx="405" cy="200" r="4" fill="#57534e"/>
+          <line x1="405" y1="204" x2="405" y2="256" stroke="rgba(28,25,23,0.18)" stroke-width="1"/>
+          <text x="405" y="288" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">M2 · PAT 全覆盖</text>
+          <text x="405" y="306" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">M6 · 2027-04 · AEC-Q001 参数全落标</text>
+
+          <!-- M3 上（主要） -->
+          <circle cx="560" cy="200" r="6" fill="#c2410c"/>
+          <line x1="560" y1="194" x2="560" y2="132" stroke="rgba(194,65,12,0.5)" stroke-width="1"/>
+          <text x="560" y="84" fill="#c2410c" font-size="13" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">M3 · 平台上线</text>
+          <text x="560" y="102" fill="#57534e" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">M9 · 2027-07 · T+1 SLO 达成</text>
+
+          <!-- M4 下 -->
+          <circle cx="715" cy="200" r="4" fill="#57534e"/>
+          <line x1="715" y1="204" x2="715" y2="256" stroke="rgba(28,25,23,0.18)" stroke-width="1"/>
+          <text x="715" y="288" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">M4 · 首个 ML 模型上线</text>
+          <text x="715" y="306" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">M12 · 2027-10 · 晶圆图识别精度 ≥98%</text>
+
+          <!-- M5 上 -->
+          <circle cx="869" cy="200" r="4" fill="#57534e"/>
+          <line x1="869" y1="196" x2="869" y2="140" stroke="rgba(28,25,23,0.18)" stroke-width="1"/>
+          <text x="869" y="92" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">M5 · 闭环灰度</text>
+          <text x="869" y="110" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">M15 · 2028-01 · 灰度域测试时长 −10%</text>
+
+          <!-- M6 下（主要） -->
+          <circle cx="1024" cy="200" r="6" fill="#c2410c"/>
+          <line x1="1024" y1="206" x2="1024" y2="264" stroke="rgba(194,65,12,0.5)" stroke-width="1"/>
+          <text x="1004" y="296" fill="#c2410c" font-size="13" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">M6 · 全面推广</text>
+          <text x="1004" y="314" fill="#57534e" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">M18 · 2028-03 · 逃逸 DPPM −30%</text>
+
+          <text x="96" y="368" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.1em">时间轴按项目月等距（M1 = 2026-10）· KPI 幅度为设计假设，立项时以实测基线重校</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ═══ KPI 主线 ═══ -->
+    <section id="kpi">
+      <p class="sec-eyebrow">KPI Lines</p>
+      <h2>三条 KPI 主线</h2>
+      <p class="sec-intro">三个幅度不是拍出来的：<strong>PART 00 §7 的 ROI 三档反推</strong>——DPPM −30% 对应基准档约 1.5 年回收，
+        −15%（保守档）则回收期拉长到 ~3 年；−30% 是「立项可辩护」与「保守可兜底」之间的取值。</p>
+      <div class="cards three">
+        <div class="card focal">
+          <div class="card-header"><span class="card-dot coral"></span><h3>质量 · 逃逸 DPPM</h3></div>
+          <ul>
+            <li>北极星指标：M6 实现<strong>逃逸 DPPM −30%</strong>（相对实测基线）</li>
+            <li>约束条件：误杀率劣化 ≤ 0.05pp——质量收益不以误杀换</li>
+            <li>口径：现场返回归因为「测试逃逸」的部分（SIA 归因框架）</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot dusty"></span><h3>效率 · 测试时长</h3></div>
+          <ul>
+            <li>M5 灰度域 <strong>−10%</strong> → M6 推广域 <strong>−20%</strong></li>
+            <li>来源：预测驱动跳项 + 自适应改流（PART 02 回写闭环）</li>
+            <li>护栏：跳项批次的可靠性随访不低于全测批次</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot link"></span><h3>兑现 · 平台采用</h3></div>
+          <ul>
+            <li>M3 起：宽表/看板周活分析师生占比 ≥ 80%</li>
+            <li>一次性取数需求占比持续下降（平台自服务的反证）</li>
+            <li>模型从上线到放行的 MRB 周期 ≤ 2 个评审窗口</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 风险与投入 ═══ -->
+    <section id="risk">
+      <p class="sec-eyebrow">Risks &amp; Investment</p>
+      <h2>风险对策与投入</h2>
+      <div class="cards five">
+        <div class="card">
+          <div class="card-header"><span class="card-dot must"></span><h3>数据质量</h3></div>
+          <ul><li>P1 先做数据剖析与准入规则，坏数据不进 silver 层</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot dusty"></span><h3>标签稀缺</h3></div>
+          <ul><li>失效样本少：GAN 增广 + 半监督；无标签场景用无监督四法</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot coral"></span><h3>组织采纳</h3></div>
+          <ul><li>良率分析组内嵌产品线；委员会裁定口径，减少返工</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot link"></span><h3>模型漂移</h3></div>
+          <ul><li>批次漂移监控 + 回退线；抽验复核常态化（闭环③）</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot sage"></span><h3>合规</h3></div>
+          <ul><li>数据分级 L1–L4 前置到 P2；导出审批与全链路审计</li></ul>
+        </div>
+      </div>
+      <div class="cards three" style="margin-top:1rem;">
+        <div class="card">
+          <div class="card-header"><span class="card-dot ink"></span><h3>人力投入</h3></div>
+          <ul><li>16 → 28 → 42 人（M1–M18 三期），曲线与 PART 01 编制论证一致；成本侧 = 28 人 × ¥70 万（PART 00 §7）</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot must"></span><h3>算力投入</h3></div>
+          <ul><li>GPU 训练节点 x4（P3 前到位），训练区独立网络边界；云价锚点 $2.74–2.96/GPU-hr（AWS p4d，2026-09 快照，价格波动大须标快照日期），自建平衡见 D-08</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot muted"></span><h3>投入纪律</h3></div>
+          <ul><li>每阶段末做 go/no-go 评审；L4 灰度未达标不进入推广</li></ul>
+        </div>
+      </div>
+      <p class="callout">路线的检验标准也只有一条：每个里程碑都绑定一个可以当场验收的数字，验收不过就停在原阶段。</p>
+    </section>
+
+    <!-- ═══ 页脚 ═══ -->
+    <section id="sources">
+      <p class="sec-eyebrow">Assumptions &amp; References</p>
+      <h2>假设与引用</h2>
+      <div class="cred">
+        <div class="card">
+          <div class="card-header"><span class="card-dot must"></span><h3>设计假设（非实测，可替换）</h3></div>
+          <ul>
+            <li>起始 2026-10、18 个月、四阶段：参考中型封测厂组织与平台成熟节奏（落地主体为公司，以实际产能与客户认证节奏重校）</li>
+            <li>KPI 幅度（DPPM −30% / 时长 −20% / 误杀 ≤0.05pp）：需以实测基线重校</li>
+            <li>里程碑月份与任务起止：甘特内标注为项目月</li>
+            <li>GPU x4 与人力曲线：与 PART 01/02 假设联动</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot muted"></span><h3>事实与方法论引用</h3></div>
+          <ul>
+            <li>自适应闭环技术路线：双预测器（Pan et al. 2024，JETTA，合肥工业大学；原归属 Auburn 有误）· Synopsys VMIN（出处待核）· SemiEngineering《Adaptive Test Gaining Ground》（2025-12-09）——产线成熟实践为 PAT/DPAT 与多变量离群，预测跳项属试点前沿</li>
+            <li>筛查基线：AEC-Q001（限值按批次样本统计计算）/ AEC-Q002（SYL/SBL）</li>
+            <li>晶圆图识别基线：WM-811K · AE 增广 CNN 98.56%（Bao et al. 2024, arXiv:2411.11029）；原引 Yoon 2022（&gt;99%@93%）未能溯源已删除，M12 里程碑"≥98%"有 98.56% 实证支撑</li>
+            <li>逃逸经济学：总成本 = 测试成本 + 逃逸率×现场失效成本（行业通用框架；原引 NXP/SIA 出处未能定位）</li>
+            <li>阶段评审（go/no-go）与 MRB 回退线：常见 MLOps 治理实践</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer">
+        <span>测试数据智能 · 全系列四篇：00 立项论证 · 01 组织 · 02 架构 · 03 蓝图 · 前作《测试数据分析》《工艺图解》</span>
+        <span>diagram-design 暖纸皮肤 · 2026-09-19</span>
+      </div>
+    </section>
+
+  </div>
+
+  <script data-diagram-controls>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      const staticOverride = params.get('motion') === 'static' || document.documentElement.dataset.motion === 'static';
+      const requestedStep = params.get('step');
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      document.fonts.ready.then(() => { document.documentElement.dataset.fontsReady = 'true'; });
+
+      document.querySelectorAll('[data-motion-root]').forEach((root) => {
+        const count = Number(root.dataset.stepCount);
+        const hold = parseFloat(getComputedStyle(root).getPropertyValue('--motion-hold')) || 720;
+        const parsedStep = requestedStep !== null && /^\d+$/.test(requestedStep) ? Number(requestedStep) : null;
+        const exactStep = params.get('motion') === 'step' && Number.isSafeInteger(parsedStep) && parsedStep >= 0 && parsedStep <= count ? parsedStep : null;
+        const items = [...root.querySelectorAll('[data-motion-item]')];
+        const labels = Array.from({ length: count + 1 }, (_, index) => index === 0
+          ? 'Ready'
+          : items.filter((item) => !item.hasAttribute('data-motion-decorative') && Number(item.dataset.step) === index)
+              .map((item) => item.getAttribute('aria-label')).join('; '));
+        const controls = root.querySelector('[data-motion-controls]');
+        const status = root.querySelector('[data-motion-status]');
+        const visibleStep = root.querySelector('[data-motion-step-label]');
+        let step = count;
+        let timer = 0;
+        let playing = false;
+        let stepBeforeReduce = 0;
+        let resumeAfterReduce = root.dataset.motionMode === 'reveal';
+
+        const buttons = (action) => controls.querySelector(`[data-motion-action="${action}"]`);
+        const clearClock = () => { window.clearTimeout(timer); timer = 0; };
+        const announce = () => { status.textContent = `Step ${step} of ${count}: ${labels[step] || 'Complete'}`; };
+        const setControlsAvailable = (available) => {
+          controls.hidden = !available;
+          controls.setAttribute('aria-hidden', String(!available));
+          controls.dataset.playbackDisabled = String(!available);
+          controls.querySelectorAll('button').forEach((control) => { control.disabled = !available; });
+        };
+
+        function render(next, userInitiated = false) {
+          step = Math.max(0, Math.min(count, next));
+          root.dataset.stepCurrent = String(step);
+          root.dataset.frame = step === count ? 'end' : step === 0 ? 'start' : 'step';
+          items.forEach((item) => {
+            const itemStep = Number(item.dataset.step);
+            item.classList.toggle('is-visible', itemStep <= step);
+            item.classList.toggle('is-current', itemStep === step);
+          });
+          if (visibleStep) visibleStep.textContent = String(step);
+          const unavailable = controls.dataset.playbackDisabled === 'true';
+          buttons('prev').disabled = unavailable || step === 0;
+          buttons('next').disabled = unavailable || step === count;
+          if (userInitiated) announce();
+        }
+
+        function pause(userInitiated = false) {
+          clearClock();
+          playing = false;
+          root.classList.remove('is-playing');
+          buttons('play').setAttribute('aria-pressed', 'false');
+          buttons('pause').setAttribute('aria-pressed', 'true');
+          if (userInitiated) status.textContent = `Paused at step ${step} of ${count}`;
+        }
+
+        function finish() {
+          pause(false);
+          root.dataset.frame = 'end';
+          status.textContent = `Complete · step ${count} of ${count}`;
+        }
+
+        function tick() {
+          if (!playing) return;
+          if (step >= count) { finish(); return; }
+          render(step + 1, false);
+          if (step >= count) { finish(); return; }
+          timer = window.setTimeout(tick, hold);
+        }
+
+        function play(fromStart = false, userInitiated = false) {
+          clearClock();
+          if (fromStart || step >= count) render(0, userInitiated);
+          playing = true;
+          root.classList.add('is-playing');
+          buttons('play').setAttribute('aria-pressed', 'true');
+          buttons('pause').setAttribute('aria-pressed', 'false');
+          timer = window.setTimeout(tick, hold);
+        }
+
+        controls.addEventListener('click', (event) => {
+          const button = event.target.closest('[data-motion-action]');
+          if (!button) return;
+          const action = button.dataset.motionAction;
+          if (action === 'play') play(false, true);
+          if (action === 'pause') pause(true);
+          if (action === 'replay') play(true, true);
+          if (action === 'prev') { pause(false); render(step - 1, true); }
+          if (action === 'next') { pause(false); render(step + 1, true); }
+        });
+
+        root.addEventListener('keydown', (event) => {
+          if (event.target.matches('input, textarea, select, a[href]')) return;
+          const keys = { ArrowLeft: step - 1, ArrowRight: step + 1, Home: 0, End: count };
+          if (event.code === 'Space' && !event.target.closest('button')) {
+            event.preventDefault();
+            playing ? pause(true) : play(false, true);
+            return;
+          }
+          if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase() === 'r') {
+            event.preventDefault();
+            play(true, true);
+            return;
+          }
+          if (!(event.key in keys)) return;
+          event.preventDefault();
+          pause(false);
+          render(keys[event.key], true);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden' && playing) pause(false);
+        });
+        reduce.addEventListener('change', (event) => {
+          if (event.matches && root.dataset.motionState !== 'reduced') {
+            stepBeforeReduce = step;
+            resumeAfterReduce = playing;
+          }
+          pause(false);
+          if (event.matches) {
+            setControlsAvailable(false);
+            render(count, false);
+            root.dataset.frame = 'static';
+            root.dataset.motionState = 'reduced';
+            status.textContent = 'Reduced motion · complete static frame · playback controls unavailable';
+          } else if (staticOverride || root.dataset.motionMode === 'none') {
+            setControlsAvailable(false);
+            render(count, false);
+            root.dataset.frame = 'static';
+            root.dataset.motionState = 'static';
+            status.textContent = 'Static frame · complete diagram · playback controls unavailable';
+          } else {
+            delete root.dataset.motionState;
+            if (exactStep !== null) {
+              setControlsAvailable(false);
+              render(exactStep, false);
+              root.dataset.frame = 'step';
+              root.dataset.motionState = 'test';
+              status.textContent = `Test frame · step ${step} of ${count} · playback controls unavailable`;
+            } else {
+              setControlsAvailable(true);
+              render(stepBeforeReduce, false);
+              status.textContent = `Ready · step ${step} of ${count}`;
+              if (resumeAfterReduce && root.dataset.motionMode === 'reveal') {
+                play(false, false);
+              }
+            }
+            resumeAfterReduce = false;
+          }
+        });
+
+        if (staticOverride) {
+          document.documentElement.dataset.motion = 'static';
+          pause(false);
+          setControlsAvailable(false);
+          render(count, false);
+          root.dataset.frame = 'static';
+          root.dataset.motionState = 'static';
+          status.textContent = 'Static frame · complete diagram · playback controls unavailable';
+        } else if (reduce.matches || root.dataset.motionMode === 'none') {
+          pause(false);
+          setControlsAvailable(false);
+          render(count, false);
+          root.dataset.frame = 'static';
+          root.dataset.motionState = reduce.matches ? 'reduced' : 'static';
+          status.textContent = reduce.matches
+            ? 'Reduced motion · complete static frame · playback controls unavailable'
+            : 'Static frame · complete diagram · playback controls unavailable';
+        } else if (exactStep !== null) {
+          document.documentElement.dataset.motion = 'step';
+          pause(false);
+          setControlsAvailable(false);
+          render(exactStep, false);
+          root.dataset.frame = 'step';
+          root.dataset.motionState = 'test';
+          status.textContent = `Test frame · step ${step} of ${count} · playback controls unavailable`;
+        } else if (root.dataset.motionMode === 'reveal') {
+          setControlsAvailable(true);
+          render(0, false);
+          play(false, false);
+        } else {
+          pause(false);
+          setControlsAvailable(true);
+          render(0, false);
+          status.textContent = `Ready · step 0 of ${count}`;
+        }
+        root.classList.add('motion-ready');
+      });
+    })();
+  </script>
+<a href="/" style="position:fixed;top:14px;right:14px;z-index:99;font:500 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#57534e;text-decoration:none;border:1px solid rgba(28,25,23,.18);background:rgba(255,255,255,.92);border-radius:999px;padding:8px 14px;backdrop-filter:blur(4px)">&#8592; more-than-moore</a>
+</body>
+</html>

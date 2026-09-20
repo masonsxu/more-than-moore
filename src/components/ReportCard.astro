@@ -1,0 +1,23 @@
+---
+interface Props {
+  title: string;
+  sub?: string;
+  href: string;
+  desc: string;
+  level: string;
+}
+
+const { title, sub, href, desc, level } = Astro.props;
+---
+
+<a
+  href={href}
+  class="group block rounded-xl border border-slate-200 p-5 transition-colors hover:border-cyan-600/60 hover:bg-cyan-50/40"
+>
+  <div class="flex flex-wrap items-baseline gap-3">
+    <h3 class="font-semibold text-slate-900 group-hover:text-cyan-800">{title}</h3>
+    {sub && <span class="text-xs text-slate-500">{sub}</span>}
+    <span class="ml-auto rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-500">{level}</span>
+  </div>
+  <p class="mt-2 text-sm leading-relaxed text-slate-600">{desc}</p>
+</a>

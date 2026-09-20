@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试数据智能 · PART 02 系统架构</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #faf7f2; --color-paper-2: #ffffff;
+      --color-ink: #1c1917; --color-muted: #57534e; --color-soft: #6f665f;
+      --color-rule: rgba(28,25,23,0.12);
+      --color-accent: #c2410c; --color-accent-tint: rgba(194,65,12,0.12);
+      --color-link: #4e6e81; --color-mustard: #a16207;
+      --color-sage: #5c7444; --color-dusty: #4e6e81;
+      --font-sans: 'Geist', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+      --font-serif: 'Instrument Serif', 'Noto Serif SC', 'Songti SC', serif;
+      --font-mono: 'Geist Mono', 'PingFang SC', ui-monospace, Menlo, monospace;
+      --motion-fast: 160ms; --motion-step: 480ms; --motion-hold: 720ms;
+      --motion-total: 3600ms; --motion-ease: cubic-bezier(.2,.8,.2,1);
+    }
+    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink); min-height: 100vh; padding: 3rem 2rem 4rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 2.5rem; }
+    .header-eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.75rem; }
+    .crumb { color: var(--color-soft); }
+    h1 { font-family: var(--font-serif); font-size: clamp(1.9rem, 3vw + 1rem, 2.75rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 0.75rem; }
+    .subtitle { font-size: 0.95rem; line-height: 1.65; color: var(--color-muted); max-width: 62ch; }
+    .metrics { display: grid; grid-template-columns: 1fr 1.1fr 0.9fr 1.05fr; gap: 1rem; margin-bottom: 3.5rem; }
+    .metric { min-width: 0; background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: 6px; padding: 1.1rem 1.25rem 1rem; }
+    .metric .m-eyebrow { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-soft); margin-bottom: 0.6rem; }
+    .metric .m-value { font-family: var(--font-serif); font-size: 1.6rem; line-height: 1.15; margin-bottom: 0.35rem; }
+    .metric .m-value em { font-style: normal; color: var(--color-accent); }
+    .metric .m-note { font-size: 0.75rem; color: var(--color-soft); line-height: 1.5; }
+    section { margin-bottom: 3.5rem; }
+    .sec-eyebrow { font-family: var(--font-mono); font-size: 0.64rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-soft); margin-bottom: 0.5rem; }
+    section h2 { font-family: var(--font-serif); font-size: clamp(1.35rem, 1.6vw + 0.7rem, 1.75rem); font-weight: 400; letter-spacing: -0.01em; margin-bottom: 0.6rem; }
+    .sec-intro { font-size: 0.875rem; line-height: 1.7; color: var(--color-muted); max-width: 70ch; margin-bottom: 1.5rem; }
+    .sec-intro strong { color: var(--color-ink); font-weight: 600; }
+    svg { display: block; width: 100%; }
+    .diagram-container { overflow-x: auto; }
+    .diagram-container svg { min-width: 900px; }
+    .cards { display: grid; gap: 1rem; margin-top: 1.25rem; }
+    .cards.three { grid-template-columns: 1fr 1.05fr 1.12fr; }
+    .card { min-width: 0; background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: 6px; padding: 1.1rem 1.2rem 1.15rem; }
+    .card.focal { border-color: rgba(194,65,12,0.55); }
+    .card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
+    .card-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .card-dot.ink { background: var(--color-ink); } .card-dot.muted { background: var(--color-muted); }
+    .card-dot.coral { background: var(--color-accent); } .card-dot.link { background: var(--color-link); }
+    .card-dot.must { background: var(--color-mustard); }
+    .card h3 { font-size: 0.9rem; font-weight: 600; letter-spacing: -0.005em; }
+    .card h3 .h3-mono { font-family: var(--font-mono); font-weight: 500; font-size: 0.68rem; color: var(--color-soft); letter-spacing: 0.08em; }
+    .card ul { list-style: none; color: var(--color-muted); font-size: 0.8rem; line-height: 1.6; }
+    .card ul li { margin-bottom: 0.35rem; padding-left: 0.9rem; position: relative; }
+    .card ul li::before { content: '—'; position: absolute; left: 0; color: rgba(28,25,23,0.28); font-size: 0.72rem; }
+    .card ul li strong { color: var(--color-ink); font-weight: 600; }
+    .stack { width: 100%; border-collapse: collapse; background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: 6px; overflow: hidden; }
+    .stack th, .stack td { text-align: left; padding: 0.62rem 0.9rem; border-bottom: 1px solid rgba(28,25,23,0.08); vertical-align: top; }
+    .stack thead th { font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-soft); background: rgba(28,25,23,0.04); border-bottom: 1px solid rgba(28,25,23,0.14); }
+    .stack td { font-size: 0.8rem; line-height: 1.55; color: var(--color-muted); }
+    .stack td.el { font-weight: 600; color: var(--color-ink); white-space: nowrap; }
+    .stack td.mono { font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-ink); }
+    .formula-strip { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; }
+    .fchip { font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-muted); border: 1px solid rgba(28,25,23,0.18); border-radius: 4px; padding: 0.5rem 0.85rem; line-height: 1.5; }
+    .fchip strong { color: var(--color-ink); font-weight: 600; }
+    .callout { border-left: 2px solid var(--color-accent); padding: 0.35rem 0 0.35rem 1rem; margin-top: 1.25rem; font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.6; color: var(--color-muted); max-width: 62ch; }
+    .cred { display: grid; grid-template-columns: 1fr 1.35fr; gap: 1rem; margin-top: 1.25rem; }
+    .footer { margin-top: 2.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(28,25,23,0.10); font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--color-soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+    .motion-ready [data-motion-item] { opacity: .12; transform: translateY(8px); transform-box: fill-box; transform-origin: center; transition: opacity var(--motion-step) var(--motion-ease), transform var(--motion-step) var(--motion-ease); }
+    .motion-ready [data-motion-item].is-visible,
+    .motion-ready[data-frame="end"] [data-motion-item],
+    .motion-ready[data-frame="static"] [data-motion-item] { opacity: 1; transform: none; }
+    .motion-ready.is-playing [data-motion-item].is-visible:not(.is-current) { opacity: .45; }
+    .draw-path { fill: none; stroke: var(--color-accent); stroke-width: 3; stroke-dasharray: 1; stroke-dashoffset: 1; pointer-events: none; }
+    .motion-ready .draw-path.is-visible { animation: draw-path var(--motion-step) linear forwards; }
+    @keyframes draw-path { to { stroke-dashoffset: 0; } }
+    [data-motion-controls] { display: none; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-rule); }
+    .motion-ready [data-motion-controls] { display: flex; }
+    [data-motion-controls][hidden] { display: none !important; }
+    [data-motion-controls] button { min-width: 44px; min-height: 44px; padding: 8px 12px; border: 1px solid rgba(28,25,23,0.30); border-radius: 4px; color: var(--color-ink); background: var(--color-paper-2); font: 600 12px/1 var(--font-sans); cursor: pointer; }
+    [data-motion-controls] button:hover { border-color: var(--color-accent); }
+    [data-motion-controls] button:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+    [data-motion-controls] button:disabled { cursor: not-allowed; opacity: .45; }
+    [data-motion-status-visible] { margin-left: auto; color: var(--color-muted); font: 500 12px/1.4 var(--font-mono); }
+    .keyboard-help { color: var(--color-soft); font: 500 11px/1.4 var(--font-mono); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    noscript p { margin: 12px 0 0; color: var(--color-muted); font: 500 12px/1.4 var(--font-mono); }
+    html[data-motion="static"] [data-motion-controls], html[data-motion="static"] [data-motion-decorative] { display: none !important; }
+    html[data-motion="static"] [data-motion-item] { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; }
+    html[data-motion="step"] [data-motion-controls], html[data-motion="step"] [data-motion-decorative] { display: none !important; }
+    html[data-motion="step"] [data-motion-item] { animation: none !important; transition: none !important; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+      [data-motion-item] { opacity: 1 !important; transform: none !important; }
+      [data-motion-decorative] { display: none !important; }
+      [data-motion-controls] { display: none !important; }
+    }
+    @media print {
+      [data-motion-controls], [data-motion-decorative] { display: none !important; }
+      [data-motion-item] { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; }
+    }
+    @media (max-width: 960px) {
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .cards.three { grid-template-columns: 1fr; }
+      .cred { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="header">
+      <p class="header-eyebrow">Test Data Intelligence · Part 02 · System Architecture <span class="crumb">/ 全系列 04 篇 · 论证底座《立项论证》(PART 00) · 上接《组织架构》</span></p>
+      <h1>测试数据平台系统架构</h1>
+      <p class="subtitle">承载 PART 01 三部门能力的统一平台：从 ATE 原始记录到自适应测试回写的端到端架构、
+        湖仓数据分层、部署边界与技术栈选型。选型全部为真实开源组件；SLO 与数据量级为<strong style="color:var(--color-ink)">设计假设</strong>。
+        <strong style="color:var(--color-ink)">2026-09-19 核对：组件版本基线全部刷新（截至 2026-09 快照），对象存储由 MinIO 改为 Ceph（RGW）——MinIO 官方仓库已归档、社区版功能收缩，详见选型表。</strong></p>
+    </header>
+
+    <div class="metrics">
+      <div class="metric">
+        <p class="m-eyebrow">架构分层</p>
+        <p class="m-value">5 <em>层</em> · 2 分区</p>
+        <p class="m-note">接入 / 存储 / 计算 / 智能服务 + 厂端源层</p>
+      </div>
+      <div class="metric">
+        <p class="m-eyebrow">双时延管线</p>
+        <p class="m-value">T+0 <em>+</em> T+1</p>
+        <p class="m-note">Flink 流（在线特征）+ Spark 批（宽表与训练样本）</p>
+      </div>
+      <div class="metric">
+        <p class="m-eyebrow">部署形态（设计假设）</p>
+        <p class="m-value">厂内 <em>私有云</em></p>
+        <p class="m-note">生产区 / GPU 训练区 / 管理区，数据单向流动</p>
+      </div>
+      <div class="metric">
+        <p class="m-eyebrow">开放表格式</p>
+        <p class="m-value">Iceberg <em>湖仓</em></p>
+        <p class="m-note">bronze / silver / gold 三层 + 冷归档，多引擎互操作</p>
+      </div>
+    </div>
+
+    <!-- ═══ FIG 01 · 端到端架构 ═══ -->
+    <section id="fig-arch" data-motion-root data-motion-mode="reveal" data-step-count="5" data-step-current="0" data-frame="static" data-static-frame="complete">
+      <p class="sec-eyebrow">Fig.01 · End-to-End Architecture</p>
+      <h2>端到端系统架构</h2>
+      <p class="sec-intro">左为厂端源层，右为平台五层。<strong>湖仓存储是全图焦点</strong>——所有计算都对着同一份开放表格式；
+        橙色虚线回写是本架构与传统报表平台的本质区别：<strong>分析结果以参数形式流回 ATE，驱动自适应测试</strong>。</p>
+
+      <div class="diagram-container">
+        <svg viewBox="0 0 1120 632" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="arch-title arch-desc">
+          <title id="arch-title">测试数据平台端到端架构</title>
+          <desc id="arch-desc">左区为厂端四个数据源，右区平台五层自上而下为接入、湖仓存储、批流计算、特征与模型、服务消费，橙色虚线表示评分参数回写 ATE 的闭环。</desc>
+          <defs>
+            <marker id="arch-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#57534e"/>
+            </marker>
+            <marker id="arch-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#c2410c"/>
+            </marker>
+          </defs>
+          <rect width="1120" height="632" fill="#ffffff"/>
+
+          <!-- 分区（先画） -->
+          <rect x="24" y="88" width="200" height="420" rx="8" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.10)" stroke-width="0.8"/>
+          <rect x="36" y="92" width="132" height="14" rx="2" fill="#ffffff"/>
+          <text x="40" y="103" fill="rgba(28,25,23,0.45)" font-size="7" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">源层 · FAB EDGE</text>
+
+          <rect x="264" y="64" width="832" height="488" rx="8" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.10)" stroke-width="0.8"/>
+          <rect x="276" y="68" width="304" height="14" rx="2" fill="#ffffff"/>
+          <text x="280" y="79" fill="rgba(28,25,23,0.45)" font-size="7" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">测试数据智能平台 · 厂内私有云（设计假设）</text>
+
+          <!-- 连接器 -->
+          <path d="M 224 298 H 340 V 136 Q 340 128 348 128 H 412" fill="none" stroke="#57534e" stroke-width="1.2" marker-end="url(#arch-arrow)"/>
+          <rect x="232" y="276" width="120" height="14" rx="2" fill="#ffffff"/>
+          <text x="292" y="287" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">STDF · E142 · T+0</text>
+
+          <line x1="680" y1="160" x2="680" y2="184" stroke="#57534e" stroke-width="1.2" marker-end="url(#arch-arrow)"/>
+          <line x1="680" y1="248" x2="680" y2="272" stroke="#57534e" stroke-width="1.2" marker-end="url(#arch-arrow)"/>
+          <line x1="680" y1="336" x2="680" y2="360" stroke="#57534e" stroke-width="1.2" marker-end="url(#arch-arrow)"/>
+          <line x1="680" y1="424" x2="680" y2="448" stroke="#57534e" stroke-width="1.2" marker-end="url(#arch-arrow)"/>
+
+          <path d="M 412 480 H 240 V 306 a 8 8 0 0 1 0 -16 V 164 Q 240 156 248 156 H 200" fill="none" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arch-arrow-accent)"/>
+          <rect x="248" y="324" width="104" height="16" rx="2" fill="#ffffff"/>
+          <text x="256" y="336" fill="#c2410c" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">自适应参数回写</text>
+
+          <path data-motion-item data-step="5" data-motion-decorative aria-hidden="true" focusable="false" pathLength="1" class="draw-path" d="M 412 480 H 240 V 306"/>
+
+          <!-- 源层 4 节点 -->
+          <g data-motion-item data-step="1" aria-label="Step 1: 厂端四个数据源">
+            <rect x="48" y="120" width="152" height="72" rx="6" fill="rgba(28,25,23,0.03)"/>
+            <rect x="48" y="120" width="152" height="72" rx="6" fill="none" stroke="rgba(28,25,23,0.25)" stroke-width="1"/>
+            <text x="124" y="150" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">ATE 测试机</text>
+            <text x="124" y="168" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">STDF v4 · WT / FT / KGSD</text>
+
+            <rect x="48" y="216" width="152" height="72" rx="6" fill="rgba(28,25,23,0.03)"/>
+            <rect x="48" y="216" width="152" height="72" rx="6" fill="none" stroke="rgba(28,25,23,0.25)" stroke-width="1"/>
+            <text x="124" y="246" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">晶圆图</text>
+            <text x="124" y="264" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">SEMI E142 XML</text>
+
+            <rect x="48" y="312" width="152" height="72" rx="6" fill="rgba(28,25,23,0.03)"/>
+            <rect x="48" y="312" width="152" height="72" rx="6" fill="none" stroke="rgba(28,25,23,0.25)" stroke-width="1"/>
+            <text x="124" y="342" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">MES</text>
+            <text x="124" y="360" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">批次 · 工单 · 载具</text>
+
+            <rect x="48" y="408" width="152" height="72" rx="6" fill="rgba(28,25,23,0.03)"/>
+            <rect x="48" y="408" width="152" height="72" rx="6" fill="none" stroke="rgba(28,25,23,0.25)" stroke-width="1"/>
+            <text x="124" y="438" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">SPC / 设备传感</text>
+            <text x="124" y="456" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">过程质量 · 虚拟量测</text>
+          </g>
+
+          <!-- 平台五层 -->
+          <g data-motion-item data-step="2" aria-label="Step 2: 接入层与湖仓存储">
+            <rect x="412" y="96" width="536" height="64" rx="6" fill="#ffffff"/>
+            <rect x="412" y="96" width="536" height="64" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <rect x="424" y="108" width="52" height="12" rx="2" fill="transparent" stroke="rgba(28,25,23,0.35)" stroke-width="0.8"/>
+            <text x="450" y="118" fill="#6f665f" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">INGEST</text>
+            <text x="452" y="138" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">流式接入网关</text>
+            <text x="936" y="138" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="end">Kafka · STDF 解析 · E142 接入</text>
+
+            <rect x="412" y="184" width="536" height="64" rx="6" fill="#ffffff"/>
+            <rect x="412" y="184" width="536" height="64" rx="6" fill="rgba(194,65,12,0.12)" stroke="#c2410c" stroke-width="1"/>
+            <rect x="424" y="196" width="52" height="12" rx="2" fill="transparent" stroke="rgba(194,65,12,0.5)" stroke-width="0.8"/>
+            <text x="450" y="206" fill="#c2410c" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">STORE</text>
+            <text x="452" y="226" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">湖仓存储（焦点）</text>
+            <text x="936" y="226" fill="#57534e" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="end">对象存储 + Iceberg · bronze/silver/gold</text>
+          </g>
+          <g data-motion-item data-step="3" aria-label="Step 3: 批流计算层">
+            <rect x="412" y="272" width="536" height="64" rx="6" fill="#ffffff"/>
+            <rect x="412" y="272" width="536" height="64" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <rect x="424" y="284" width="64" height="12" rx="2" fill="transparent" stroke="rgba(28,25,23,0.35)" stroke-width="0.8"/>
+            <text x="456" y="294" fill="#6f665f" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">COMPUTE</text>
+            <text x="452" y="314" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">批流计算</text>
+            <text x="936" y="314" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="end">Spark T+1 批 · Flink T+0 流</text>
+          </g>
+          <g data-motion-item data-step="4" aria-label="Step 4: 特征与模型层">
+            <rect x="412" y="360" width="536" height="64" rx="6" fill="#ffffff"/>
+            <rect x="412" y="360" width="536" height="64" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <rect x="424" y="372" width="36" height="12" rx="2" fill="transparent" stroke="rgba(28,25,23,0.35)" stroke-width="0.8"/>
+            <text x="442" y="382" fill="#6f665f" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">ML</text>
+            <text x="452" y="402" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">特征与模型</text>
+            <text x="936" y="402" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="end">Feature Store · Registry · GPU 训练池</text>
+          </g>
+          <g data-motion-item data-step="5" aria-label="Step 5: 服务层与回写闭环">
+            <rect x="412" y="448" width="536" height="64" rx="6" fill="#ffffff"/>
+            <rect x="412" y="448" width="536" height="64" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <rect x="424" y="460" width="52" height="12" rx="2" fill="transparent" stroke="rgba(28,25,23,0.35)" stroke-width="0.8"/>
+            <text x="450" y="470" fill="#6f665f" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">SERVE</text>
+            <text x="452" y="490" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">服务与消费</text>
+            <text x="936" y="490" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="end">评分 API · BI 看板 · 告警推送</text>
+          </g>
+
+          <line x1="24" y1="568" x2="1096" y2="568" stroke="rgba(28,25,23,0.12)" stroke-width="0.8"/>
+          <text x="24" y="596" fill="#6f665f" font-size="8" font-weight="500" font-family="'Geist Mono',monospace" letter-spacing="0.14em">LEGEND</text>
+          <rect x="96" y="586" width="16" height="12" rx="2" fill="rgba(194,65,12,0.12)" stroke="#c2410c" stroke-width="1"/>
+          <text x="120" y="596" fill="#57534e" font-size="9" font-family="'Geist','PingFang SC',sans-serif">湖仓（单一事实源）</text>
+          <line x1="272" y1="592" x2="292" y2="592" stroke="#57534e" stroke-width="1.2" marker-end="url(#arch-arrow)"/>
+          <text x="302" y="596" fill="#57534e" font-size="9" font-family="'Geist','PingFang SC',sans-serif">数据流</text>
+          <line x1="392" y1="592" x2="412" y2="592" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arch-arrow-accent)"/>
+          <text x="422" y="596" fill="#57534e" font-size="9" font-family="'Geist','PingFang SC',sans-serif">自适应回写闭环</text>
+          <rect x="548" y="586" width="16" height="12" rx="2" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.20)" stroke-width="0.8"/>
+          <text x="572" y="596" fill="#57534e" font-size="9" font-family="'Geist','PingFang SC',sans-serif">部署分区（虚线为信任边界）</text>
+        </svg>
+      </div>
+
+      <div data-motion-controls role="group" aria-label="架构图播放控制">
+        <button type="button" data-motion-action="prev">上一步</button>
+        <button type="button" data-motion-action="play" aria-pressed="false">播放</button>
+        <button type="button" data-motion-action="pause" aria-pressed="true">暂停</button>
+        <button type="button" data-motion-action="next">下一步</button>
+        <button type="button" data-motion-action="replay">重播</button>
+        <span class="keyboard-help">←/→ 逐步 · Space 播放/暂停 · R 重播</span>
+        <span data-motion-status-visible aria-hidden="true">Step <span data-motion-step-label>0</span> of 5</span>
+      </div>
+      <p class="sr-only" data-motion-status role="status" aria-live="polite" aria-atomic="true"></p>
+      <noscript><p>播放控制需要 JavaScript。上方为完整的静态架构图。</p></noscript>
+    </section>
+
+    <!-- ═══ FIG 02 · 数据分层 ═══ -->
+    <section id="fig-medallion">
+      <p class="sec-eyebrow">Fig.02 · Medallion Layers</p>
+      <h2>湖仓数据分层建模</h2>
+      <p class="sec-intro">同一份数据的三个质量层级加一个冷归档层：<strong>gold 消费区是焦点</strong>——特征表、PAT 基线与训练样本都从这里出发；
+        层间晋升有明确的加工动作，越往右越可信、越可复用。</p>
+
+      <div class="diagram-container">
+        <svg viewBox="0 0 868 548" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="med-title med-desc">
+          <title id="med-title">湖仓 bronze-silver-gold 数据分层</title>
+          <desc id="med-desc">bronze 原始区、silver 标准区、gold 消费区、archive 冷区四张层级卡，顶部晋升弧线标注清洗建模、特征加工与冷归档动作，底部为批与流两条写入路径。</desc>
+          <defs>
+            <marker id="med-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#57534e"/>
+            </marker>
+            <marker id="med-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#c2410c"/>
+            </marker>
+          </defs>
+          <rect width="868" height="548" fill="#ffffff"/>
+
+          <!-- 晋升弧线（先于卡片） -->
+          <path d="M 102 80 C 102 0 290 0 290 80" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#med-arrow)"/>
+          <path d="M 290 80 C 290 0 478 0 478 80" fill="none" stroke="#c2410c" stroke-width="1.6" marker-end="url(#med-arrow-accent)"/>
+          <path d="M 478 80 C 478 0 666 0 666 80" fill="none" stroke="#57534e" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#med-arrow)"/>
+          <text x="196" y="50" fill="#57534e" font-size="10" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle" letter-spacing="0.08em">清洗建模</text>
+          <text x="384" y="50" fill="#c2410c" font-size="10" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle" letter-spacing="0.08em">特征加工</text>
+          <text x="572" y="50" fill="#6f665f" font-size="10" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle" letter-spacing="0.08em">冷归档</text>
+
+          <!-- Bronze -->
+          <rect x="16" y="80" width="172" height="380" rx="6" fill="#ffffff"/>
+          <rect x="16" y="80" width="172" height="380" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+          <rect x="16" y="80" width="172" height="40" rx="6" fill="rgba(28,25,23,0.08)"/>
+          <text x="102" y="106" fill="#1c1917" font-size="13" font-weight="700" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">Bronze 原始区</text>
+          <text x="102" y="144" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">bronze_raw</text>
+          <text x="32" y="180" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">工具</text>
+          <foreignObject x="32" y="186" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">网关原始落盘</div></foreignObject>
+          <text x="32" y="220" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">格式</text>
+          <foreignObject x="32" y="226" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">STDF · E142 XML</div></foreignObject>
+          <text x="32" y="260" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">写入方</text>
+          <foreignObject x="32" y="266" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">大数据平台部</div></foreignObject>
+          <text x="32" y="360" fill="#6f665f" font-size="10" font-weight="600" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.08em">典型载荷</text>
+          <text x="32" y="380" fill="#57534e" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">STDF v4 逐批记录</text>
+          <text x="32" y="396" fill="#57534e" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">E142 晶圆图原样</text>
+
+          <!-- Silver -->
+          <rect x="204" y="80" width="172" height="380" rx="6" fill="#ffffff"/>
+          <rect x="204" y="80" width="172" height="380" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+          <rect x="204" y="80" width="172" height="40" rx="6" fill="rgba(28,25,23,0.08)"/>
+          <text x="290" y="106" fill="#1c1917" font-size="13" font-weight="700" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">Silver 标准区</text>
+          <text x="290" y="144" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">silver_dies</text>
+          <text x="220" y="180" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">工具</text>
+          <foreignObject x="220" y="186" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">Spark 批 · Flink 流</div></foreignObject>
+          <text x="220" y="220" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">格式</text>
+          <foreignObject x="220" y="226" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">Iceberg · die 级宽表</div></foreignObject>
+          <text x="220" y="260" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">写入方</text>
+          <foreignObject x="220" y="266" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">大数据平台部</div></foreignObject>
+          <text x="220" y="360" fill="#6f665f" font-size="10" font-weight="600" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.08em">典型载荷</text>
+          <text x="220" y="380" fill="#57534e" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">逐 die 参数向量</text>
+          <text x="220" y="396" fill="#57534e" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">批次 / 机台维度表</text>
+
+          <!-- Gold（焦点） -->
+          <rect x="392" y="80" width="172" height="380" rx="6" fill="#ffffff"/>
+          <rect x="392" y="80" width="172" height="380" rx="6" fill="rgba(194,65,12,0.10)" stroke="#c2410c" stroke-width="1.4"/>
+          <rect x="392" y="80" width="172" height="40" rx="6" fill="rgba(194,65,12,0.20)"/>
+          <text x="478" y="106" fill="#1c1917" font-size="13" font-weight="700" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">Gold 消费区</text>
+          <text x="478" y="144" fill="#c2410c" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">gold_features</text>
+          <text x="408" y="180" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">工具</text>
+          <foreignObject x="408" y="186" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">特征仓 · Spark SQL</div></foreignObject>
+          <text x="408" y="220" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">格式</text>
+          <foreignObject x="408" y="226" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">Iceberg · 特征 / 指标</div></foreignObject>
+          <text x="408" y="260" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">写入方</text>
+          <foreignObject x="408" y="266" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">算法部 · 数据分析部</div></foreignObject>
+          <text x="408" y="360" fill="#c2410c" font-size="10" font-weight="600" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.08em">典型载荷</text>
+          <text x="408" y="380" fill="#c2410c" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">PAT 基线表（版本化）</text>
+          <text x="408" y="396" fill="#c2410c" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">训练样本集（快照）</text>
+
+          <!-- Archive（冷） -->
+          <rect x="580" y="80" width="172" height="380" rx="6" fill="#ffffff"/>
+          <rect x="580" y="80" width="172" height="380" rx="6" fill="rgba(28,25,23,0.06)" stroke="rgba(87,83,78,0.45)" stroke-width="1" stroke-dasharray="5,3"/>
+          <rect x="580" y="80" width="172" height="40" rx="6" fill="rgba(111,102,95,0.24)"/>
+          <text x="666" y="106" fill="#1c1917" font-size="13" font-weight="700" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">Archive 冷区</text>
+          <text x="666" y="144" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">archive_cold</text>
+          <text x="596" y="180" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">工具</text>
+          <foreignObject x="596" y="186" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">生命周期策略</div></foreignObject>
+          <text x="596" y="220" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">格式</text>
+          <foreignObject x="596" y="226" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">冷存储 · 不可变</div></foreignObject>
+          <text x="596" y="260" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">写入方</text>
+          <foreignObject x="596" y="266" width="140" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'Geist Mono','PingFang SC',monospace;color:#57534e;font-size:9px;line-height:1.25;">大数据平台部</div></foreignObject>
+          <text x="596" y="360" fill="#6f665f" font-size="10" font-weight="600" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.08em">典型载荷</text>
+          <text x="596" y="380" fill="#57534e" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">原始记录 ≥5 年留存</text>
+          <text x="596" y="396" fill="#57534e" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">审计 / 追溯快照</text>
+
+          <!-- 写入路径 -->
+          <rect x="16" y="476" width="460" height="56" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.20)" stroke-width="1"/>
+          <rect x="24" y="482" width="60" height="12" rx="2" fill="transparent" stroke="rgba(28,25,23,0.30)" stroke-width="0.8"/>
+          <text x="54" y="492" fill="#1c1917" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">批路径</text>
+          <text x="96" y="506" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">Spark SQL · T+1 重算</text>
+          <text x="96" y="522" fill="#6f665f" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">宽表重建 · 样本快照 · PAT 基线刷新</text>
+          <rect x="492" y="476" width="360" height="56" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.20)" stroke-width="1"/>
+          <rect x="500" y="482" width="60" height="12" rx="2" fill="transparent" stroke="rgba(28,25,23,0.30)" stroke-width="0.8"/>
+          <text x="530" y="492" fill="#1c1917" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">流路径</text>
+          <text x="572" y="506" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">Flink · T+0 追加</text>
+          <text x="572" y="522" fill="#6f665f" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">在线特征 · 告警事件 · 回写判定</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ═══ FIG 03 · 部署视图 ═══ -->
+    <section id="fig-deploy">
+      <p class="sec-eyebrow">Fig.03 · Deployment View</p>
+      <h2>部署视图：三区边界与算力布局</h2>
+      <p class="sec-intro">三个网络分区：<strong>生产区</strong>承载接入/存储/计算，<strong>GPU 训练区</strong>隔离训练负载（新增投入，焦点标注），
+        <strong>管理区</strong>承载开发运维。跨区链路一律蓝色并标注协议端口；训练产出的模型经注册表单向回流生产区；
+        <strong>训练数据默认不出区——出厂导出止于审批门（阻断符）</strong>。</p>
+
+      <div class="diagram-container">
+        <svg viewBox="0 0 1120 576" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="dep-title dep-desc">
+          <title id="dep-title">三区部署视图</title>
+          <desc id="dep-desc">生产区含网关、湖仓存储、批流计算三节点，GPU 训练区含训练节点，管理区含开发运维节点，区间以标注协议端口的链路连接；训练区数据出厂导出被审批门阻断。</desc>
+          <defs>
+            <marker id="dep-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#4e6e81"/>
+            </marker>
+            <marker id="dep-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#c2410c"/>
+            </marker>
+          </defs>
+          <rect width="1120" height="576" fill="#ffffff"/>
+
+          <!-- 分区 -->
+          <rect x="24" y="88" width="660" height="360" rx="8" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.20)" stroke-width="1" stroke-dasharray="4,4"/>
+          <rect x="36" y="92" width="160" height="14" rx="2" fill="#ffffff"/>
+          <text x="40" y="103" fill="rgba(28,25,23,0.45)" font-size="7" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">生产区 · PROD（厂内）</text>
+
+          <rect x="708" y="88" width="388" height="170" rx="8" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.20)" stroke-width="1" stroke-dasharray="4,4"/>
+          <rect x="720" y="92" width="140" height="14" rx="2" fill="#ffffff"/>
+          <text x="724" y="103" fill="rgba(28,25,23,0.45)" font-size="7" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">GPU 训练区 · TRAIN</text>
+
+          <rect x="708" y="332" width="388" height="160" rx="8" fill="rgba(28,25,23,0.02)" stroke="rgba(28,25,23,0.20)" stroke-width="1" stroke-dasharray="4,4"/>
+          <rect x="720" y="336" width="140" height="14" rx="2" fill="#ffffff"/>
+          <text x="724" y="347" fill="rgba(28,25,23,0.45)" font-size="7" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">管理区 · OPS</text>
+
+          <!-- 跨区链路（先于节点） -->
+          <path d="M 660 360 H 690 V 176 H 732" fill="none" stroke="#4e6e81" stroke-width="1.2" marker-end="url(#dep-arrow)"/>
+          <rect x="698" y="252" width="110" height="16" rx="2" fill="#ffffff"/>
+          <text x="706" y="264" fill="#4e6e81" font-size="8" font-family="'Geist Mono',monospace">TLS:443 样本下发</text>
+
+          <path d="M 732 176 H 700 V 324 H 698 a 8 8 0 0 1 -16 0 H 660" fill="none" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#dep-arrow-accent)"/>
+          <rect x="706" y="300" width="110" height="16" rx="2" fill="#ffffff"/>
+          <text x="714" y="312" fill="#c2410c" font-size="8" font-family="'Geist Mono',monospace">模型注册回传</text>
+
+          <line x1="732" y1="416" x2="660" y2="416" stroke="#4e6e81" stroke-width="1.2" marker-end="url(#dep-arrow)"/>
+          <rect x="620" y="424" width="80" height="28" rx="2" fill="#ffffff"/>
+          <text x="660" y="436" fill="#4e6e81" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle">SSH:22</text>
+          <text x="660" y="448" fill="#4e6e81" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle">HTTPS:443</text>
+
+          <line x1="902" y1="352" x2="902" y2="240" stroke="#4e6e81" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#dep-arrow)"/>
+          <rect x="910" y="288" width="72" height="16" rx="2" fill="#ffffff"/>
+          <text x="916" y="300" fill="#4e6e81" font-size="8" font-family="'Geist Mono',monospace">CI:443 部署</text>
+
+          <!-- 出厂导出阻断（审批门） -->
+          <path d="M 1072 240 V 294" fill="none" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <path d="M 1067 298 L 1077 308 M 1077 298 L 1067 308" stroke="#c2410c" stroke-width="1.4" fill="none"/>
+          <text x="1058" y="314" fill="#c2410c" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="end">出厂导出 · 审批门（默认阻断）</text>
+
+          <!-- 生产区节点 -->
+          <rect x="48" y="136" width="288" height="96" rx="6" fill="#ffffff"/>
+          <rect x="48" y="136" width="288" height="96" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+          <rect x="60" y="144" width="28" height="12" rx="2" fill="transparent" stroke="rgba(28,25,23,0.35)" stroke-width="0.8"/>
+          <text x="74" y="154" fill="#6f665f" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle">VM</text>
+          <rect x="292" y="144" width="32" height="14" rx="2" fill="rgba(28,25,23,0.08)"/>
+          <text x="308" y="155" fill="#57534e" font-size="8" font-weight="600" font-family="'Geist Mono',monospace" text-anchor="middle">x3</text>
+          <text x="60" y="180" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">流式接入节点</text>
+          <rect x="60" y="192" width="264" height="24" rx="4" fill="rgba(28,25,23,0.05)" stroke="rgba(87,83,78,0.45)" stroke-width="0.8"/>
+          <text x="70" y="208" fill="#1c1917" font-size="11" font-family="'Geist','PingFang SC',sans-serif">Apache Kafka（KRaft）</text>
+          <text x="314" y="208" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="end">v4.x</text>
+
+          <rect x="356" y="136" width="304" height="128" rx="6" fill="#ffffff"/>
+          <rect x="356" y="136" width="304" height="128" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+          <rect x="368" y="144" width="28" height="12" rx="2" fill="transparent" stroke="rgba(28,25,23,0.35)" stroke-width="0.8"/>
+          <text x="382" y="154" fill="#6f665f" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle">VM</text>
+          <rect x="608" y="144" width="32" height="14" rx="2" fill="rgba(28,25,23,0.08)"/>
+          <text x="624" y="155" fill="#57534e" font-size="8" font-weight="600" font-family="'Geist Mono',monospace" text-anchor="middle">x2</text>
+          <text x="368" y="180" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">湖仓存储节点</text>
+          <rect x="368" y="192" width="280" height="24" rx="4" fill="rgba(28,25,23,0.05)" stroke="rgba(87,83,78,0.45)" stroke-width="0.8"/>
+          <text x="378" y="208" fill="#1c1917" font-size="11" font-family="'Geist','PingFang SC',sans-serif">Ceph RGW · 对象存储</text>
+          <text x="638" y="208" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="end">v19.x</text>
+          <rect x="368" y="224" width="280" height="24" rx="4" fill="rgba(28,25,23,0.05)" stroke="rgba(87,83,78,0.45)" stroke-width="0.8"/>
+          <text x="378" y="240" fill="#1c1917" font-size="11" font-family="'Geist','PingFang SC',sans-serif">Apache Iceberg · 表格式</text>
+          <text x="638" y="240" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="end">v1.11</text>
+
+          <rect x="48" y="296" width="612" height="128" rx="6" fill="#ffffff"/>
+          <rect x="48" y="296" width="612" height="128" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+          <rect x="60" y="304" width="28" height="12" rx="2" fill="transparent" stroke="rgba(28,25,23,0.35)" stroke-width="0.8"/>
+          <text x="74" y="314" fill="#6f665f" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle">VM</text>
+          <rect x="588" y="304" width="32" height="14" rx="2" fill="rgba(28,25,23,0.08)"/>
+          <text x="604" y="315" fill="#57534e" font-size="8" font-weight="600" font-family="'Geist Mono',monospace" text-anchor="middle">x8</text>
+          <text x="60" y="340" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">批流计算节点</text>
+          <rect x="60" y="352" width="284" height="24" rx="4" fill="rgba(28,25,23,0.05)" stroke="rgba(87,83,78,0.45)" stroke-width="0.8"/>
+          <text x="70" y="368" fill="#1c1917" font-size="11" font-family="'Geist','PingFang SC',sans-serif">Apache Spark · T+1 批</text>
+          <text x="334" y="368" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="end">v4.2</text>
+          <rect x="60" y="384" width="284" height="24" rx="4" fill="rgba(28,25,23,0.05)" stroke="rgba(87,83,78,0.45)" stroke-width="0.8"/>
+          <text x="70" y="400" fill="#1c1917" font-size="11" font-family="'Geist','PingFang SC',sans-serif">Apache Flink · T+0 流</text>
+          <text x="334" y="400" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="end">v2.3</text>
+
+          <!-- 训练区节点（焦点） -->
+          <rect x="732" y="112" width="340" height="128" rx="6" fill="#ffffff"/>
+          <rect x="732" y="112" width="340" height="128" rx="6" fill="rgba(194,65,12,0.12)" stroke="#c2410c" stroke-width="1"/>
+          <rect x="744" y="120" width="28" height="12" rx="2" fill="transparent" stroke="rgba(194,65,12,0.5)" stroke-width="0.8"/>
+          <text x="758" y="130" fill="#c2410c" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle">VM</text>
+          <rect x="1000" y="120" width="32" height="14" rx="2" fill="rgba(194,65,12,0.20)"/>
+          <text x="1016" y="131" fill="#c2410c" font-size="8" font-weight="600" font-family="'Geist Mono',monospace" text-anchor="middle">x4</text>
+          <text x="744" y="156" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">GPU 训练节点（新增投入）</text>
+          <rect x="744" y="168" width="316" height="24" rx="4" fill="rgba(28,25,23,0.05)" stroke="rgba(87,83,78,0.45)" stroke-width="0.8"/>
+          <text x="754" y="184" fill="#1c1917" font-size="11" font-family="'Geist','PingFang SC',sans-serif">PyTorch · 训练框架</text>
+          <text x="1050" y="184" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="end">v2.14</text>
+          <rect x="744" y="200" width="316" height="24" rx="4" fill="rgba(28,25,23,0.05)" stroke="rgba(87,83,78,0.45)" stroke-width="0.8"/>
+          <text x="754" y="216" fill="#1c1917" font-size="11" font-family="'Geist','PingFang SC',sans-serif">MLflow · 模型注册表</text>
+          <text x="1050" y="216" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="end">v3.16</text>
+
+          <!-- 管理区节点 -->
+          <rect x="732" y="352" width="340" height="128" rx="6" fill="#ffffff"/>
+          <rect x="732" y="352" width="340" height="128" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+          <rect x="744" y="360" width="28" height="12" rx="2" fill="transparent" stroke="rgba(28,25,23,0.35)" stroke-width="0.8"/>
+          <text x="758" y="370" fill="#6f665f" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle">VM</text>
+          <rect x="1004" y="360" width="32" height="14" rx="2" fill="rgba(28,25,23,0.08)"/>
+          <text x="1020" y="371" fill="#57534e" font-size="8" font-weight="600" font-family="'Geist Mono',monospace" text-anchor="middle">x1</text>
+          <text x="744" y="396" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">开发运维节点</text>
+          <rect x="744" y="408" width="316" height="24" rx="4" fill="rgba(28,25,23,0.05)" stroke="rgba(87,83,78,0.45)" stroke-width="0.8"/>
+          <text x="754" y="424" fill="#1c1917" font-size="11" font-family="'Geist','PingFang SC',sans-serif">Prometheus · 指标监控</text>
+          <text x="1050" y="424" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="end">v3.14</text>
+          <rect x="744" y="440" width="316" height="24" rx="4" fill="rgba(28,25,23,0.05)" stroke="rgba(87,83,78,0.45)" stroke-width="0.8"/>
+          <text x="754" y="456" fill="#1c1917" font-size="11" font-family="'Geist','PingFang SC',sans-serif">GitLab CI · 发布流水线</text>
+          <text x="1050" y="456" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="end">v19</text>
+
+          <line x1="24" y1="520" x2="1096" y2="520" stroke="rgba(28,25,23,0.12)" stroke-width="0.8"/>
+          <text x="24" y="548" fill="#6f665f" font-size="8" font-weight="500" font-family="'Geist Mono',monospace" letter-spacing="0.14em">LEGEND</text>
+          <rect x="96" y="538" width="16" height="12" rx="2" fill="rgba(194,65,12,0.12)" stroke="#c2410c" stroke-width="1"/>
+          <text x="120" y="548" fill="#57534e" font-size="9" font-family="'Geist','PingFang SC',sans-serif">新增投入（GPU 池）</text>
+          <line x1="272" y1="544" x2="292" y2="544" stroke="#4e6e81" stroke-width="1.2" marker-end="url(#dep-arrow)"/>
+          <text x="302" y="548" fill="#57534e" font-size="9" font-family="'Geist','PingFang SC',sans-serif">跨区链路</text>
+          <line x1="404" y1="544" x2="424" y2="544" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#dep-arrow-accent)"/>
+          <text x="434" y="548" fill="#57534e" font-size="9" font-family="'Geist','PingFang SC',sans-serif">模型回流</text>
+          <text x="544" y="548" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">组件版本为 2026-09 参考基线（设计假设）</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ═══ 技术栈 ═══ -->
+    <section id="stack">
+      <p class="sec-eyebrow">Technology Stack</p>
+      <h2>技术栈选型</h2>
+      <table class="stack">
+        <thead><tr><th style="width:8em">层</th><th style="width:13em">选型</th><th style="width:12em">备选</th><th>选型理由</th></tr></thead>
+        <tbody>
+          <tr><td class="el">流接入</td><td class="mono">Apache Kafka</td><td>Pulsar / Kinesis</td><td>生态成熟 · exactly-once 语义 · 厂内自托管可控</td></tr>
+          <tr><td class="el">批计算</td><td class="mono">Apache Spark</td><td>Trino / DuckDB</td><td>SQL 生态完整 · 与 Iceberg 原生集成</td></tr>
+          <tr><td class="el">流计算</td><td class="mono">Apache Flink</td><td>Spark Streaming</td><td>低延迟窗口与状态管理，匹配在线特征场景</td></tr>
+          <tr><td class="el">表格式</td><td class="mono">Apache Iceberg</td><td>Delta Lake / Hudi</td><td>厂商中立开放表格式，多引擎互操作</td></tr>
+          <tr><td class="el">对象存储</td><td class="mono">Ceph（RGW）</td><td>MinIO（锁定旧版）/ SeaweedFS / 云对象存储</td><td>S3 兼容 · 厂内私有部署，满足 IP 出厂管控。原选 MinIO，2026-09 核对后改选：其官方仓库已归档（2026-04）、社区版移除管理控制台且为 AGPL——新建场景有供应与合规风险，MinIO 降为"存量锁定版本 + 法务评估"备选</td></tr>
+          <tr><td class="el">特征 / 模型</td><td class="mono">Feast + MLflow</td><td>商业特征平台</td><td>开源自托管 · registry 提供版本与审计线</td></tr>
+          <tr><td class="el">监控</td><td class="mono">Prometheus + Grafana</td><td>商业 APM</td><td>私有云标配 · SLO 看板与告警链路短</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ═══ 量级论证 ═══ -->
+    <section id="sizing-evidence">
+      <p class="sec-eyebrow">Sizing Evidence</p>
+      <h2>选型的数据支撑</h2>
+      <p class="sec-intro">上表每个选型都有一条可复核的量级论证（推导过程见 PART 00 §3，决策与回退条件见 PART 00 §8）：</p>
+      <div class="formula-strip">
+        <span class="fchip"><strong>接入：</strong>需求 10²–10³ msg/s（§3 推导）≪ Kafka 三机基准 2×10⁶ msg/s —— 余量 3 个数量级（ADR-1）</span>
+        <span class="fchip"><strong>存储：</strong>原始年增 10–20 TB → 单机一年溢出 → 湖仓在 P2 引入（D-07），对象存储冷区 5 年 ≤ 25 TB</span>
+        <span class="fchip"><strong>训练算力：</strong>WM 级图像模型月均 &lt;80 GPU 时 → x4 自建够用（D-08）</span>
+        <span class="fchip acc">Day-0 极简形态：1 台 VM + Postgres + Python STDF 解析 + Grafana —— 本图是 P2 之后的形态，不是 Day-1 采购单（PART 00 §6）</span>
+      </div>
+    </section>
+    <section id="nfr">
+      <p class="sec-eyebrow">Non-Functional Requirements</p>
+      <h2>非功能约束（设计假设）</h2>
+      <div class="cards three">
+        <div class="card">
+          <div class="card-header"><span class="card-dot dusty"></span><h3>数据量级 <span class="h3-mono">单厂估算</span></h3></div>
+          <ul>
+            <li>WT + FT + KGSD 全年 <strong>10⁹ 行级 die 记录</strong>（10¹² 参数值级）</li>
+            <li>原始 STDF 年增 <strong>10–20 TB</strong>（PART 00 §3 推导），湖仓列存压缩后 &lt;10 TB</li>
+            <li>晶圆图 E142 年百万级 XML 文档</li>
+          </ul>
+        </div>
+        <div class="card focal">
+          <div class="card-header"><span class="card-dot coral"></span><h3>SLO</h3></div>
+          <ul>
+            <li>在线评分 API：<strong>P99 &lt; 1s</strong>（自适应判定用）</li>
+            <li>批表：<strong>T+1 06:00 前</strong>完成宽表与基线刷新</li>
+            <li>管道月度可用性 <strong>≥ 99.5%</strong>，回填窗口 ≤ 24h</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot must"></span><h3>安全与合规</h3></div>
+          <ul>
+            <li>数据分级 <strong>L1–L4</strong>：L3 以上出厂管控、字段级脱敏</li>
+            <li>IP 管控：训练区数据不落地终端，导出需审批</li>
+            <li>全链路审计：谁在何时用哪份数据训练了哪个模型</li>
+          </ul>
+        </div>
+      </div>
+      <div class="formula-strip">
+        <span class="fchip"><strong>标准映射：</strong>STDF v4（ATE 记录）· SEMI E142（晶圆图）· IEEE 1838（堆叠测试访问）</span>
+        <span class="fchip"><strong>方法论引用：</strong>湖仓 medallion 分层 · MLOps registry 审计</span>
+        <span class="fchip acc">架构检验标准：任何模型上线不需要平台部写一次性代码</span>
+      </div>
+    </section>
+
+    <!-- ═══ 页脚 ═══ -->
+    <section id="sources">
+      <p class="sec-eyebrow">Assumptions &amp; References</p>
+      <h2>假设与引用</h2>
+      <div class="cred">
+        <div class="card">
+          <div class="card-header"><span class="card-dot must"></span><h3>设计假设（非实测，可替换）</h3></div>
+          <ul>
+            <li>厂内私有云 + 三区隔离：按 IP 管控最严口径设计，可换云上专属区</li>
+            <li>数据量级与 SLO 数字：中型封测单厂参考规模（落地主体为公司，以实测产能重校）</li>
+            <li>组件版本：2026-09 快照参考基线——Kafka 4.x（KRaft，v3.7 已 EOL）· Iceberg 1.11 · Spark 4.2（3.5 为维护线）· Flink 2.3（1.x 已出局支持线）· Ceph 19.x · PyTorch 2.14 · MLflow 3.16 · Prometheus 3.14（2.x 全系 EOL）· GitLab 19；落地以当期 LTS 为准</li>
+            <li>GPU 池规模（x4）按 WM-811K 级图像模型训练需求估算</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot muted"></span><h3>事实与方法论引用</h3></div>
+          <ul>
+            <li>STDF v4（Teradyne 事实标准）· SEMI E142 基板/晶圆图 XML · IEEE 1838-2019</li>
+            <li>湖仓 medallion 分层（bronze/silver/gold）：Databricks 公开架构模式</li>
+            <li>Apache Kafka（4.0 起 KRaft-only、移除 ZooKeeper）/ Spark / Flink / Iceberg / Ceph / MLflow / Prometheus：开源项目官方文档与 endoflife.date 支持线（2026-09 快照）；MinIO 归档状态：GitHub minio/minio（archived，2026-04）</li>
+            <li>自适应回写闭环的技术可行性：见《先进封装测试数据分析报告》Fig.05（Pan 2024，JETTA，合肥工业大学等）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer">
+        <span>测试数据智能 · 全系列四篇：00 立项论证 · 01 组织 · 02 架构 · 03 蓝图 · 前作《测试数据分析》《工艺图解》</span>
+        <span>diagram-design 暖纸皮肤 · 2026-09-19</span>
+      </div>
+    </section>
+
+  </div>
+
+  <script data-diagram-controls>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      const staticOverride = params.get('motion') === 'static' || document.documentElement.dataset.motion === 'static';
+      const requestedStep = params.get('step');
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      document.fonts.ready.then(() => { document.documentElement.dataset.fontsReady = 'true'; });
+
+      document.querySelectorAll('[data-motion-root]').forEach((root) => {
+        const count = Number(root.dataset.stepCount);
+        const hold = parseFloat(getComputedStyle(root).getPropertyValue('--motion-hold')) || 720;
+        const parsedStep = requestedStep !== null && /^\d+$/.test(requestedStep) ? Number(requestedStep) : null;
+        const exactStep = params.get('motion') === 'step' && Number.isSafeInteger(parsedStep) && parsedStep >= 0 && parsedStep <= count ? parsedStep : null;
+        const items = [...root.querySelectorAll('[data-motion-item]')];
+        const labels = Array.from({ length: count + 1 }, (_, index) => index === 0
+          ? 'Ready'
+          : items.filter((item) => !item.hasAttribute('data-motion-decorative') && Number(item.dataset.step) === index)
+              .map((item) => item.getAttribute('aria-label')).join('; '));
+        const controls = root.querySelector('[data-motion-controls]');
+        const status = root.querySelector('[data-motion-status]');
+        const visibleStep = root.querySelector('[data-motion-step-label]');
+        let step = count;
+        let timer = 0;
+        let playing = false;
+        let stepBeforeReduce = 0;
+        let resumeAfterReduce = root.dataset.motionMode === 'reveal';
+
+        const buttons = (action) => controls.querySelector(`[data-motion-action="${action}"]`);
+        const clearClock = () => { window.clearTimeout(timer); timer = 0; };
+        const announce = () => { status.textContent = `Step ${step} of ${count}: ${labels[step] || 'Complete'}`; };
+        const setControlsAvailable = (available) => {
+          controls.hidden = !available;
+          controls.setAttribute('aria-hidden', String(!available));
+          controls.dataset.playbackDisabled = String(!available);
+          controls.querySelectorAll('button').forEach((control) => { control.disabled = !available; });
+        };
+
+        function render(next, userInitiated = false) {
+          step = Math.max(0, Math.min(count, next));
+          root.dataset.stepCurrent = String(step);
+          root.dataset.frame = step === count ? 'end' : step === 0 ? 'start' : 'step';
+          items.forEach((item) => {
+            const itemStep = Number(item.dataset.step);
+            item.classList.toggle('is-visible', itemStep <= step);
+            item.classList.toggle('is-current', itemStep === step);
+          });
+          if (visibleStep) visibleStep.textContent = String(step);
+          const unavailable = controls.dataset.playbackDisabled === 'true';
+          buttons('prev').disabled = unavailable || step === 0;
+          buttons('next').disabled = unavailable || step === count;
+          if (userInitiated) announce();
+        }
+
+        function pause(userInitiated = false) {
+          clearClock();
+          playing = false;
+          root.classList.remove('is-playing');
+          buttons('play').setAttribute('aria-pressed', 'false');
+          buttons('pause').setAttribute('aria-pressed', 'true');
+          if (userInitiated) status.textContent = `Paused at step ${step} of ${count}`;
+        }
+
+        function finish() {
+          pause(false);
+          root.dataset.frame = 'end';
+          status.textContent = `Complete · step ${count} of ${count}`;
+        }
+
+        function tick() {
+          if (!playing) return;
+          if (step >= count) { finish(); return; }
+          render(step + 1, false);
+          if (step >= count) { finish(); return; }
+          timer = window.setTimeout(tick, hold);
+        }
+
+        function play(fromStart = false, userInitiated = false) {
+          clearClock();
+          if (fromStart || step >= count) render(0, userInitiated);
+          playing = true;
+          root.classList.add('is-playing');
+          buttons('play').setAttribute('aria-pressed', 'true');
+          buttons('pause').setAttribute('aria-pressed', 'false');
+          timer = window.setTimeout(tick, hold);
+        }
+
+        controls.addEventListener('click', (event) => {
+          const button = event.target.closest('[data-motion-action]');
+          if (!button) return;
+          const action = button.dataset.motionAction;
+          if (action === 'play') play(false, true);
+          if (action === 'pause') pause(true);
+          if (action === 'replay') play(true, true);
+          if (action === 'prev') { pause(false); render(step - 1, true); }
+          if (action === 'next') { pause(false); render(step + 1, true); }
+        });
+
+        root.addEventListener('keydown', (event) => {
+          if (event.target.matches('input, textarea, select, a[href]')) return;
+          const keys = { ArrowLeft: step - 1, ArrowRight: step + 1, Home: 0, End: count };
+          if (event.code === 'Space' && !event.target.closest('button')) {
+            event.preventDefault();
+            playing ? pause(true) : play(false, true);
+            return;
+          }
+          if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase() === 'r') {
+            event.preventDefault();
+            play(true, true);
+            return;
+          }
+          if (!(event.key in keys)) return;
+          event.preventDefault();
+          pause(false);
+          render(keys[event.key], true);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden' && playing) pause(false);
+        });
+        reduce.addEventListener('change', (event) => {
+          if (event.matches && root.dataset.motionState !== 'reduced') {
+            stepBeforeReduce = step;
+            resumeAfterReduce = playing;
+          }
+          pause(false);
+          if (event.matches) {
+            setControlsAvailable(false);
+            render(count, false);
+            root.dataset.frame = 'static';
+            root.dataset.motionState = 'reduced';
+            status.textContent = 'Reduced motion · complete static frame · playback controls unavailable';
+          } else if (staticOverride || root.dataset.motionMode === 'none') {
+            setControlsAvailable(false);
+            render(count, false);
+            root.dataset.frame = 'static';
+            root.dataset.motionState = 'static';
+            status.textContent = 'Static frame · complete diagram · playback controls unavailable';
+          } else {
+            delete root.dataset.motionState;
+            if (exactStep !== null) {
+              setControlsAvailable(false);
+              render(exactStep, false);
+              root.dataset.frame = 'step';
+              root.dataset.motionState = 'test';
+              status.textContent = `Test frame · step ${step} of ${count} · playback controls unavailable`;
+            } else {
+              setControlsAvailable(true);
+              render(stepBeforeReduce, false);
+              status.textContent = `Ready · step ${step} of ${count}`;
+              if (resumeAfterReduce && root.dataset.motionMode === 'reveal') {
+                play(false, false);
+              }
+            }
+            resumeAfterReduce = false;
+          }
+        });
+
+        if (staticOverride) {
+          document.documentElement.dataset.motion = 'static';
+          pause(false);
+          setControlsAvailable(false);
+          render(count, false);
+          root.dataset.frame = 'static';
+          root.dataset.motionState = 'static';
+          status.textContent = 'Static frame · complete diagram · playback controls unavailable';
+        } else if (reduce.matches || root.dataset.motionMode === 'none') {
+          pause(false);
+          setControlsAvailable(false);
+          render(count, false);
+          root.dataset.frame = 'static';
+          root.dataset.motionState = reduce.matches ? 'reduced' : 'static';
+          status.textContent = reduce.matches
+            ? 'Reduced motion · complete static frame · playback controls unavailable'
+            : 'Static frame · complete diagram · playback controls unavailable';
+        } else if (exactStep !== null) {
+          document.documentElement.dataset.motion = 'step';
+          pause(false);
+          setControlsAvailable(false);
+          render(exactStep, false);
+          root.dataset.frame = 'step';
+          root.dataset.motionState = 'test';
+          status.textContent = `Test frame · step ${step} of ${count} · playback controls unavailable`;
+        } else if (root.dataset.motionMode === 'reveal') {
+          setControlsAvailable(true);
+          render(0, false);
+          play(false, false);
+        } else {
+          pause(false);
+          setControlsAvailable(true);
+          render(0, false);
+          status.textContent = `Ready · step 0 of ${count}`;
+        }
+        root.classList.add('motion-ready');
+      });
+    })();
+  </script>
+<a href="/" style="position:fixed;top:14px;right:14px;z-index:99;font:500 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#57534e;text-decoration:none;border:1px solid rgba(28,25,23,.18);background:rgba(255,255,255,.92);border-radius:999px;padding:8px 14px;backdrop-filter:blur(4px)">&#8592; more-than-moore</a>
+</body>
+</html>

@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ReportCard from '../../components/ReportCard.astro';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 4);
+---
+
+<Base title="报告">
+  <section class="py-4">
+    <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Featured Reports</p>
+    <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">精排 HTML 报告</h1>
+    <p class="mt-3 max-w-2xl text-slate-600">
+      重点主题用前端排版展开的独立报告页。内容以 2026-09 的逐条数据核对为准，与笔记区的事实核查记录同源。
+    </p>
+  </section>
+
+  <section class="mt-6">
+    <h2 class="text-lg font-semibold text-slate-900">专题报告</h2>
+    <div class="mt-3 grid gap-3">
+      <ReportCard
+        title="HBM 先进封装工艺图解"
+        sub="HBM3E → HBM4E"
+        href="/reports/hbm3e-hbm4e/hbm-packaging-process.html"
+        desc="九步封装链路、WOW vs DOW、键合三工艺（TC-NCF / MR-MUF / Hybrid Bonding）、KGD→KGSD 测试左移、代际对照与良率难点。"
+        level="入门"
+      />
+      <ReportCard
+        title="先进封装测试数据分析报告"
+        sub="数据、模型与算法"
+        href="/reports/hbm3e-hbm4e/test-data-analytics.html"
+        desc="五层数据管道、PAT/DPAT/GDBN 统计筛查、良率与堆叠建模、WM-811K 晶圆图识别、异常检测与自适应测试闭环、逃逸经济学。"
+        level="进阶"
+      />
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <h2 class="text-lg font-semibold text-slate-900">测试数据智能平台系列</h2>
+    <div class="mt-3 grid gap-3">
+      <ReportCard
+        title="PART 00 · 从零到一 · 立项论证"
+        href="/reports/hbm3e-hbm4e/part00-justification.html"
+        desc="四个零、痛点量化、数据量级第一性推导、Build vs Buy、ADR 三则、90 天 MVP、ROI 三档敏感性与决策清单。"
+        level="进阶"
+      />
+      <ReportCard
+        title="PART 01 · 组织架构"
+        href="/reports/hbm3e-hbm4e/part01-organization.html"
+        desc="三部门六小组、团队拓扑与交互模式、RACI 责任矩阵、编制从负载推导（16→28→42）、治理机制与设计原则。"
+        level="进阶"
+      />
+      <ReportCard
+        title="PART 02 · 系统架构"
+        href="/reports/hbm3e-hbm4e/part02-architecture.html"
+        desc="端到端五层架构、湖仓 medallion 分层、三区部署边界、技术栈选型与版本基线（2026-09）、SLO 与合规约束。"
+        level="进阶"
+      />
+      <ReportCard
+        title="PART 03 · 蓝图与落地路线"
+        href="/reports/hbm3e-hbm4e/part03-roadmap.html"
+        desc="L1–L5 能力阶梯、18 个月 12 项任务甘特、里程碑与三条 KPI 主线、风险对策与投入纪律。"
+        level="进阶"
+      />
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <h2 class="text-lg font-semibold text-slate-900">原始来源归档</h2>
+    <p class="mt-2 text-sm text-slate-600">
+      报告与笔记引用的厂商新闻稿、行业媒体原文摘录，按日期归档于{' '}
+      <a href="/sources/hbm3e-hbm4e/" class="text-cyan-700 underline decoration-cyan-300 underline-offset-2 hover:text-cyan-900">
+        /sources/hbm3e-hbm4e/
+      </a>。
+    </p>
+  </section>
+
+  <section class="mt-10 border-t border-slate-200 pt-6">
+    <h2 class="text-lg font-semibold text-slate-900">相关笔记</h2>
+    <ul class="mt-3 grid gap-2">
+      {notes.map((n) => (
+        <li>
+          <a href={`/notes/${n.id}/`} class="text-sm text-slate-700 hover:text-cyan-800">
+            {n.data.title}
+            <span class="ml-2 text-xs text-slate-400">
+              {n.data.date.toISOString().slice(0, 10)}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>

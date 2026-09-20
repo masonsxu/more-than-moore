@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试数据智能 · PART 00 从零到一 · 立项论证</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #faf7f2; --color-paper-2: #ffffff;
+      --color-ink: #1c1917; --color-muted: #57534e; --color-soft: #6f665f;
+      --color-rule: rgba(28,25,23,0.12);
+      --color-accent: #c2410c; --color-accent-tint: rgba(194,65,12,0.12);
+      --color-link: #4e6e81; --color-mustard: #a16207;
+      --color-sage: #5c7444; --color-dusty: #4e6e81; --color-rust: #9a3412;
+      --font-sans: 'Geist', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+      --font-serif: 'Instrument Serif', 'Noto Serif SC', 'Songti SC', serif;
+      --font-mono: 'Geist Mono', 'PingFang SC', ui-monospace, Menlo, monospace;
+      --motion-fast: 160ms; --motion-step: 480ms; --motion-hold: 720ms;
+      --motion-total: 4320ms; --motion-ease: cubic-bezier(.2,.8,.2,1);
+    }
+    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink); min-height: 100vh; padding: 3rem 2rem 4rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 2.5rem; }
+    .header-eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.75rem; }
+    .crumb { color: var(--color-soft); }
+    h1 { font-family: var(--font-serif); font-size: clamp(1.9rem, 3vw + 1rem, 2.75rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 0.75rem; }
+    .subtitle { font-size: 0.95rem; line-height: 1.65; color: var(--color-muted); max-width: 64ch; }
+    .subtitle strong { color: var(--color-ink); font-weight: 600; }
+    .metrics { display: grid; grid-template-columns: 1fr 0.9fr 1.05fr 1.1fr; gap: 1rem; margin-bottom: 3.5rem; }
+    .metric { min-width: 0; background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: 6px; padding: 1.1rem 1.25rem 1rem; }
+    .metric .m-eyebrow { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-soft); margin-bottom: 0.6rem; }
+    .metric .m-value { font-family: var(--font-serif); font-size: 1.6rem; line-height: 1.15; margin-bottom: 0.35rem; }
+    .metric .m-value em { font-style: normal; color: var(--color-accent); }
+    .metric .m-note { font-size: 0.75rem; color: var(--color-soft); line-height: 1.5; }
+    section { margin-bottom: 3.5rem; }
+    .sec-eyebrow { font-family: var(--font-mono); font-size: 0.64rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-soft); margin-bottom: 0.5rem; }
+    section h2 { font-family: var(--font-serif); font-size: clamp(1.35rem, 1.6vw + 0.7rem, 1.75rem); font-weight: 400; letter-spacing: -0.01em; margin-bottom: 0.6rem; }
+    .sec-intro { font-size: 0.875rem; line-height: 1.7; color: var(--color-muted); max-width: 72ch; margin-bottom: 1.5rem; }
+    .sec-intro strong { color: var(--color-ink); font-weight: 600; }
+    svg { display: block; width: 100%; }
+    .diagram-container { overflow-x: auto; }
+    .diagram-container svg { min-width: 900px; }
+    .cards { display: grid; gap: 1rem; margin-top: 1.25rem; }
+    .cards.two { grid-template-columns: 1fr 1.1fr; }
+    .cards.three { grid-template-columns: 1fr 1.05fr 1.12fr; }
+    .cards.four { grid-template-columns: repeat(4, 1fr); }
+    .card { min-width: 0; background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: 6px; padding: 1.1rem 1.2rem 1.15rem; }
+    .card.focal { border-color: rgba(194,65,12,0.55); }
+    .card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
+    .card-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .card-dot.ink { background: var(--color-ink); } .card-dot.muted { background: var(--color-muted); }
+    .card-dot.coral { background: var(--color-accent); } .card-dot.link { background: var(--color-link); }
+    .card-dot.must { background: var(--color-mustard); } .card-dot.sage { background: var(--color-sage); }
+    .card-dot.dusty { background: var(--color-dusty); } .card-dot.rust { background: var(--color-rust); }
+    .card h3 { font-size: 0.9rem; font-weight: 600; letter-spacing: -0.005em; }
+    .card ul { list-style: none; color: var(--color-muted); font-size: 0.8rem; line-height: 1.6; }
+    .card ul li { margin-bottom: 0.35rem; padding-left: 0.9rem; position: relative; }
+    .card ul li::before { content: '—'; position: absolute; left: 0; color: rgba(28,25,23,0.28); font-size: 0.72rem; }
+    .card ul li strong { color: var(--color-ink); font-weight: 600; }
+    table.arg { width: 100%; border-collapse: collapse; background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: 6px; overflow: hidden; margin-top: 1.25rem; }
+    table.arg th, table.arg td { text-align: left; padding: 0.6rem 0.9rem; border-bottom: 1px solid rgba(28,25,23,0.08); vertical-align: top; }
+    table.arg thead th { font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-soft); background: rgba(28,25,23,0.04); border-bottom: 1px solid rgba(28,25,23,0.14); }
+    table.arg td { font-size: 0.79rem; line-height: 1.6; color: var(--color-muted); }
+    table.arg td.el { font-weight: 600; color: var(--color-ink); white-space: nowrap; }
+    table.arg td.num { font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-ink); }
+    table.arg td.num em { font-style: normal; color: var(--color-accent); font-weight: 600; }
+    table.arg tr:last-child td { border-bottom: none; }
+    .verdict { font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-accent); border: 1px solid rgba(194,65,12,0.5); border-radius: 4px; padding: 0.6rem 0.9rem; margin-top: 0.9rem; line-height: 1.6; }
+    .verdict strong { color: var(--color-ink); }
+    .formula-strip { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; }
+    .fchip { font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-muted); border: 1px solid rgba(28,25,23,0.18); border-radius: 4px; padding: 0.5rem 0.85rem; line-height: 1.5; }
+    .fchip strong { color: var(--color-ink); font-weight: 600; }
+    .fchip.acc { color: var(--color-accent); border-color: rgba(194,65,12,0.5); }
+    .callout { border-left: 2px solid var(--color-accent); padding: 0.35rem 0 0.35rem 1rem; margin-top: 1.25rem; font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.6; color: var(--color-muted); max-width: 64ch; }
+    .cred { display: grid; grid-template-columns: 1fr 1.35fr; gap: 1rem; margin-top: 1.25rem; }
+    .footer { margin-top: 2.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(28,25,23,0.10); font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--color-soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+    .motion-ready [data-motion-item] { opacity: .12; transform: translateY(8px); transform-box: fill-box; transform-origin: center; transition: opacity var(--motion-step) var(--motion-ease), transform var(--motion-step) var(--motion-ease); }
+    .motion-ready [data-motion-item].is-visible,
+    .motion-ready[data-frame="end"] [data-motion-item],
+    .motion-ready[data-frame="static"] [data-motion-item] { opacity: 1; transform: none; }
+    .draw-path { fill: none; stroke: var(--color-accent); stroke-width: 3; stroke-dasharray: 1; stroke-dashoffset: 1; pointer-events: none; }
+    .motion-ready .draw-path.is-visible { animation: draw-path var(--motion-step) linear forwards; }
+    @keyframes draw-path { to { stroke-dashoffset: 0; } }
+    [data-motion-controls] { display: none; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-rule); }
+    .motion-ready [data-motion-controls] { display: flex; }
+    [data-motion-controls][hidden] { display: none !important; }
+    [data-motion-controls] button { min-width: 44px; min-height: 44px; padding: 8px 12px; border: 1px solid rgba(28,25,23,0.30); border-radius: 4px; color: var(--color-ink); background: var(--color-paper-2); font: 600 12px/1 var(--font-sans); cursor: pointer; }
+    [data-motion-controls] button:hover { border-color: var(--color-accent); }
+    [data-motion-controls] button:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+    [data-motion-controls] button:disabled { cursor: not-allowed; opacity: .45; }
+    [data-motion-status-visible] { margin-left: auto; color: var(--color-muted); font: 500 12px/1.4 var(--font-mono); }
+    .keyboard-help { color: var(--color-soft); font: 500 11px/1.4 var(--font-mono); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    noscript p { margin: 12px 0 0; color: var(--color-muted); font: 500 12px/1.4 var(--font-mono); }
+    html[data-motion="static"] [data-motion-controls], html[data-motion="static"] [data-motion-decorative] { display: none !important; }
+    html[data-motion="static"] [data-motion-item] { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; }
+    html[data-motion="step"] [data-motion-controls], html[data-motion="step"] [data-motion-decorative] { display: none !important; }
+    html[data-motion="step"] [data-motion-item] { animation: none !important; transition: none !important; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+      [data-motion-item] { opacity: 1 !important; transform: none !important; }
+      [data-motion-decorative] { display: none !important; }
+      [data-motion-controls] { display: none !important; }
+    }
+    @media print {
+      [data-motion-controls], [data-motion-decorative] { display: none !important; }
+      [data-motion-item] { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; }
+    }
+    @media (max-width: 960px) {
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .cards.two, .cards.three { grid-template-columns: 1fr; }
+      .cards.four { grid-template-columns: 1fr 1fr; }
+      .cred { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="header">
+      <p class="header-eyebrow">Test Data Intelligence · Part 00 · From Zero, With Evidence <span class="crumb">/ 全系列 04 篇 · 本篇为 01–03 的论证底座</span></p>
+      <h1>从零到一 · 立项论证</h1>
+      <p class="subtitle">起点是「四个零」：<strong>0 团队、0 平台、0 数据资产、0 流程</strong>。本篇回答四个问题——为什么做（痛点量化）、
+        需要扛多大数据（第一性推导）、第一台机器买什么（Build vs Buy 与选型 ADR）、什么时候回本（ROI 敏感性）。
+        每个结论都给出推导链：引用锚点 × 显式假设 × 计算过程；锚点见页脚 A 区，假设见 B 区。
+        <strong style="color:var(--color-ink);font-weight:500">2026-09-19 核对：公开锚点逐条验证并修正（IRDS 已删除、anysilicon 降级为量级参考、Kafka/GPU 价格标注快照口径）；落地主体锚定为公司（封测/OSAT，名称脱敏不入材料）。</strong></p>
+    </header>
+
+    <div class="metrics">
+      <div class="metric">
+        <p class="m-eyebrow">起点</p>
+        <p class="m-value">四个 <em>零</em></p>
+        <p class="m-note">0 团队 · 0 平台 · 0 数据资产 · 0 流程</p>
+      </div>
+      <div class="metric">
+        <p class="m-eyebrow">首个可用版本</p>
+        <p class="m-value">90 <em>天</em></p>
+        <p class="m-note">1 台虚拟机 + 2 人，接通 1 台 tester 试点线</p>
+      </div>
+      <div class="metric">
+        <p class="m-eyebrow">量级推导结论</p>
+        <p class="m-value">10²–10³ <em>msg/s</em></p>
+        <p class="m-note">比 Kafka 公开基准低 3 个数量级——不过度建设的第一依据</p>
+      </div>
+      <div class="metric">
+        <p class="m-eyebrow">回收期（三档敏感性）</p>
+        <p class="m-value">保守 3 <em>年</em> 内</p>
+        <p class="m-note">基准档约 1.5 年；三档均含成本上浮与收益打折</p>
+      </div>
+    </div>
+
+    <!-- ═══ FIG 01 · 论证链 ═══ -->
+    <section id="fig-chain" data-motion-root data-motion-mode="reveal" data-step-count="6" data-step-current="0" data-frame="static" data-static-frame="complete">
+      <p class="sec-eyebrow">Fig.01 · Argument Chain</p>
+      <h2>论证链总览</h2>
+      <p class="sec-intro">六个环节环环相扣，<strong>前一步的输出是后一步的输入</strong>：痛点量化给出「值多少钱」，量级推导给出「要扛多大数据」，
+        二者共同决定方案与选型，MVP 用最小成本验证假设，ROI 汇总裁决，最后落成决策清单。任何一环被推翻，后续环节跟着修订——这是本篇可被审计的原因。</p>
+
+      <div class="diagram-container">
+        <svg viewBox="0 0 1120 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="chain-title chain-desc">
+          <title id="chain-title">立项论证六环链</title>
+          <desc id="chain-desc">痛点量化、量级推导、方案对比、选型决策、90 天 MVP、ROI 敏感性六个论证环节自左向右串联，每步标注关键数字。</desc>
+          <defs>
+            <marker id="chain-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#57534e"/>
+            </marker>
+            <marker id="chain-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#c2410c"/>
+            </marker>
+          </defs>
+          <rect width="1120" height="420" fill="#ffffff"/>
+
+          <line x1="224" y1="150" x2="264" y2="150" stroke="#57534e" stroke-width="1.2" marker-end="url(#chain-arrow)"/>
+          <line x1="432" y1="150" x2="472" y2="150" stroke="#57534e" stroke-width="1.2" marker-end="url(#chain-arrow)"/>
+          <line x1="640" y1="150" x2="680" y2="150" stroke="#57534e" stroke-width="1.2" marker-end="url(#chain-arrow)"/>
+          <line x1="848" y1="150" x2="888" y2="150" stroke="#57534e" stroke-width="1.2" marker-end="url(#chain-arrow)"/>
+
+          <g data-motion-item data-step="1" aria-label="Step 1: 痛点量化">
+            <rect x="48" y="88" width="176" height="124" rx="6" fill="#ffffff"/>
+            <rect x="48" y="88" width="176" height="124" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <text x="136" y="118" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">痛点量化</text>
+            <text x="136" y="140" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">1-10-100 法则（引用）</text>
+            <text x="136" y="154" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">测试占制造成本 ~2%↑（引用）</text>
+            <text x="136" y="176" fill="#c2410c" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">→ 年可改善空间 ¥ 数千万</text>
+          </g>
+          <g data-motion-item data-step="2" aria-label="Step 2: 数据量级推导">
+            <rect x="264" y="88" width="168" height="124" rx="6" fill="#ffffff"/>
+            <rect x="264" y="88" width="168" height="124" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <text x="348" y="118" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">量级推导</text>
+            <text x="348" y="140" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">64 台 × 日 800 万 die</text>
+            <text x="348" y="154" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">→ 原始 10–20 TB/年</text>
+            <text x="348" y="176" fill="#c2410c" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">→ 消息 10²–10³ msg/s</text>
+          </g>
+          <g data-motion-item data-step="3" aria-label="Step 3: Build vs Buy">
+            <rect x="472" y="88" width="168" height="124" rx="6" fill="#ffffff"/>
+            <rect x="472" y="88" width="168" height="124" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <text x="556" y="118" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">Build vs Buy</text>
+            <text x="556" y="140" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">商业套件 / 纯自研 / 开源混合</text>
+            <text x="556" y="154" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">五维评分 + 总分</text>
+            <text x="556" y="176" fill="#c2410c" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">→ 开源混合（21/25）</text>
+          </g>
+          <g data-motion-item data-step="4" aria-label="Step 4: 选型 ADR">
+            <rect x="680" y="88" width="168" height="124" rx="6" fill="#ffffff"/>
+            <rect x="680" y="88" width="168" height="124" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <text x="764" y="118" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">选型 ADR × 3</text>
+            <text x="764" y="140" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">需求 10³ msg/s ≪ 2×10⁶/s</text>
+            <text x="764" y="154" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">（Kafka 三机公开基准）</text>
+            <text x="764" y="176" fill="#c2410c" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">→ Kafka · Iceberg · 暂不上 K8s</text>
+          </g>
+          <g data-motion-item data-step="5" aria-label="Step 5: 90 天 MVP">
+            <rect x="888" y="88" width="184" height="124" rx="6" fill="#ffffff"/>
+            <rect x="888" y="88" width="184" height="124" rx="6" fill="rgba(194,65,12,0.12)" stroke="#c2410c" stroke-width="1"/>
+            <text x="980" y="118" fill="#1c1917" font-size="12" font-weight="600" font-family="'Geist','PingFang SC',sans-serif" text-anchor="middle">90 天 MVP</text>
+            <text x="980" y="140" fill="#57534e" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">1 台 VM + 2 人</text>
+            <text x="980" y="154" fill="#57534e" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">试点线端到端 + PAT 试点</text>
+            <text x="980" y="176" fill="#c2410c" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" text-anchor="middle">→ 用最小成本验证假设</text>
+          </g>
+
+          <g data-motion-item data-step="6" aria-label="Step 6: ROI 敏感性">
+            <rect x="48" y="264" width="1024" height="96" rx="6" fill="#ffffff"/>
+            <rect x="48" y="264" width="1024" height="96" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+            <text x="72" y="298" fill="#1c1917" font-size="13" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">ROI 敏感性（三档，全部含假设标注）</text>
+            <g font-family="'Geist Mono','PingFang SC',monospace" font-size="9" fill="#57534e">
+              <text x="72" y="330">保守档：年收益 ¥2500 万 · 年成本 ¥2800 万 → <tspan fill="#c2410c">回收期 ~3 年</tspan></text>
+              <text x="472" y="330">基准档：¥5000 万 vs ¥2400 万 → <tspan fill="#c2410c">~1.5 年</tspan></text>
+              <text x="812" y="330">乐观档：¥7500 万 vs ¥2200 万 → <tspan fill="#c2410c">~1 年</tspan></text>
+            </g>
+            <text x="72" y="348" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">推导见 §7 · 单价锚点：单颗终测 $0.40（anysilicon 模型）· 逃逸成本放大 100×（1-10-100）</text>
+          </g>
+          <path d="M 980 212 V 238 Q 980 246 972 246 H 144 Q 136 246 136 254 V 264" fill="none" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#chain-arrow-accent)"/>
+          <path data-motion-item data-step="6" data-motion-decorative aria-hidden="true" focusable="false" pathLength="1" class="draw-path" d="M 980 212 V 238 Q 980 246 972 246 H 144"/>
+
+          <line x1="48" y1="388" x2="1072" y2="388" stroke="rgba(28,25,23,0.12)" stroke-width="0.8"/>
+          <text x="48" y="410" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.1em">链上任一环被推翻则后续环节随之修订 —— 推翻点本身也应被记录（§8 决策清单的回退条件）</text>
+        </svg>
+      </div>
+
+      <div data-motion-controls role="group" aria-label="论证链播放控制">
+        <button type="button" data-motion-action="prev">上一步</button>
+        <button type="button" data-motion-action="play" aria-pressed="false">播放</button>
+        <button type="button" data-motion-action="pause" aria-pressed="true">暂停</button>
+        <button type="button" data-motion-action="next">下一步</button>
+        <button type="button" data-motion-action="replay">重播</button>
+        <span class="keyboard-help">←/→ 逐步 · Space 播放/暂停 · R 重播</span>
+        <span data-motion-status-visible aria-hidden="true">Step <span data-motion-step-label>0</span> of 6</span>
+      </div>
+      <p class="sr-only" data-motion-status role="status" aria-live="polite" aria-atomic="true"></p>
+      <noscript><p>播放控制需要 JavaScript。上方为完整的静态论证链。</p></noscript>
+    </section>
+
+    <!-- ═══ §1 从零的定义 ═══ -->
+    <section id="zero">
+      <p class="sec-eyebrow">§1 · Day-Zero Definition</p>
+      <h2>从零的定义：四个零</h2>
+      <p class="sec-intro">「从零搭建」不是修辞，是边界条件：<strong>立项日不存在任何前置资产</strong>——没有现成管道可复用、没有历史数据可训练、
+        没有 SPC 系统可挂载、甚至没有第一个工程师。这决定了三件事：<strong>第一年只做减法不做全量</strong>、
+        <strong>每个组件都要论证「为什么现在就需要」</strong>、<strong>90 天内必须产出一个能被业务认可的可用物</strong>。</p>
+
+      <div class="cards four">
+        <div class="card">
+          <div class="card-header"><span class="card-dot muted"></span><h3>0 团队</h3></div>
+          <ul><li>无在职数据/算法人员；前 2 人画像见 §6</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot muted"></span><h3>0 平台</h3></div>
+          <ul><li>无消息队列、无湖仓、无算力池；只有 tester 自带机台电脑</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot muted"></span><h3>0 数据资产</h3></div>
+          <ul><li>STDF 落盘在机台本地、按需手工拷贝，无集中存储</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot muted"></span><h3>0 流程</h3></div>
+          <ul><li>无口径定义、无筛查规则、无评审机制</li></ul>
+        </div>
+      </div>
+      <div class="verdict">Day-0 原则：<strong>先在一条试点线上证明价值（§6 的 90 天 MVP），再谈全厂推广（PART 03 的 P2 起步）。</strong>反对在 Day-0 购买任何为「全量规模」准备的组件。</div>
+    </section>
+
+    <!-- ═══ §2 痛点量化 ═══ -->
+    <section id="pain">
+      <p class="sec-eyebrow">§2 · Why: Quantified Pain</p>
+      <h2>为什么做：三条痛点量化</h2>
+      <p class="sec-intro">立项报告最忌「行业趋势」式开头。下面三条论证全部落到数字：两条有公开锚点，一条显式标注假设。</p>
+
+      <table class="arg">
+        <thead><tr><th style="width:11em">论证</th><th style="width:20em">锚点 / 假设</th><th>推导</th><th style="width:13em">结论</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="el">A · 逃逸成本被系统性放大</td>
+            <td>1-10-100 质量成本法则（Labovitz &amp; Chang 1992 等多来源）：缺陷在源头 / 内部 / 现场修复的成本比 ≈ 1 : 10 : 100</td>
+            <td class="num">设内部拦截成本 ¥20/颗（假设），则现场处置 ≈ <em>¥2000/颗</em>。测试数据分析的每一分投入都在把「现场修复」前移为「源头拦截」</td>
+            <td class="num">逃逸每降 150 DPPM × 年 5000 万颗 → 年省 <em>¥1500 万</em></td>
+          </tr>
+          <tr>
+            <td class="el">B · 测试时长是真实成本</td>
+            <td>测试成本数十年来约占制造成本 ~2%，复杂器件可上升一个数量级（SemiEngineering 2020-03-10 原文口径；原"5–15%"非原文已改）；单颗终测 $0.40（anysilicon 口径，原文未能定位，作量级参考）</td>
+            <td class="num">年 5000 万颗 × ¥3.5/颗（$0.40 锚点 + 封测溢价，假设）= 年测试支出 <em>¥1.75 亿</em>。时长每降 10% ≈ ¥1750 万/年</td>
+            <td class="num">时长 −20% → 年省 <em>¥3500 万</em></td>
+          </tr>
+          <tr>
+            <td class="el">C · 无平台 = 人肉取数（假设）</td>
+            <td>设计假设：STDF 散落机台本地，分析师 60% 时间用于取数与对数</td>
+            <td class="num">P1 期 6 名分析岗 × 60% × 人年 ¥70 万 = <em>¥252 万/年</em> 的可回收工时（试点线验证后重估）</td>
+            <td class="num">工时回收 ≥ <em>¥250 万/年</em></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="verdict">三条合计基准年收益 <strong>≈ ¥5000 万</strong>（A 1500 + B 3500，C 计入工时口径不重复计入现金），为 §7 ROI 提供分子。注意：A/B 的产能与单价假设在 §7 做三档敏感性，单点数字不作为承诺。</div>
+    </section>
+
+    <!-- ═══ §3 量级推导 ═══ -->
+    <section id="scale">
+      <p class="sec-eyebrow">§3 · First-Principles Sizing</p>
+      <h2>数据量级推导（第一性原理）</h2>
+      <p class="sec-intro">平台要扛多大数据不由架构偏好决定，由产线算术决定。推导的每一步假设都可被替换——替换后重算，结论若变，架构跟着变。</p>
+
+      <table class="arg">
+        <thead><tr><th style="width:6em">步骤</th><th>推导</th><th style="width:16em">假设值（可替换）</th><th style="width:13em">结果</th></tr></thead>
+        <tbody>
+          <tr><td class="el">① die 产出</td><td>tester 台数 × 单台日测 = 64 × 12.5 万</td><td class="num">64 台（两班制）</td><td class="num">800 万 die/日</td></tr>
+          <tr><td class="el">② 参数量</td><td>每 die 测试项 × 平均字节 = 512 × 12 B</td><td class="num">512 项（混合 WT/FT）</td><td class="num">~6 KB/die</td></tr>
+          <tr><td class="el">③ 日增量</td><td>800 万 × 6 KB</td><td class="num">单班减半另算</td><td class="num">~48 GB/日</td></tr>
+          <tr><td class="el">④ 年增量（原始）</td><td>× 350 生产日</td><td class="num">保守 8.5 TB / 基准 17 TB</td><td class="num">原始 10–20 TB/年</td></tr>
+          <tr><td class="el">⑤ 湖仓存量</td><td>列存压缩 ~25% + 5 年冷存</td><td class="num">gold/silver 更小一个量级</td><td class="num">冷区 5 年 ≤ 25 TB</td></tr>
+          <tr><td class="el">⑥ 消息速率</td><td>800 万/日 ÷ 86400 s ≈ 93 die/s；峰值 ×10</td><td class="num">每 die 1 条完成消息</td><td class="num">10²–10³ msg/s</td></tr>
+        </tbody>
+      </table>
+
+      <div class="diagram-container">
+        <svg viewBox="0 0 1120 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="cap-title cap-desc">
+          <title id="cap-title">年数据增量与三种承载方案容量对比</title>
+          <desc id="cap-desc">推导出的年增量 17TB 与单机 8TB、三节点湖仓 48TB 的容量条对比，单机不足、湖仓合适，并给出两条推论。</desc>
+          <rect width="1120" height="380" fill="#ffffff"/>
+          <text x="24" y="52" fill="#6f665f" font-size="8" font-weight="500" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">容量论证 · 线性比例（1 PX = 1 TB）</text>
+
+          <text x="24" y="94" fill="#c2410c" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">推导需求 · 17 TB/年（基准档）</text>
+          <rect x="24" y="102" width="17" height="36" fill="rgba(194,65,12,0.35)" stroke="#c2410c" stroke-width="1"/>
+
+          <text x="24" y="178" fill="#57534e" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">Day-0 单机（1×NVMe 8TB 可用）</text>
+          <rect x="24" y="186" width="8" height="36" fill="rgba(87,83,78,0.20)" stroke="#57534e" stroke-width="1"/>
+          <text x="44" y="210" fill="#a16207" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">仅够试点线（÷32 后 0.5 TB/半年）—— 全厂一年即溢出</text>
+
+          <text x="24" y="262" fill="#57534e" font-size="9" font-family="'Geist Mono','PingFang SC',monospace">P2 三节点湖仓（48 TB 可用）</text>
+          <rect x="24" y="270" width="48" height="36" fill="#4e6e81" fill-opacity="0.55" stroke="#4e6e81" stroke-width="1"/>
+          <text x="84" y="294" fill="#4e6e81" font-size="8" font-family="'Geist Mono','PingFang SC',monospace">够 2.8 年全量 → 按 5 年冷存规划滚动扩容</text>
+
+          <g font-family="'Geist Mono','PingFang SC',monospace" font-size="9">
+            <rect x="700" y="88" width="396" height="150" rx="6" fill="rgba(28,25,23,0.04)" stroke="rgba(28,25,23,0.18)" stroke-width="0.8"/>
+            <text x="716" y="116" fill="#1c1917" font-weight="600">推论 1</text>
+            <text x="716" y="136" fill="#57534e">Day-0 用单机 + 试点线（数据 ÷32）完全够用，</text>
+            <text x="716" y="152" fill="#57534e">90 天 MVP 不需要任何分布式组件。</text>
+            <text x="716" y="188" fill="#1c1917" font-weight="600">推论 2</text>
+            <text x="716" y="208" fill="#57534e">全厂量级一年溢出单机 → 湖仓在 M5–M9（P2）引入，</text>
+            <text x="716" y="224" fill="#57534e">引入的触发器是数据量，不是日历（见 D-07 回退条件）。</text>
+          </g>
+        </svg>
+      </div>
+      <div class="verdict">推导结论：<strong>消息速率 10²–10³ msg/s，比 Kafka 三机公开基准（2×10⁶ msg/s，LinkedIn 2014，异步 3 副本口径）低 3 个数量级</strong>；年原始增量 10–20 TB，单机一年溢出、湖仓五年无忧。这两条数字是 §5 两条 ADR 的全部依据。</div>
+    </section>
+
+    <!-- ═══ §4 Build vs Buy ═══ -->
+    <section id="buildbuy">
+      <p class="sec-eyebrow">§4 · Build vs Buy</p>
+      <h2>方案论证：商业套件 / 纯自研 / 开源混合</h2>
+      <p class="sec-intro">五维评分（1–5 分，总分 25），评分依据随表给出，商业套件价格量级标注为设计假设（不同厂商报价差异大，以询价为准）。</p>
+
+      <table class="arg">
+        <thead><tr><th style="width:9em">维度</th><th>商业 ATE 数据套件</th><th>纯自研（闭源栈）</th><th>开源混合（Kafka+Iceberg+Spark）</th></tr></thead>
+        <tbody>
+          <tr><td class="el">取得成本</td><td class="num">Licence 量级大（按机台/年计费，设计假设 $10⁵–10⁶/年）</td><td class="num">Licence 0，人力成本最高（重复造轮子）</td><td class="num">Licence 0 · 人力中等（用成熟轮子）</td></tr>
+          <tr><td class="el">到达可用</td><td class="num">快（4–8 周实施）</td><td class="num">最慢（9–12 月）</td><td class="num">快（90 天 MVP 路径，§6）</td></tr>
+          <tr><td class="el">可控 / 可定制</td><td class="num">弱——自适应回写、定制特征受供应商路线图约束</td><td class="num">最强</td><td class="num">强（源码在手，开放表格式无锁定）</td></tr>
+          <tr><td class="el">生态 / 人才</td><td class="num">封闭格式，人才池小</td><td class="num">依赖个别核心成员</td><td class="num">Kafka/Spark/Iceberg 人才池最大（PART 02 选型表）</td></tr>
+          <tr><td class="el">风险</td><td class="num">供应商锁定 · 版本绑定 · 出厂 IP 数据经第三方</td><td class="num">关键人风险 · 质量无外部验证</td><td class="num">集成责任在自己（有社区兜底）</td></tr>
+          <tr><td class="el">总分（/25）</td><td class="num">14</td><td class="num">15</td><td class="num"><em>21</em></td></tr>
+        </tbody>
+      </table>
+      <div class="verdict">结论：<strong>开源混合路线</strong>。决定性理由不是 licence 省钱，而是（1）本方案的核心差异化能力——<strong>自适应参数回写闭环</strong>——商业套件不开放；（2）开放表格式避免数据资产被格式锁定，这对「0 数据资产起步」的团队是唯一的不可逆决策点。</div>
+    </section>
+
+    <!-- ═══ §5 选型 ADR ═══ -->
+    <section id="adr">
+      <p class="sec-eyebrow">§5 · Architecture Decision Records</p>
+      <h2>选型 ADR 三则</h2>
+      <p class="sec-intro">每则 ADR 按同一格式：<strong>需求推导 → 候选对比 → 事实/基准 → 决策</strong>。基准数字全部来自公开来源（页脚 A 区）。</p>
+
+      <div class="cards three">
+        <div class="card">
+          <div class="card-header"><span class="card-dot link"></span><h3>ADR-1 · 消息中间件</h3></div>
+          <ul>
+            <li><strong>需求推导</strong>：10²–10³ msg/s（§3 ⑥），峰值余量按 ×10 计</li>
+            <li><strong>候选</strong>：Kafka / Pulsar / RabbitMQ</li>
+            <li><strong>事实</strong>：Kafka 三台廉价机基准 2×10⁶ 写入/s（LinkedIn 2014，异步 3 副本口径）；生产峰值 4.5×10⁶ msg/s（LinkedIn Engineering 2015-09）；云 VM 上亦有 2–3.2×10⁵/s 实测（Aiven 2017，Kafka 0.10/512B 消息口径，2022 年有更新版基准）</li>
+            <li><strong>决策</strong>：Kafka。余量 ≥3 个数量级，多厂区复用无需换型；Pulsar 多层架构运维更重，本场景用不到其多租户优势</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot must"></span><h3>ADR-2 · 开放表格式</h3></div>
+          <ul>
+            <li><strong>需求推导</strong>：数据资产 5 年+ 生命周期；引擎覆盖批 SQL（Spark/Trino）与流（Flink）</li>
+            <li><strong>候选</strong>：Iceberg / Delta Lake / Hudi</li>
+            <li><strong>事实</strong>：三者能力趋同；差异在引擎中立性与多引擎写入成熟度——Iceberg 为厂商中立开放标准、Spark/Flink/Trino 均一等支持</li>
+            <li><strong>决策</strong>：Iceberg。防锁定的权重高于单点特性；schema evolution / hidden partitioning 升级路径清晰</li>
+          </ul>
+        </div>
+        <div class="card focal">
+          <div class="card-header"><span class="card-dot coral"></span><h3>ADR-3 · Day-0 不建什么</h3></div>
+          <ul>
+            <li><strong>不上 Kubernetes</strong>：单机 MVP 无编排需求；容器化收益在服务数 &gt;10 之后。升级阈值（量化）：常驻服务 &gt;10 个、持续吞吐 &gt;5×10⁴ msg/s、或需要端到端 exactly-once 管线时逐项重评（复核周期：每阶段末 go/no-go）</li>
+            <li><strong>不上流计算集群</strong>：T+0 需求真实但量级 10² msg/s，Python 消费者即可；Flink 推迟到 P3（在线特征）</li>
+            <li><strong>不建实时数仓</strong>：批表 T+1 满足基线分析；评分 API 在 P4 之前不存在</li>
+            <li><strong>判据</strong>：§3 推导量级未触发的组件一律不建（YAGNI）</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ §6 90 天 MVP ═══ -->
+    <section id="mvp">
+      <p class="sec-eyebrow">§6 · 90-Day MVP</p>
+      <h2>90 天 MVP：从零的第一台机器</h2>
+      <p class="sec-intro">MVP 的目的不是「上线系统」，是<strong>用最小成本验证 §2 的痛点假设与 §3 的量级假设</strong>。
+        配置：1 台虚拟机（32C / 128G / 2TB NVMe，§3 推论 1 支撑）+ 2 个人。</p>
+
+      <div class="cards three">
+        <div class="card">
+          <div class="card-header"><span class="card-dot link"></span><h3>Day 0–30 · 接通</h3></div>
+          <ul>
+            <li>招到前 2 人：1 名<strong>懂测试数据的数据工程师</strong> + 1 名<strong>会 Python 的测试工程师</strong>（测试知识 &gt; 编码技巧）</li>
+            <li>1 台 tester 试点线：STDF → Python 解析器 → Postgres</li>
+            <li>产出：逐 die 参数表，按批次可查询</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot dusty"></span><h3>Day 30–60 · 有用</h3></div>
+          <ul>
+            <li>CPK / 良率 / 直通率日报自动化（Grafana 或静态 HTML 报）</li>
+            <li>第一次替代人工周报——业务方开始每天看</li>
+            <li>记录取数工时对比（验证 §2 论证 C 的 60% 假设）</li>
+          </ul>
+        </div>
+        <div class="card focal">
+          <div class="card-header"><span class="card-dot coral"></span><h3>Day 60–90 · 值钱</h3></div>
+          <ul>
+            <li>PAT（AEC-Q001 口径）在试点线上离线试跑：对历史批次回测</li>
+            <li>产出一份<strong>价值备忘录</strong>：拦截了多少此前漏掉的离群 die（个位数案例即可）</li>
+            <li>Go/No-Go：业务方书面确认痛点真实 → 进入 PART 03 的 P1 收尾</li>
+          </ul>
+        </div>
+      </div>
+      <div class="verdict">MVP 退出标准（写进立项书）：<strong>试点线取数工时下降 ≥50%，且 PAT 回测至少发现 1 个此前未拦截的真实离群案例</strong>。两条任一不满足 → 停止扩张，回到假设重检（§8 回退条件 D-10）。</div>
+    </section>
+
+    <!-- ═══ §7 ROI ═══ -->
+    <section id="roi">
+      <p class="sec-eyebrow">§7 · ROI Sensitivity</p>
+      <h2>ROI 与回收期：三档敏感性</h2>
+      <p class="sec-intro">分子（收益）来自 §2 三条论证；分母（成本）来自 PART 01 编制 × 人年成本假设 + PART 02 算力价格锚点。
+        <strong>三档全部保留</strong>——立项不依赖乐观档成立。</p>
+
+      <table class="arg">
+        <thead><tr><th style="width:9em">档位</th><th>年化收益构成</th><th>年化成本构成</th><th style="width:11em">回收期</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="el">保守（各分项折半）</td>
+            <td class="num">逃逸收益 ¥750 万（DPPM −15%）+ 时长 ¥1750 万（−10%）—— 工时收益不计入现金口径（§2 C）</td>
+            <td class="num">人力 ¥2250 万（+15% 招聘与进度溢价）+ 运维/GPU ¥210 万 + capex 摊销 ¥340 万</td>
+            <td class="num"><em>~3 年</em>（含 12 个月爬坡）</td>
+          </tr>
+          <tr>
+            <td class="el">基准</td>
+            <td class="num">逃逸 ¥1500 万（−150 DPPM）+ 时长 ¥3500 万（−20%）—— 合计 ¥5000 万</td>
+            <td class="num">人力 ¥1960 万 + 运维/GPU ¥140 万 + capex 摊销 ¥300 万 —— 合计 ¥2400 万</td>
+            <td class="num"><em>~1.5 年</em></td>
+          </tr>
+          <tr>
+            <td class="el">乐观</td>
+            <td class="num">逃逸 ¥2250 万（−225 DPPM）+ 时长 ¥5250 万（−30%）—— 合计 ¥7500 万</td>
+            <td class="num">同基准 ¥2200 万（capex 摊销降至 ¥100 万：GPU 转云竞价，D-08 回退触发）</td>
+            <td class="num"><em>~1 年</em></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="diagram-container">
+        <svg viewBox="0 0 1120 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="roi-title roi-desc">
+          <title id="roi-title">三档 ROI 敏感性：年收益与年成本对比</title>
+          <desc id="roi-desc">保守、基准、乐观三档的年化收益与年化成本成对柱状对比，基准与乐观档收益显著高于成本，保守档接近持平。</desc>
+          <rect width="1120" height="400" fill="#ffffff"/>
+          <text x="24" y="48" fill="#6f665f" font-size="8" font-weight="500" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.14em">三档敏感性 · 万元/年 · 线性比例 1 PX ≈ 7.3 万</text>
+
+          <line x1="140" y1="64" x2="140" y2="330" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+          <line x1="140" y1="330" x2="1096" y2="330" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+
+          <!-- 保守 -->
+          <text x="24" y="106" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">保守档</text>
+          <rect x="140" y="88" width="289" height="24" fill="#a16207" fill-opacity="0.85"/>
+          <text x="437" y="105" fill="#a16207" font-size="9" font-family="'Geist Mono',monospace">收益 2500</text>
+          <rect x="140" y="120" width="323" height="24" fill="rgba(87,83,78,0.25)" stroke="#57534e" stroke-width="1"/>
+          <text x="471" y="137" fill="#57534e" font-size="9" font-family="'Geist Mono',monospace">成本 2800</text>
+
+          <!-- 基准 -->
+          <text x="24" y="186" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">基准档</text>
+          <rect x="140" y="168" width="577" height="24" fill="#a16207" fill-opacity="0.85"/>
+          <text x="725" y="185" fill="#a16207" font-size="9" font-family="'Geist Mono',monospace">收益 5000</text>
+          <rect x="140" y="200" width="277" height="24" fill="rgba(87,83,78,0.25)" stroke="#57534e" stroke-width="1"/>
+          <text x="425" y="217" fill="#57534e" font-size="9" font-family="'Geist Mono',monospace">成本 2400</text>
+
+          <!-- 乐观 -->
+          <text x="24" y="266" fill="#1c1917" font-size="11" font-weight="600" font-family="'Geist','PingFang SC',sans-serif">乐观档</text>
+          <rect x="140" y="248" width="866" height="24" fill="#a16207" fill-opacity="0.85"/>
+          <text x="1014" y="265" fill="#a16207" font-size="9" font-family="'Geist Mono',monospace">收益 7500</text>
+          <rect x="140" y="280" width="254" height="24" fill="rgba(87,83,78,0.25)" stroke="#57534e" stroke-width="1"/>
+          <text x="402" y="297" fill="#57534e" font-size="9" font-family="'Geist Mono',monospace">成本 2200</text>
+
+          <line x1="140" y1="352" x2="1096" y2="352" stroke="rgba(28,25,23,0.12)" stroke-width="0.8"/>
+          <text x="140" y="380" fill="#6f665f" font-size="8" font-family="'Geist Mono','PingFang SC',monospace" letter-spacing="0.1em">mustard 黄 = 年化收益 · 灰 = 年化成本 · 单位万元 · 线性等比（1 PX ≈ 8.7 万）· 三档构成见上表</text>
+        </svg>
+      </div>
+      <div class="verdict">读法：<strong>回收期由「收益爬坡斜率 vs 成本曲线」决定</strong>。保守档收益≈成本，靠工时回收与质量避免损失兜底（3 年内回正）；
+        基准与乐观档首年即净正。三档共用同一套假设区（页脚 B），任何单价替换后整表可重算。
+        <strong style="color:var(--color-ink)">口径注记（2026-09-19 补）：表中人力成本按 28 人（P2 编制）年化；P3 满编 42 人后人力年成本约 ¥2940 万、总成本约 ¥3380 万，基准档收益 ¥5000 万下回收期相应拉长（约 2 年内），不改变结论方向。</strong></div>
+    </section>
+
+    <!-- ═══ §8 决策清单 ═══ -->
+    <section id="decisions">
+      <p class="sec-eyebrow">§8 · Decision Ledger</p>
+      <h2>决策清单（一页纸）</h2>
+      <table class="arg">
+        <thead><tr><th style="width:4.5em">编号</th><th>决策</th><th style="width:21em">依据</th><th style="width:21em">回退条件</th></tr></thead>
+        <tbody>
+          <tr><td class="el">D-01</td><td class="el">立项：开源混合路线</td><td>§4 评分 21/25 · 回写闭环不可外购</td><td>商业套件承诺开放 API 且价格 &lt; 自建人力成本</td></tr>
+          <tr><td class="el">D-02</td><td class="el">90 天 MVP（1 VM + 2 人）</td><td>§3 推论 1 · §6 退出标准</td><td>MVP 双退出标准任一未达（§6）</td></tr>
+          <tr><td class="el">D-03</td><td class="el">消息中间件 = Kafka</td><td>ADR-1 · 量级余量 3 个数量级</td><td>接入源 &gt;200 台或引入晶圆图片流再重评</td></tr>
+          <tr><td class="el">D-04</td><td class="el">表格式 = Iceberg</td><td>ADR-2 · 引擎中立防锁定</td><td>仅当组织全量绑定单一云厂商栈</td></tr>
+          <tr><td class="el">D-05</td><td class="el">Day-0 不上 K8s / Flink / 实时数仓</td><td>ADR-3 · YAGNI（§3 量级未触发）</td><td>在线特征需求正式立项（P3）时逐项重评</td></tr>
+          <tr><td class="el">D-06</td><td class="el">编制 16→28→42（三期）</td><td>PART 01 编制论证 · 跟随能力阶段</td><td>MVP 工时回收 &lt;30% → 冻结扩编</td></tr>
+          <tr><td class="el">D-07</td><td class="el">湖仓引入时点 = P2（M5–M9）</td><td>§3 推论 2 · 全厂量年溢出单机</td><td>试点线扩到 8 条以上时提前触发</td></tr>
+          <tr><td class="el">D-08</td><td class="el">GPU x4 自建（P3 前到位）</td><td>WM 级图像模型训练 + 云价/自建平衡（页脚 A）</td><td>训练任务月均 &lt;80 GPU 时 → 转用云竞价实例</td></tr>
+          <tr><td class="el">D-09</td><td class="el">灰度放行 A = 品质（MRB）</td><td>PART 01 RACI · 模型不自批</td><td>无（不可让渡）</td></tr>
+          <tr><td class="el">D-10</td><td class="el">整体回退线</td><td>§6 MVP 退出标准</td><td>触发即停止扩张、保留试点线资产、复盘假设</td></tr>
+        </tbody>
+      </table>
+      <p class="callout">本篇的全部数字都可以被挑战——被挑战的正确姿势是替换页脚 B 区的假设值后重算，而不是换一个形容词。</p>
+    </section>
+
+    <!-- ═══ 页脚 ═══ -->
+    <section id="sources">
+      <p class="sec-eyebrow">Anchors &amp; Assumptions</p>
+      <h2>引用锚点与设计假设</h2>
+      <div class="cred">
+        <div class="card">
+          <div class="card-header"><span class="card-dot link"></span><h3>A · 引用锚点（公开来源）</h3></div>
+          <ul>
+            <li>测试成本占制造成本：历史 ~2%，复杂器件可上升一个数量级（SemiEngineering《Test Costs Spiking》2020-03-10 原文口径）；单颗终测 <strong>$0.40</strong> / 整机 $5.72（anysilicon 成本模型口径，原文未能定位，仅作量级参考）；原引 IRDS"测试成本控制在 IC 营收 2–3%"未能溯源，已删除</li>
+            <li>1-10-100 质量成本法则：缺陷在源头 / 内部 / 现场修复成本比 ≈ 1 : 10 : 100（Labovitz &amp; Chang 1992 等，COPQ 框架）</li>
+            <li>Kafka 基准：<strong>三台廉价机 2×10⁶ 写入/s</strong>（LinkedIn《Benchmarking Apache Kafka》2014-04，异步 3 副本）；生产峰值 4.5×10⁶ msg/s（LinkedIn Engineering 2015-09）；云 VM 实测 2–3.2×10⁵ msg/s（Aiven 2017，Kafka 0.10.1 / 512B / RF=1 口径）</li>
+            <li>GPU 价格锚点（2026-09 快照，区域敏感，引用须标日期）：AWS p4d.24xlarge（8×A100）on-demand us-east-1 ≈ $21.96/instance-hr（≈$2.74/GPU-hr），eu-west-1 ≈ $23.72；历史长期价 $32.77/hr，波动大；专业云 A100（Lambda，2026-09）$1.39–2.79/GPU-hr（原"~$1/GPU-hr"已不成立）；DGX Station A100 整机 ~$6–20 万（Vantage 等比价站口径）</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-dot muted"></span><h3>B · 设计假设（立项时以实测重校）</h3></div>
+          <ul>
+            <li>落地主体：公司（封测/OSAT 定位；名称、地址与供应链关联属敏感信息，不入材料，仅在沟通中口头对齐）。本篇产能与成本均为量级假设，立项时以公司实测重校</li>
+            <li>产能：64 台 tester · 日 800 万 die · 年 350 生产日 · 年出货 5000 万颗（满产量级假设，以实测机台数与稼动率重校）</li>
+            <li>单价：单颗综合测试 ¥3.5（$0.40 锚点 + 溢价）；人年综合成本 ¥70 万</li>
+            <li>质量：基线逃逸 500 DPPM；现场处置成本差 ¥2000/颗（1-10-100 的 100× 端）</li>
+            <li>算力：GPU x4 自建 vs 云竞价平衡点见 D-08；服务器 capex ¥300 万量级摊销</li>
+            <li>工时：无平台时分析岗 60% 时间用于取数对数（公开调研口径为数据准备占 45–60%，Anaconda 2020 等；本篇取 60% 为保守端，试点期实测替换）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer">
+        <span>测试数据智能 · PART 00/03 立项论证 · 论证底座：01 组织 / 02 架构 / 03 蓝图 · 前作《测试数据分析》《工艺图解》</span>
+        <span>diagram-design 暖纸皮肤 · 2026-09-19</span>
+      </div>
+    </section>
+
+  </div>
+
+  <script data-diagram-controls>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      const staticOverride = params.get('motion') === 'static' || document.documentElement.dataset.motion === 'static';
+      const requestedStep = params.get('step');
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      document.fonts.ready.then(() => { document.documentElement.dataset.fontsReady = 'true'; });
+
+      document.querySelectorAll('[data-motion-root]').forEach((root) => {
+        const count = Number(root.dataset.stepCount);
+        const hold = parseFloat(getComputedStyle(root).getPropertyValue('--motion-hold')) || 720;
+        const parsedStep = requestedStep !== null && /^\d+$/.test(requestedStep) ? Number(requestedStep) : null;
+        const exactStep = params.get('motion') === 'step' && Number.isSafeInteger(parsedStep) && parsedStep >= 0 && parsedStep <= count ? parsedStep : null;
+        const items = [...root.querySelectorAll('[data-motion-item]')];
+        const labels = Array.from({ length: count + 1 }, (_, index) => index === 0
+          ? 'Ready'
+          : items.filter((item) => !item.hasAttribute('data-motion-decorative') && Number(item.dataset.step) === index)
+              .map((item) => item.getAttribute('aria-label')).join('; '));
+        const controls = root.querySelector('[data-motion-controls]');
+        const status = root.querySelector('[data-motion-status]');
+        const visibleStep = root.querySelector('[data-motion-step-label]');
+        let step = count;
+        let timer = 0;
+        let playing = false;
+        let stepBeforeReduce = 0;
+        let resumeAfterReduce = root.dataset.motionMode === 'reveal';
+
+        const buttons = (action) => controls.querySelector(`[data-motion-action="${action}"]`);
+        const clearClock = () => { window.clearTimeout(timer); timer = 0; };
+        const announce = () => { status.textContent = `Step ${step} of ${count}: ${labels[step] || 'Complete'}`; };
+        const setControlsAvailable = (available) => {
+          controls.hidden = !available;
+          controls.setAttribute('aria-hidden', String(!available));
+          controls.dataset.playbackDisabled = String(!available);
+          controls.querySelectorAll('button').forEach((control) => { control.disabled = !available; });
+        };
+
+        function render(next, userInitiated = false) {
+          step = Math.max(0, Math.min(count, next));
+          root.dataset.stepCurrent = String(step);
+          root.dataset.frame = step === count ? 'end' : step === 0 ? 'start' : 'step';
+          items.forEach((item) => {
+            const itemStep = Number(item.dataset.step);
+            item.classList.toggle('is-visible', itemStep <= step);
+            item.classList.toggle('is-current', itemStep === step);
+          });
+          if (visibleStep) visibleStep.textContent = String(step);
+          const unavailable = controls.dataset.playbackDisabled === 'true';
+          buttons('prev').disabled = unavailable || step === 0;
+          buttons('next').disabled = unavailable || step === count;
+          if (userInitiated) announce();
+        }
+
+        function pause(userInitiated = false) {
+          clearClock();
+          playing = false;
+          root.classList.remove('is-playing');
+          buttons('play').setAttribute('aria-pressed', 'false');
+          buttons('pause').setAttribute('aria-pressed', 'true');
+          if (userInitiated) status.textContent = `Paused at step ${step} of ${count}`;
+        }
+
+        function finish() {
+          pause(false);
+          root.dataset.frame = 'end';
+          status.textContent = `Complete · step ${count} of ${count}`;
+        }
+
+        function tick() {
+          if (!playing) return;
+          if (step >= count) { finish(); return; }
+          render(step + 1, false);
+          if (step >= count) { finish(); return; }
+          timer = window.setTimeout(tick, hold);
+        }
+
+        function play(fromStart = false, userInitiated = false) {
+          clearClock();
+          if (fromStart || step >= count) render(0, userInitiated);
+          playing = true;
+          root.classList.add('is-playing');
+          buttons('play').setAttribute('aria-pressed', 'true');
+          buttons('pause').setAttribute('aria-pressed', 'false');
+          timer = window.setTimeout(tick, hold);
+        }
+
+        controls.addEventListener('click', (event) => {
+          const button = event.target.closest('[data-motion-action]');
+          if (!button) return;
+          const action = button.dataset.motionAction;
+          if (action === 'play') play(false, true);
+          if (action === 'pause') pause(true);
+          if (action === 'replay') play(true, true);
+          if (action === 'prev') { pause(false); render(step - 1, true); }
+          if (action === 'next') { pause(false); render(step + 1, true); }
+        });
+
+        root.addEventListener('keydown', (event) => {
+          if (event.target.matches('input, textarea, select, a[href]')) return;
+          const keys = { ArrowLeft: step - 1, ArrowRight: step + 1, Home: 0, End: count };
+          if (event.code === 'Space' && !event.target.closest('button')) {
+            event.preventDefault();
+            playing ? pause(true) : play(false, true);
+            return;
+          }
+          if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase() === 'r') {
+            event.preventDefault();
+            play(true, true);
+            return;
+          }
+          if (!(event.key in keys)) return;
+          event.preventDefault();
+          pause(false);
+          render(keys[event.key], true);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden' && playing) pause(false);
+        });
+        reduce.addEventListener('change', (event) => {
+          if (event.matches && root.dataset.motionState !== 'reduced') {
+            stepBeforeReduce = step;
+            resumeAfterReduce = playing;
+          }
+          pause(false);
+          if (event.matches) {
+            setControlsAvailable(false);
+            render(count, false);
+            root.dataset.frame = 'static';
+            root.dataset.motionState = 'reduced';
+            status.textContent = 'Reduced motion · complete static frame · playback controls unavailable';
+          } else if (staticOverride || root.dataset.motionMode === 'none') {
+            setControlsAvailable(false);
+            render(count, false);
+            root.dataset.frame = 'static';
+            root.dataset.motionState = 'static';
+            status.textContent = 'Static frame · complete diagram · playback controls unavailable';
+          } else {
+            delete root.dataset.motionState;
+            if (exactStep !== null) {
+              setControlsAvailable(false);
+              render(exactStep, false);
+              root.dataset.frame = 'step';
+              root.dataset.motionState = 'test';
+              status.textContent = `Test frame · step ${step} of ${count} · playback controls unavailable`;
+            } else {
+              setControlsAvailable(true);
+              render(stepBeforeReduce, false);
+              status.textContent = `Ready · step ${step} of ${count}`;
+              if (resumeAfterReduce && root.dataset.motionMode === 'reveal') {
+                play(false, false);
+              }
+            }
+            resumeAfterReduce = false;
+          }
+        });
+
+        if (staticOverride) {
+          document.documentElement.dataset.motion = 'static';
+          pause(false);
+          setControlsAvailable(false);
+          render(count, false);
+          root.dataset.frame = 'static';
+          root.dataset.motionState = 'static';
+          status.textContent = 'Static frame · complete diagram · playback controls unavailable';
+        } else if (reduce.matches || root.dataset.motionMode === 'none') {
+          pause(false);
+          setControlsAvailable(false);
+          render(count, false);
+          root.dataset.frame = 'static';
+          root.dataset.motionState = reduce.matches ? 'reduced' : 'static';
+          status.textContent = reduce.matches
+            ? 'Reduced motion · complete static frame · playback controls unavailable'
+            : 'Static frame · complete diagram · playback controls unavailable';
+        } else if (exactStep !== null) {
+          document.documentElement.dataset.motion = 'step';
+          pause(false);
+          setControlsAvailable(false);
+          render(exactStep, false);
+          root.dataset.frame = 'step';
+          root.dataset.motionState = 'test';
+          status.textContent = `Test frame · step ${step} of ${count} · playback controls unavailable`;
+        } else if (root.dataset.motionMode === 'reveal') {
+          setControlsAvailable(true);
+          render(0, false);
+          play(false, false);
+        } else {
+          pause(false);
+          setControlsAvailable(true);
+          render(0, false);
+          status.textContent = `Ready · step 0 of ${count}`;
+        }
+        root.classList.add('motion-ready');
+      });
+    })();
+  </script>
+<a href="/" style="position:fixed;top:14px;right:14px;z-index:99;font:500 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#57534e;text-decoration:none;border:1px solid rgba(28,25,23,.18);background:rgba(255,255,255,.92);border-radius:999px;padding:8px 14px;backdrop-filter:blur(4px)">&#8592; more-than-moore</a>
+</body>
+</html>

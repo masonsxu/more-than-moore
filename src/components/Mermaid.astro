@@ -1,0 +1,22 @@
+---
+// 客户端渲染 Mermaid 图。code 传入 Mermaid 语法原文。
+import mermaid from 'mermaid';
+
+interface Props {
+  code: string;
+}
+
+const { code } = Astro.props;
+---
+
+<pre class="mermaid not-prose my-6 overflow-x-auto rounded-xl border border-slate-200 bg-slate-50 p-5 text-[13px] leading-relaxed">{code}</pre>
+
+<script>
+  import mermaid from 'mermaid';
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'neutral',
+    flowchart: { curve: 'basis' },
+  });
+</script>
