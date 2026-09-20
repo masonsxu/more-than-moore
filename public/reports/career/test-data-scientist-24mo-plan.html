@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试数据科学工程师 · 从零开始 24 个月发展计划</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-paper:       #ffffff;
+      --color-ink:         #1c1917;
+      --color-muted:       #57534e;
+      --color-soft:        #6f665f;
+      --color-rule:        rgba(28,25,23,0.12);
+      --color-rule-strong: rgba(28,25,23,0.22);
+      --color-accent:      #c2410c;
+      --color-accent-tint: rgba(194,65,12,0.12);
+      --color-link:        #4e6e81;
+      --color-mustard:     #a16207;
+      --color-rust:        #9a3412;
+      --font-sans:   'Geist', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+      --font-serif:  'Instrument Serif', 'Noto Serif SC', 'Songti SC', serif;
+      --font-mono:   'Geist Mono', 'PingFang SC', ui-monospace, Menlo, monospace;
+      --phase-s0: #a8a29e;
+      --phase-s1: #4e6e81;
+      --phase-s2: #a16207;
+      --phase-s3: #c2410c;
+      --phase-s4: #9a3412;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      padding: 3rem 2rem 4rem;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .header { margin-bottom: 2.5rem; }
+    .header-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.9rem, 3vw + 1rem, 2.75rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.12;
+      margin-bottom: 0.75rem;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: var(--color-muted);
+      max-width: 62ch;
+    }
+    .header-meta {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--color-soft);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Metric strip ───────────────────────────────────────── */
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1.4fr;
+      gap: 1rem;
+      margin-bottom: 3.5rem;
+    }
+    .metric {
+      min-width: 0;
+      background: var(--color-paper);
+      border: 1px solid var(--color-rule);
+      border-radius: 6px;
+      padding: 0.9rem 1rem;
+    }
+    .metric .k {
+      font-family: var(--font-serif);
+      font-size: 1.7rem;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+    }
+    .metric .k small { font-size: 1rem; color: var(--color-muted); }
+    .metric .l {
+      margin-top: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+    }
+
+    /* ── Sections ───────────────────────────────────────────── */
+    section { margin-bottom: 3.5rem; }
+    .sec-head { display: flex; align-items: baseline; gap: 0.9rem; margin-bottom: 1.1rem; }
+    .sec-no {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--color-accent);
+    }
+    h2 {
+      font-family: var(--font-serif);
+      font-size: 1.55rem;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+    .sec-lede {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      color: var(--color-muted);
+      max-width: 76ch;
+      margin-bottom: 1.25rem;
+    }
+    h3 {
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.6rem;
+    }
+
+    /* ── Tables ─────────────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    th {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      border-top: 1px solid var(--color-rule-strong);
+      border-bottom: 1px solid var(--color-rule);
+      white-space: nowrap;
+    }
+    td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--color-rule);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    td.num { font-family: var(--font-mono); font-size: 0.8rem; white-space: nowrap; }
+    .tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      border: 1px solid var(--color-rule-strong);
+      border-radius: 999px;
+      padding: 0.1rem 0.55rem;
+      color: var(--color-muted);
+      white-space: nowrap;
+    }
+
+    /* ── Diagram blocks ─────────────────────────────────────── */
+    .diagram {
+      border: 1px solid var(--color-rule);
+      border-radius: 8px;
+      background: #fdfcfa;
+      padding: 1.25rem 1rem 0.9rem;
+      margin: 1.25rem 0;
+    }
+    .diagram svg { display: block; width: 100%; height: auto; }
+    .diagram-caption {
+      margin-top: 0.7rem;
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.08em;
+      color: var(--color-soft);
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+      margin-top: 0.75rem;
+      font-size: 0.72rem;
+      color: var(--color-muted);
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+    /* ── Callouts ───────────────────────────────────────────── */
+    .callout {
+      border-left: 3px solid var(--color-mustard);
+      background: rgba(161,98,7,0.06);
+      border-radius: 0 6px 6px 0;
+      padding: 0.85rem 1.1rem;
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: var(--color-muted);
+      margin: 1.1rem 0;
+    }
+    .callout strong { color: var(--color-ink); }
+
+    /* ── Phase cards ────────────────────────────────────────── */
+    .phases { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .phase-card {
+      border: 1px solid var(--color-rule);
+      border-radius: 8px;
+      padding: 1.1rem 1.2rem;
+    }
+    .phase-card .ph-head { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.5rem; }
+    .phase-card .ph-no {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 0.12rem 0.5rem;
+      border-radius: 999px;
+      color: #fff;
+    }
+    .phase-card .ph-name { font-family: var(--font-serif); font-size: 1.15rem; }
+    .phase-card .ph-months {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--color-soft);
+    }
+    .phase-card ul { list-style: none; margin-top: 0.5rem; }
+    .phase-card li {
+      font-size: 0.83rem;
+      line-height: 1.65;
+      color: var(--color-muted);
+      padding-left: 1rem;
+      position: relative;
+    }
+    .phase-card li::before { content: "·"; position: absolute; left: 0.25rem; color: var(--color-accent); font-weight: 600; }
+    .phase-card .accept {
+      margin-top: 0.7rem;
+      padding-top: 0.6rem;
+      border-top: 1px dashed var(--color-rule);
+      font-size: 0.78rem;
+      line-height: 1.65;
+      color: var(--color-soft);
+    }
+    .phase-card .accept b {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-rust);
+    }
+
+    .two-col { display: grid; grid-template-columns: 1.15fr 1fr; gap: 1.5rem; align-items: start; }
+
+    a { color: var(--color-link); }
+
+    @media (max-width: 860px) {
+      body { padding: 2rem 1rem 3rem; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .phases { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { padding: 1rem; }
+      section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <a href="/" style="position:fixed;top:14px;right:14px;z-index:99;font:500 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#57534e;text-decoration:none;border:1px solid rgba(28,25,23,.18);background:rgba(255,255,255,.92);border-radius:999px;padding:8px 14px;backdrop-filter:blur(4px)">&#8592; more-than-moore</a>
+
+  <div class="container">
+
+    <!-- ═══════════════ Header ═══════════════ -->
+    <header class="header">
+      <div class="header-eyebrow">Career Plan · Test Data Science in Advanced Packaging</div>
+      <h1>测试数据科学工程师<br>从零开始的 24 个月发展计划</h1>
+      <p class="subtitle">
+        先进封装测试场（OSAT 型）的测试数据科学岗位，1–2 年成长路径调研与设计：角色边界、能力模型、五阶段路线、
+        个人工作台系统架构与可验收 KPI。行业事实与标准引用复用本仓库 2026-09-19 全量核对结论，计划参数全部标注为设计假设。
+      </p>
+      <div class="header-meta">
+        <span>版本 v1.0 · 2026-09</span>
+        <span>适用对象：入岗 0–2 年测试数据科学工程师</span>
+        <span>范围：CP / FT / SLT 测试数据分析</span>
+      </div>
+    </header>
+
+    <!-- ═══════════════ Metric strip ═══════════════ -->
+    <div class="metrics">
+      <div class="metric"><div class="k">24 <small>月</small></div><div class="l">规划周期 · 5 阶段</div></div>
+      <div class="metric"><div class="k">4 <small>支柱</small></div><div class="l">域 · 工程 · 统计 · 影响力</div></div>
+      <div class="metric"><div class="k">12 <small>项</small></div><div class="l">甘特任务 · 5 个里程碑</div></div>
+      <div class="metric"><div class="k">6 <small>层</small></div><div class="l">工作台架构 · 数据源→治理</div></div>
+    </div>
+
+    <!-- ═══════════════ 01 角色定位 ═══════════════ -->
+    <section>
+      <div class="sec-head"><span class="sec-no">01</span><h2>角色定位：把机台吐出的字节变成可复现的决策依据</h2></div>
+      <p class="sec-lede">
+        测试数据科学工程师不替代任何现有岗位，作用是把三类人（测试工程师、品质、管理层）反复要的数，
+        从"人工导文件 + Excel 手工拼"变成"可查询、可复现、可追溯"的数据服务。产线协作边界如下。
+      </p>
+      <table>
+        <thead><tr><th>协作对象</th><th>他们负责</th><th>你负责</th><th>边界红线</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>测试工程师（TE）</b></td>
+            <td>测试程序、limit 维护、correlation、机台调试</td>
+            <td>STDF 落库、yield 与异常分析、参数级追溯</td>
+            <td>不改测试条件与 limit——建议一律走 TE 流程</td>
+          </tr>
+          <tr>
+            <td><b>品质（QE）</b></td>
+            <td>客户规格、放行决定、8D 报告</td>
+            <td>逃逸追溯、统计证据（PAT/SPC 报表）、DPPM 口径</td>
+            <td>放行权在品质；模型输出只是证据，不是决定</td>
+          </tr>
+          <tr>
+            <td><b>IT / 基础设施</b></td>
+            <td>网络、权限、备份、机房</td>
+            <td>分析工作台与管道的应用层运维</td>
+            <td>不碰产线网络与机台，接口需求书面化</td>
+          </tr>
+          <tr>
+            <td><b>客户（隐性方）</b></td>
+            <td>产品规格与质量协议</td>
+            <td>数据分级 L1–L4 内建到每一个环节</td>
+            <td>客户产品的测试数据属客户 IP，最小化拷贝</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>一句话使命：</strong>任何一次"这个批次为什么掉良率"的提问，都能在分钟级给出可复现的数据回答——
+        而不是再开一次会、再导一遍文件。24 个月内，这条链路从 1 台机台长到全产线。
+      </div>
+    </section>
+
+    <!-- ═══════════════ 02 调研结论 ═══════════════ -->
+    <section>
+      <div class="sec-head"><span class="sec-no">02</span><h2>调研结论：四个行业信号与四条推论</h2></div>
+      <p class="sec-lede">
+        以下行业事实标注可信度级别（A = 标准/论文/官方口径，B = 行业媒体口径），引用细节见文末资源表与
+        《<a href="/notes/hbm/hbm-fact-check-log/">数据核对与落地评估报告</a>》。
+      </p>
+      <table>
+        <thead><tr><th style="width:38%">行业信号</th><th style="width:8%">级别</th><th>对个人计划的推论</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Chiplet / 2.5D 把测试数据链拉长：Data Feed Forward 让上游测量（CP）供给下游（FT / SLT）跨插入点、跨厂区使用（PDF Solutions，2026）</td>
+            <td class="num">B</td>
+            <td>"多插入点数据对齐"是地基能力：lot / wafer / die / insert 谱系建模从第一个月就开始，而不是用到再补</td>
+          </tr>
+          <tr>
+            <td>自适应测试（Adaptive Test）从试点走向产线标配，PAT / 多变量离群检测已是先进产线常见配置（SemiEngineering，2025-12）</td>
+            <td class="num">B</td>
+            <td>统计基线是前置技能：M7–M12 必须交付 PAT / DPAT / GDBN 原型，模型是它之上的增量</td>
+          </tr>
+          <tr>
+            <td>制造业数据"只有一小部分被分析"，先进封装测试进入 PB 级数据量级（SemiEngineering "Petabyte Problem"，2026）</td>
+            <td class="num">B</td>
+            <td>瓶颈顺序是 管道 → 存储 → 才是模型：工程能力（列存、增量、压缩）先于模型建设</td>
+          </tr>
+          <tr>
+            <td>测试成本占营收约 2%，复杂器件可上升一个数量级；缺陷拦截越靠前成本越低（1-10-100 法则，Labovitz &amp; Chang 1992）</td>
+            <td class="num">A/B</td>
+            <td>个人价值叙事锚定"拦截成本"：每一个分析交付都要能换算成 DPPM 或测试时长的变化</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>总体判断：</strong>这个岗位 24 个月的最优路径不是"先学 AI 再上手业务"，而是
+        <strong>域知识 × 数据工程先扎根，统计基线做第一批正式交付，模型只在基线稳定后进场</strong>。
+        与公司平台蓝图（PART 03 的 L1→L5 阶梯）逐级对应，个人路线是它的单人子集。
+      </div>
+    </section>
+
+    <!-- ═══════════════ 03 能力模型 ═══════════════ -->
+    <section>
+      <div class="sec-head"><span class="sec-no">03</span><h2>能力模型：四支柱与目标水平</h2></div>
+      <div class="two-col">
+        <div>
+          <table>
+            <thead><tr><th>支柱</th><th>覆盖内容</th><th class="num">M0 起点</th><th class="num">M24 目标</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b>A 域知识</b></td>
+                <td>STDF / KLARF、CP·FT·SLT 流程、良率与 DPPM 数学、PAT/DPAT/GDBN/SPC、HBM 特有（KGSD、堆叠逃逸乘法）</td>
+                <td class="num">L0.5</td>
+                <td class="num">L2.5</td>
+              </tr>
+              <tr>
+                <td><b>B 数据工程</b></td>
+                <td>Python、SQL、Parquet/DuckDB、增量管道、数据质量门、git、调度</td>
+                <td class="num">L1.5</td>
+                <td class="num">L2.5</td>
+              </tr>
+              <tr>
+                <td><b>C 统计与 ML</b></td>
+                <td>分布与假设检验、控制图、离群检测四法、良率模型（负二项）、GPR/Vmin、CNN 晶圆图、无泄漏评估</td>
+                <td class="num">L0.5</td>
+                <td class="num">L2</td>
+              </tr>
+              <tr>
+                <td><b>D 交付与影响力</b></td>
+                <td>需求访谈、可复现报告、看板、内部培训、跨部门推进、客户合规意识</td>
+                <td class="num">L0.5</td>
+                <td class="num">L2</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:0.72rem;color:var(--color-soft);margin-top:0.5rem">
+            水平定义：L0 零基础 · L1 独立完成单点任务 · L2 设计可被复用的小系统 · L3 定方法 / 带人。
+            起点值假设入岗者有互联网工程背景、无半导体产线经验（设计假设，以实测自评重校）。
+          </p>
+        </div>
+        <div>
+          <div class="diagram" style="margin:0">
+            <svg viewBox="0 0 440 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="能力雷达图：M0 起点与 M24 目标">
+              <!-- 网格 -->
+              <g fill="none" stroke="rgba(28,25,23,0.14)" stroke-width="1">
+                <polygon points="210,50 340,180 210,310 80,180"/>
+                <polygon points="210,82.5 307.5,180 210,277.5 112.5,180"/>
+                <polygon points="210,115 275,180 210,245 145,180"/>
+                <polygon points="210,147.5 242.5,180 210,212.5 177.5,180"/>
+                <line x1="210" y1="50" x2="210" y2="310"/>
+                <line x1="80" y1="180" x2="340" y2="180"/>
+              </g>
+              <!-- 轴标签 -->
+              <g font-family="Geist, PingFang SC, sans-serif" font-size="12" fill="#57534e">
+                <text x="210" y="36" text-anchor="middle">域知识</text>
+                <text x="352" y="184" text-anchor="start">数据工程</text>
+                <text x="210" y="332" text-anchor="middle">统计与 ML</text>
+                <text x="68" y="184" text-anchor="end">交付与影响力</text>
+              </g>
+              <g font-family="Geist Mono, monospace" font-size="9" fill="#a8a29e">
+                <text x="214" y="153">0.25</text>
+                <text x="214" y="120.5">0.50</text>
+                <text x="214" y="88">0.75</text>
+                <text x="214" y="55.5">1.00</text>
+              </g>
+              <!-- M0 起点 -->
+              <polygon points="210,160.5 268.5,180 210,199.5 184,180"
+                       fill="rgba(110,110,106,0.15)" stroke="#78716c" stroke-width="1.5" stroke-dasharray="4 3"/>
+              <!-- M24 目标 -->
+              <polygon points="210,82.5 314,180 210,264.5 119,180"
+                       fill="rgba(194,65,12,0.14)" stroke="#c2410c" stroke-width="2"/>
+              <g font-family="Geist Mono, monospace" font-size="10" fill="#1c1917">
+                <text x="210" y="76" text-anchor="middle">0.75</text>
+                <text x="318" y="172" text-anchor="start">0.80</text>
+                <text x="210" y="280" text-anchor="middle">0.65</text>
+                <text x="115" y="172" text-anchor="end">0.70</text>
+              </g>
+              <!-- 图例 -->
+              <g font-family="Geist, PingFang SC, sans-serif" font-size="11" fill="#57534e">
+                <rect x="88" y="348" width="18" height="3" fill="#78716c"/>
+                <text x="112" y="353">M0 起点（假设）</text>
+                <rect x="238" y="348" width="18" height="3" fill="#c2410c"/>
+                <text x="262" y="353">M24 目标</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 04 五阶段路线 ═══════════════ -->
+    <section>
+      <div class="sec-head"><span class="sec-no">04</span><h2>24 个月路线：五阶段与 12 项任务</h2></div>
+      <p class="sec-lede">
+        阶段划分与公司平台蓝图的 L1–L5 能力阶梯对齐（见
+        <a href="/reports/hbm3e-hbm4e/part03-roadmap.html">PART 03</a>），但以单人可运维为约束：
+        任何阶段都不引入超出"1 人 + 1 台虚拟机"运维能力的组件，升级触发阈值见第 05 节设计原则。
+      </p>
+
+      <div class="diagram">
+        <svg viewBox="0 0 1160 436" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="24 个月甘特图：12 项任务、5 阶段、5 个里程碑">
+          <!-- 阶段底色 -->
+          <g opacity="0.06">
+            <rect x="260" y="40" width="110" height="370" fill="#a8a29e"/>
+            <rect x="370" y="40" width="110" height="370" fill="#4e6e81"/>
+            <rect x="516.7" y="40" width="183.3" height="370" fill="#a16207"/>
+            <rect x="736.7" y="40" width="183.3" height="370" fill="#c2410c"/>
+            <rect x="956.7" y="40" width="183.3" height="370" fill="#9a3412"/>
+          </g>
+          <!-- 月份网格 -->
+          <g stroke="rgba(28,25,23,0.10)" stroke-width="1">
+            <line x1="260" y1="40" x2="260" y2="410"/><line x1="370" y1="40" x2="370" y2="410"/>
+            <line x1="480" y1="40" x2="480" y2="410"/><line x1="590" y1="40" x2="590" y2="410"/>
+            <line x1="700" y1="40" x2="700" y2="410"/><line x1="810" y1="40" x2="810" y2="410"/>
+            <line x1="920" y1="40" x2="920" y2="410"/><line x1="1030" y1="40" x2="1030" y2="410"/>
+            <line x1="1140" y1="40" x2="1140" y2="410"/>
+          </g>
+          <g font-family="Geist Mono, monospace" font-size="10.5" fill="#57534e">
+            <text x="260" y="28" text-anchor="middle">M0</text><text x="370" y="28" text-anchor="middle">M3</text>
+            <text x="480" y="28" text-anchor="middle">M6</text><text x="590" y="28" text-anchor="middle">M9</text>
+            <text x="700" y="28" text-anchor="middle">M12</text><text x="810" y="28" text-anchor="middle">M15</text>
+            <text x="920" y="28" text-anchor="middle">M18</text><text x="1030" y="28" text-anchor="middle">M21</text>
+            <text x="1140" y="28" text-anchor="middle">M24</text>
+          </g>
+          <g font-family="Geist Mono, monospace" font-size="9.5" fill-opacity="0.9">
+            <text x="315" y="52" text-anchor="middle" fill="#78716c">S0 扎根</text>
+            <text x="425" y="52" text-anchor="middle" fill="#4e6e81">S1 管道</text>
+            <text x="608" y="52" text-anchor="middle" fill="#a16207">S2 统计基线</text>
+            <text x="828" y="52" text-anchor="middle" fill="#c2410c">S3 预测试点</text>
+            <text x="1048" y="52" text-anchor="middle" fill="#9a3412">S4 系统化</text>
+          </g>
+          <!-- 任务条 -->
+          <g font-family="Geist, PingFang SC, sans-serif" font-size="12" fill="#1c1917">
+            <text x="248" y="71" text-anchor="end">STDF/KLARF 规范精读与解析器</text>
+            <rect x="260" y="58" width="73.3" height="16" rx="3" fill="#a8a29e"/>
+            <text x="248" y="99" text-anchor="end">产线跟班与数据字典</text>
+            <rect x="296.7" y="86" width="73.3" height="16" rx="3" fill="#a8a29e"/>
+            <text x="248" y="127" text-anchor="end">落盘采集与对象存储</text>
+            <rect x="370" y="114" width="73.3" height="16" rx="3" fill="#4e6e81"/>
+            <text x="248" y="155" text-anchor="end">Silver 管道与数据质量门</text>
+            <rect x="406.7" y="142" width="73.3" height="16" rx="3" fill="#4e6e81"/>
+            <text x="248" y="183" text-anchor="end">T+1 看板与自动报告</text>
+            <rect x="443.3" y="170" width="36.7" height="16" rx="3" fill="#4e6e81"/>
+            <text x="248" y="211" text-anchor="end">PAT/DPAT/GDBN 基线引擎</text>
+            <rect x="516.7" y="198" width="110" height="16" rx="3" fill="#a16207"/>
+            <text x="248" y="239" text-anchor="end">逃逸追溯与异常月报</text>
+            <rect x="590" y="226" width="110" height="16" rx="3" fill="#a16207"/>
+            <text x="248" y="267" text-anchor="end">预测试点（GPR / Vmin）</text>
+            <rect x="736.7" y="254" width="110" height="16" rx="3" fill="#c2410c"/>
+            <text x="248" y="295" text-anchor="end">晶圆图 CNN（WM-811K → 产线）</text>
+            <rect x="773.3" y="282" width="110" height="16" rx="3" fill="#c2410c"/>
+            <text x="248" y="323" text-anchor="end">自适应闭环预研</text>
+            <rect x="846.7" y="310" width="73.3" height="16" rx="3" fill="#c2410c"/>
+            <text x="248" y="351" text-anchor="end">湖仓化与服务化</text>
+            <rect x="956.7" y="338" width="110" height="16" rx="3" fill="#9a3412"/>
+            <text x="248" y="379" text-anchor="end">文档、培训与 24 月复盘</text>
+            <rect x="993.3" y="366" width="146.7" height="16" rx="3" fill="#9a3412"/>
+          </g>
+          <!-- 里程碑 -->
+          <g>
+            <g transform="translate(370,398)"><rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#1c1917"/></g>
+            <text x="370" y="424" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="#1c1917">M3 解析可用</text>
+            <g transform="translate(480,398)"><rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#1c1917"/></g>
+            <text x="480" y="424" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="#1c1917">M6 报告全自动</text>
+            <g transform="translate(700,398)"><rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#1c1917"/></g>
+            <text x="700" y="424" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="#1c1917">M12 基线上线</text>
+            <g transform="translate(920,398)"><rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#1c1917"/></g>
+            <text x="920" y="424" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="#1c1917">M18 试点结论</text>
+            <g transform="translate(1140,398)"><rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#1c1917"/></g>
+            <text x="1140" y="424" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="#1c1917">M24 复盘定级</text>
+          </g>
+        </svg>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--phase-s0)"></span>S0 扎根 M0–3</span>
+          <span><span class="dot" style="background:var(--phase-s1)"></span>S1 管道 M3–6</span>
+          <span><span class="dot" style="background:var(--phase-s2)"></span>S2 统计基线 M7–12</span>
+          <span><span class="dot" style="background:var(--phase-s3)"></span>S3 预测试点 M13–18</span>
+          <span><span class="dot" style="background:var(--phase-s4)"></span>S4 系统化 M19–24</span>
+        </div>
+      </div>
+
+      <h3>各阶段目标与验收</h3>
+      <div class="phases">
+        <div class="phase-card">
+          <div class="ph-head"><span class="ph-no" style="background:var(--phase-s0)">S0</span><span class="ph-name">扎根</span><span class="ph-months">M0–M3</span></div>
+          <ul>
+            <li>STDF V4 规范精读：PIN / PRR / PTR / TSR / HBR / SBR 等记录类型全覆盖，形成个人数据字典 v1</li>
+            <li>解析 CLI：pystdf4 流式解析 → die 级 Parquet</li>
+            <li>产线跟班 ≥ 5 天：CP、FT 各 ≥ 2 天，SLT 1 天，记录插入点与数据产生点</li>
+          </ul>
+          <div class="accept"><b>验收</b> · 任一机台 STDF zip → 命令行 5 分钟内出 die 级 Parquet；数据字典通过 TE 评审</div>
+        </div>
+        <div class="phase-card">
+          <div class="ph-head"><span class="ph-no" style="background:var(--phase-s1)">S1</span><span class="ph-name">管道</span><span class="ph-months">M3–M6</span></div>
+          <ul>
+            <li>落盘监听 + 校验和清单 + 对象存储（Bronze）</li>
+            <li>Silver 管道：dies / test_items / flows / lots 四表，主键 (lot, wafer, x, y, insert)</li>
+            <li>T+1 yield 看板与自动日报；数据质量门（行数 / 校验和 / 主键唯一）</li>
+          </ul>
+          <div class="accept"><b>验收</b> · 试点线机台覆盖率 ≥ 90%（先测基线再定）；日报 T+1 09:00 前自动产出；手工取数请求下降 ≥ 50%</div>
+        </div>
+        <div class="phase-card">
+          <div class="ph-head"><span class="ph-no" style="background:var(--phase-s2)">S2</span><span class="ph-name">统计基线</span><span class="ph-months">M7–M12</span></div>
+          <ul>
+            <li>PAT / DPAT 动态限值引擎：按 lot 分层的样本统计限值（AEC-Q001 方法论，受规格限约束）</li>
+            <li>GDBN 规则（Roehr, ITC 2000）与 SPC 控制图</li>
+            <li>逃逸追溯查询：die → lot → 插入点 → 参数，秒级；异常月报</li>
+          </ul>
+          <div class="accept"><b>验收</b> · 试点 device 全量上线；误报率量化（人工抽检 ≥ 200 die）；correlation 流程与 TE 书面确认</div>
+        </div>
+        <div class="phase-card">
+          <div class="ph-head"><span class="ph-no" style="background:var(--phase-s3)">S3</span><span class="ph-name">预测试点</span><span class="ph-months">M13–M18</span></div>
+          <ul>
+            <li>Vmin / 参数预测试点（GPR，双预测器思路，Pan et al. JETTA 2024）</li>
+            <li>晶圆图 CNN：WM-811K 基线 → 产线数据重训另行评测（数据集最高可溯源 98.56%，Bao 2024）</li>
+            <li>自适应闭环预研报告：含客户质量协议闸门设计——只出建议，不自动放行</li>
+          </ul>
+          <div class="accept"><b>验收</b> · 试点 device 达预设 AUC / 召回线（按产品分别设定，禁用数据集精度作承诺）；闭环产出评审文档而非直接变更</div>
+        </div>
+        <div class="phase-card">
+          <div class="ph-head"><span class="ph-no" style="background:var(--phase-s4)">S4</span><span class="ph-name">系统化与影响力</span><span class="ph-months">M19–M24</span></div>
+          <ul>
+            <li>管道湖仓化：Bronze / Silver / Gold 正式分层 + 保留策略</li>
+            <li>方法论文档 3 篇（解析 / 统计基线 / 预测试点），内部培训 ≥ 2 场</li>
+            <li>24 个月复盘：KPI 对照、下一周期（升 L3 / 带项目）定级</li>
+          </ul>
+          <div class="accept"><b>验收</b> · 新人按文档 2 周内复现"解析 → 报表"链路；看板周活内部用户 ≥ 5 人</div>
+        </div>
+        <div class="phase-card" style="border-style:dashed;display:flex;align-items:center;justify-content:center">
+          <p style="font-size:0.82rem;color:var(--color-soft);line-height:1.7;text-align:center;max-width:34ch">
+            S3 是全计划唯一的高风险阶段（业界状态为试点前沿 + 客户协议约束），<br>
+            对外承诺口径固定为"内部预研 + 单客户联合试点"。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 05 系统架构 ═══════════════ -->
+    <section>
+      <div class="sec-head"><span class="sec-no">05</span><h2>系统架构：个人工作台全景（重点）</h2></div>
+      <p class="sec-lede">
+        架构是本计划的中枢：五阶段里的每一项任务都落在架构的某一层，每个组件标注点亮阶段（S0–S4，右上角色点），
+        避免一次性搭大平台的沉没成本。四条设计原则：
+      </p>
+      <table>
+        <thead><tr><th style="width:22%">设计原则</th><th>内容</th><th style="width:34%">升级触发阈值（超出才升级）</th></tr></thead>
+        <tbody>
+          <tr><td><b>① 单人可运维</b></td><td>Day-0 单机（对象存储 + DuckDB + cron），组件数量与运维能力约束在 1 人 1 虚拟机内</td><td>常驻服务 &gt; 10 个、或持续 &gt; 5×10⁴ msg/s、或需端到端 exactly-once 时，才重评消息队列与集群（同 PART 00 ADR-3）</td></tr>
+          <tr><td><b>② 客户 IP 内建</b></td><td>数据分级 L1–L4 在表结构与存储路径层实现，训练区不落地终端</td><td>无升级路径——这是约束不是阶段（客户审厂必查项）</td></tr>
+          <tr><td><b>③ 一切可复现</b></td><td>分析 = SQL / Notebook + 数据版本；报告能追溯到生成代码与输入快照</td><td>无升级路径</td></tr>
+          <tr><td><b>④ 增量点亮</b></td><td>每组件带阶段色点，S3 之前不出现分布式组件；先管道后模型</td><td>某层成为瓶颈（如解析排队 &gt; 1 天）时局部升级，不重排全局</td></tr>
+        </tbody>
+      </table>
+
+      <div class="diagram">
+        <svg viewBox="0 0 1160 812" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="测试数据科学工作台六层架构：数据源、接入与解析、湖仓分层、计算层、服务层、治理横切">
+          <defs>
+            <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="#57534e"/>
+            </marker>
+          </defs>
+
+          <!-- ══ L1 数据源 ══ -->
+          <rect x="44" y="6" width="1112" height="104" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.12)"/>
+          <text transform="rotate(-90 26 58)" x="26" y="58" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10.5" letter-spacing="2" fill="#6f665f">数据源</text>
+          <g>
+            <rect x="64" y="22" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="78" y="46" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">ATE 机台</text>
+            <text x="78" y="64" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">Teradyne / Advantest</text>
+            <text x="78" y="79" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">CP · FT · SLT 插入点</text>
+            <circle cx="250" cy="36" r="5" fill="#a8a29e"/>
+            <rect x="282" y="22" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="296" y="46" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">STDF 原始档</text>
+            <text x="296" y="64" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">V4 · PTR/PRR/TSR</text>
+            <text x="296" y="79" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">HBR/SBR · zip 打包</text>
+            <circle cx="468" cy="36" r="5" fill="#a8a29e"/>
+            <rect x="500" y="22" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="514" y="46" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">KLARF 检图</text>
+            <text x="514" y="64" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">缺陷坐标</text>
+            <text x="514" y="79" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">与电测结果对照</text>
+            <circle cx="686" cy="36" r="5" fill="#4e6e81"/>
+            <rect x="718" y="22" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="732" y="46" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">MES 谱系</text>
+            <text x="732" y="64" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">lot / wafer / die 谱系</text>
+            <text x="732" y="79" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">程序版本 · 插入点</text>
+            <circle cx="904" cy="36" r="5" fill="#4e6e81"/>
+            <rect x="936" y="22" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="950" y="46" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">人工记录</text>
+            <text x="950" y="64" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">实验与复测记录</text>
+            <text x="950" y="79" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">CSV / 表单结构化</text>
+            <circle cx="1122" cy="36" r="5" fill="#4e6e81"/>
+          </g>
+
+          <line x1="600" y1="110" x2="600" y2="132" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+          <text x="612" y="128" font-family="Geist Mono, monospace" font-size="9.5" fill="#6f665f">STDF.zip · KLARF · CSV</text>
+
+          <!-- ══ L2 接入与解析 ══ -->
+          <rect x="44" y="136" width="1112" height="104" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.12)"/>
+          <text transform="rotate(-90 26 188)" x="26" y="188" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10.5" letter-spacing="2" fill="#6f665f">接入解析</text>
+          <g>
+            <rect x="64" y="152" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="78" y="176" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">落盘监听</text>
+            <text x="78" y="194" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">SFTP drop · 文件监听</text>
+            <text x="78" y="209" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">校验和 + 清单</text>
+            <circle cx="250" cy="166" r="5" fill="#4e6e81"/>
+            <rect x="282" y="152" width="200" height="72" rx="6" fill="#fff" stroke="rgba(194,65,12,0.55)" stroke-width="1.6"/>
+            <text x="296" y="176" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#9a3412">STDF 解析器</text>
+            <text x="296" y="194" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">pystdf4 流式解析</text>
+            <text x="296" y="209" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">5 分钟级 die 明细</text>
+            <circle cx="468" cy="166" r="5" fill="#a8a29e"/>
+            <rect x="500" y="152" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="514" y="176" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">KLARF 解析器</text>
+            <text x="514" y="194" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">坐标表解析</text>
+            <text x="514" y="209" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">与 Silver 层对齐</text>
+            <circle cx="686" cy="166" r="5" fill="#a16207"/>
+            <rect x="718" y="152" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="732" y="176" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">MES 连接器</text>
+            <text x="732" y="194" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">API / CSV 拉取</text>
+            <text x="732" y="209" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">谱系回填</text>
+            <circle cx="904" cy="166" r="5" fill="#4e6e81"/>
+            <rect x="936" y="152" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="950" y="176" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">数据质量门</text>
+            <text x="950" y="194" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">行数 / 校验和 / 主键</text>
+            <text x="950" y="209" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">不合格进隔离区</text>
+            <circle cx="1122" cy="166" r="5" fill="#4e6e81"/>
+          </g>
+
+          <line x1="600" y1="240" x2="600" y2="262" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+          <text x="612" y="258" font-family="Geist Mono, monospace" font-size="9.5" fill="#6f665f">合格明细</text>
+
+          <!-- ══ L3 湖仓分层 ══ -->
+          <rect x="44" y="266" width="1112" height="168" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.12)"/>
+          <text transform="rotate(-90 26 350)" x="26" y="350" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10.5" letter-spacing="2" fill="#6f665f">湖仓分层</text>
+          <g>
+            <rect x="64" y="284" width="344" height="132" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="82" y="310" font-family="Geist Mono, monospace" font-size="12.5" font-weight="600" fill="#1c1917">Bronze · 原始层</text>
+            <text x="82" y="332" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">不可变原始档 · 对象存储</text>
+            <text x="82" y="348" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">清单 + 校验和 · 按分级保留</text>
+            <text x="82" y="364" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">重解析可回放（解析器升级不丢数据）</text>
+            <circle cx="394" cy="300" r="5" fill="#4e6e81"/>
+            <rect x="428" y="284" width="344" height="132" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="446" y="310" font-family="Geist Mono, monospace" font-size="12.5" font-weight="600" fill="#1c1917">Silver · 明细层</text>
+            <text x="446" y="332" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">Parquet 四表：dies / test_items</text>
+            <text x="446" y="348" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">flows / lots</text>
+            <text x="446" y="364" font-family="Geist Mono, monospace" font-size="10" fill="#9a3412">PK (lot, wafer, x, y, insert)</text>
+            <circle cx="758" cy="300" r="5" fill="#4e6e81"/>
+            <rect x="792" y="284" width="344" height="132" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="810" y="310" font-family="Geist Mono, monospace" font-size="12.5" font-weight="600" fill="#1c1917">Gold · 指标层</text>
+            <text x="810" y="332" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">yield / bin 聚合 · PAT 标记</text>
+            <text x="810" y="348" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">插入点对齐宽表 · 逃逸追溯</text>
+            <text x="810" y="364" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">看板与告警唯一读取口</text>
+            <circle cx="1122" cy="300" r="5" fill="#a16207"/>
+          </g>
+
+          <line x1="600" y1="434" x2="600" y2="456" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+          <text x="612" y="452" font-family="Geist Mono, monospace" font-size="9.5" fill="#6f665f">Parquet 表</text>
+
+          <!-- ══ L4 计算层 ══ -->
+          <rect x="44" y="460" width="1112" height="104" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.12)"/>
+          <text transform="rotate(-90 26 512)" x="26" y="512" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10.5" letter-spacing="2" fill="#6f665f">计算层</text>
+          <g>
+            <rect x="64" y="476" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="78" y="500" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">SQL 引擎</text>
+            <text x="78" y="518" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">DuckDB 单机起步</text>
+            <text x="78" y="533" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">触发阈值后再议 Spark</text>
+            <circle cx="250" cy="490" r="5" fill="#4e6e81"/>
+            <rect x="282" y="476" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="296" y="500" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">统计基线引擎</text>
+            <text x="296" y="518" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">PAT·DPAT·GDBN·SPC</text>
+            <text x="296" y="533" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">AEC-Q001 动态限值</text>
+            <circle cx="468" cy="490" r="5" fill="#a16207"/>
+            <rect x="500" y="476" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="514" y="500" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">ML 工作台</text>
+            <text x="514" y="518" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">GPR 预测 · CNN 晶圆图</text>
+            <text x="514" y="533" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">MLflow 实验追踪</text>
+            <circle cx="686" cy="490" r="5" fill="#c2410c"/>
+            <rect x="718" y="476" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="732" y="500" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">分析 Notebook</text>
+            <text x="732" y="518" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">SQL + Notebook 留痕</text>
+            <text x="732" y="533" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">分析模板库 · 可复现</text>
+            <circle cx="904" cy="490" r="5" fill="#a8a29e"/>
+            <rect x="936" y="476" width="200" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-dasharray="5 4"/>
+            <text x="950" y="500" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#9a3412">建议闸门</text>
+            <text x="950" y="518" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">品质 + 客户协议双闸门</text>
+            <text x="950" y="533" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">输出建议 · 不自动放行</text>
+            <circle cx="1122" cy="490" r="5" fill="#c2410c"/>
+          </g>
+
+          <line x1="600" y1="564" x2="600" y2="586" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+          <text x="612" y="582" font-family="Geist Mono, monospace" font-size="9.5" fill="#6f665f">指标 / 报表</text>
+
+          <!-- ══ L5 服务层 ══ -->
+          <rect x="44" y="590" width="1112" height="104" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.12)"/>
+          <text transform="rotate(-90 26 642)" x="26" y="642" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10.5" letter-spacing="2" fill="#6f665f">服务层</text>
+          <g>
+            <rect x="64" y="606" width="253" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="78" y="630" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">Yield 看板</text>
+            <text x="78" y="648" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">T+1 09:00 自动产出</text>
+            <text x="78" y="663" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">机台 / 产品 / 插入点维度</text>
+            <circle cx="303" cy="620" r="5" fill="#4e6e81"/>
+            <rect x="337" y="606" width="253" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="351" y="630" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">异常与告警</text>
+            <text x="351" y="648" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">SPC 规则 + 基线偏移提醒</text>
+            <text x="351" y="663" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">推送品质 / TE</text>
+            <circle cx="576" cy="620" r="5" fill="#a16207"/>
+            <rect x="610" y="606" width="253" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="624" y="630" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">追溯查询 CLI</text>
+            <text x="624" y="648" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">die → lot → 插入点 → 参数</text>
+            <text x="624" y="663" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">秒级 · 全程留痕</text>
+            <circle cx="849" cy="620" r="5" fill="#a16207"/>
+            <rect x="883" y="606" width="253" height="72" rx="6" fill="#fff" stroke="rgba(28,25,23,0.18)"/>
+            <text x="897" y="630" font-family="Geist, PingFang SC, sans-serif" font-size="13" font-weight="600" fill="#1c1917">文档与培训</text>
+            <text x="897" y="648" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">数据字典 + 方法论 3 篇</text>
+            <text x="897" y="663" font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="#6f665f">新人 2 周复现链路</text>
+            <circle cx="1122" cy="620" r="5" fill="#9a3412"/>
+          </g>
+
+          <!-- ══ L6 治理横切 ══ -->
+          <rect x="44" y="722" width="1112" height="74" rx="8" fill="#1c1917"/>
+          <text x="72" y="754" font-family="Geist Mono, monospace" font-size="11" font-weight="600" letter-spacing="2" fill="#faf9f7">治理与质量 · 横切全部层</text>
+          <g font-family="Geist, PingFang SC, sans-serif" font-size="10.5" fill="rgba(250,249,247,0.82)">
+            <text x="72" y="778">客户 IP 分级 L1–L4（训练区不落地终端） · 最小化拷贝 · 访问审计</text>
+            <text x="620" y="778">数据契约与质量测试 · git / 数据版本化 · 保留与销毁策略</text>
+          </g>
+        </svg>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--phase-s0)"></span>S0 点亮</span>
+          <span><span class="dot" style="background:var(--phase-s1)"></span>S1 点亮</span>
+          <span><span class="dot" style="background:var(--phase-s2)"></span>S2 点亮</span>
+          <span><span class="dot" style="background:var(--phase-s3)"></span>S3 点亮</span>
+          <span><span class="dot" style="background:var(--phase-s4)"></span>S4 点亮</span>
+          <span style="color:var(--color-rust)">橙色描边 = 全架构第一个月唯一必做件（STDF 解析器）</span>
+          <span>虚线框 = 流程闸门（非软件组件）</span>
+        </div>
+        <div class="diagram-caption">FIG.05-A · 测试数据科学工作台六层架构 · 组件右上色点 = 点亮阶段</div>
+      </div>
+
+      <h3>逐层说明</h3>
+      <table>
+        <thead><tr><th style="width:14%">层</th><th style="width:30%">选型与职责</th><th>关键设计决定</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>数据源</b></td>
+            <td>ATE 机台（STDF zip）、KLARF、MES 谱系、人工记录</td>
+            <td>谱系（lot / wafer / die / insert / 程序版本）从 M0 就建模——它是后续一切多插入点对齐与追溯的主键，事后补的代价是重刷全量</td>
+          </tr>
+          <tr>
+            <td><b>接入解析</b></td>
+            <td>落盘监听、pystdf4、KLARF 解析、MES 连接器、质量门</td>
+            <td>质量门是"不合格数据进隔离区而不是管道"，坏数据可见但不污染 Silver 层——逃逸分析的可信度靠它兜底</td>
+          </tr>
+          <tr>
+            <td><b>湖仓分层</b></td>
+            <td>Bronze 不可变原始 → Silver 四表明细 → Gold 指标</td>
+            <td>Bronze 不可变意味着解析器升级可全量回放；Gold 是看板唯一读取口，防止指标口径分叉</td>
+          </tr>
+          <tr>
+            <td><b>计算层</b></td>
+            <td>DuckDB、统计基线引擎、ML 工作台、Notebook、建议闸门</td>
+            <td>"建议闸门"是流程不是软件：自适应/预测的一切输出经品质 + 客户协议双闸门，与公司治理设计一致（MRB 唯一放行）</td>
+          </tr>
+          <tr>
+            <td><b>服务层</b></td>
+            <td>Yield 看板、异常告警、追溯 CLI、文档培训</td>
+            <td>交付物全部落在别人"每天会用"的界面；追溯 CLI 是对 TE / QE 的高频复用件，优先级高于一切模型</td>
+          </tr>
+          <tr>
+            <td><b>治理横切</b></td>
+            <td>IP 分级、最小化拷贝、审计、契约、版本化、保留销毁</td>
+            <td>封测厂处理客户产品测试数据，分级与审计线是客户审厂必查项；训练区不落地终端在表结构层实现而非靠约定</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>数据量级锚点（引用已核对口径）：</strong>64 台 tester × 12.5 万 die/日 × 6 KB ≈ 48 GB/日、年化约 17 TB（列存压缩后更低）——
+        该量级在单机 DuckDB + 对象存储的能力圈内，是"单人可运维"原则成立的量化依据；量级出处与算术复核见
+        《<a href="/notes/hbm/hbm-fact-check-log/">数据核对与落地评估报告</a>》§1。机台数以产线实测替换后重算。
+      </div>
+    </section>
+
+    <!-- ═══════════════ 06 KPI ═══════════════ -->
+    <section>
+      <div class="sec-head"><span class="sec-no">06</span><h2>KPI 与验收：每个阶段可量化</h2></div>
+      <table>
+        <thead><tr><th class="num">阶段</th><th>KPI</th><th class="num">目标</th><th>测量方法</th></tr></thead>
+        <tbody>
+          <tr><td class="num">S0</td><td>解析链路可用性</td><td class="num">5 分钟 / 份</td><td>STDF zip 进 → die 级 Parquet 出，端到端计时（M3 里程碑评审当场演示）</td></tr>
+          <tr><td class="num">S0</td><td>数据字典覆盖率</td><td class="num">100% 记录类型</td><td>STDF V4 记录类型对照表逐项打勾，TE 评审签字</td></tr>
+          <tr><td class="num">S1</td><td>试点线机台覆盖</td><td class="num">≥ 90%</td><td>接入机台数 / 试点线在产机台数（先测 M3 基线再定分母）</td></tr>
+          <tr><td class="num">S1</td><td>日报时效</td><td class="num">T+1 09:00</td><td>调度系统产出时间戳，连续 20 个工作日统计</td></tr>
+          <tr><td class="num">S1</td><td>手工取数请求</td><td class="num">-50%</td><td>邮件/工单计数，M3 基线 vs M6</td></tr>
+          <tr><td class="num">S2</td><td>PAT 基线误报率</td><td class="num">建立基线</td><td>人工抽检 ≥ 200 die/月，误报数 / 抽检数；目标值待基线数据后设定</td></tr>
+          <tr><td class="num">S2</td><td>追溯响应时间</td><td class="num">分钟级</td><td>追溯 CLI 端到端计时，对比人工导文件历史耗时</td></tr>
+          <tr><td class="num">S3</td><td>预测试点效果</td><td class="num">预设 AUC / 召回</td><td>按产品单独设定并留出测试集；数据集精度（如 98.56%）只作能力参照，不作承诺</td></tr>
+          <tr><td class="num">S4</td><td>知识可复现性</td><td class="num">2 周</td><td>新人按文档复现"解析 → 报表"链路的实测天数</td></tr>
+          <tr><td class="num">S4</td><td>看板周活用户</td><td class="num">≥ 5 人/周</td><td>看板访问日志去重计数</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.78rem;color:var(--color-soft);margin-top:0.6rem">
+        全部目标值为设计假设（入岗时以产线实测基线重校）；"先测基线再定目标"本身写进阶段验收，
+        避免入职第一周就拍出不成立的数字。
+      </p>
+    </section>
+
+    <!-- ═══════════════ 07 风险 ═══════════════ -->
+    <section>
+      <div class="sec-head"><span class="sec-no">07</span><h2>风险与对策</h2></div>
+      <table>
+        <thead><tr><th style="width:24%">风险</th><th class="num" style="width:14%">概率 / 影响</th><th>对策</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>数据权限与客户 IP 约束，取数窗口比预期长</td>
+            <td class="num">高 / 高</td>
+            <td>M0 就提交权限申请与分级方案；先用单机台、单产品的脱敏样例数据开发解析器；分级 L1–L4 方案作为客户审厂加分项主动呈现</td>
+          </tr>
+          <tr>
+            <td>STDF 生态与 ATE 知识曲线陡（2–4 周）</td>
+            <td class="num">高 / 中</td>
+            <td>Day 0 向设备 / 测试工程部要一份样例 STDF；跟班 ≥ 5 天排进第 1 个月；规范精读以"记录类型 → 字段 → 实际字节"三层对照笔记推进</td>
+          </tr>
+          <tr>
+            <td>单人巴士因子 = 1，休假即停摆</td>
+            <td class="num">中 / 高</td>
+            <td>一切进 git；数据字典与方法论文档是交付物而非副产品；S4 验收直接考核"新人 2 周复现"</td>
+          </tr>
+          <tr>
+            <td>工具蔓延：过早引入消息队列 / 集群</td>
+            <td class="num">中 / 中</td>
+            <td>设计原则①的量化触发阈值（常驻服务 &gt; 10、持续 &gt; 5×10⁴ msg/s）；每次引入新组件先写 5 行 ADR 记录理由</td>
+          </tr>
+          <tr>
+            <td>自适应闭环触碰客户质量协议</td>
+            <td class="num">中 / 高</td>
+            <td>S3 定位降级为"内部预研 + 单客户联合试点"；建议闸门双签（品质 + 客户）；任何跳项 / 改限不进对客承诺</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ═══════════════ 08 资源 ═══════════════ -->
+    <section>
+      <div class="sec-head"><span class="sec-no">08</span><h2>学习资源（按阶段与可信度）</h2></div>
+      <h3>S0–S1 · 规范与工程</h3>
+      <table>
+        <thead><tr><th style="width:30%">资源</th><th style="width:10%">级别</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td>STDF Specification V4（官方规范 PDF，Teradyne 维护；roos.com / acp-it.com 存有镜像）</td><td class="num">A</td><td>记录类型 / 字段级精读，数据字典的唯一权威来源</td></tr>
+          <tr><td>pystdf（github.com/cmars/pystdf）· pystdf4（github.com/Asachoo/pystdf4）</td><td class="num">A</td><td>解析器选型：pystdf4 为现代化重写，S0 选型后锁定</td></tr>
+          <tr><td>Yieldhub《An introduction to STDF》</td><td class="num">B</td><td>最快的入门综述（半天读完）</td></tr>
+          <tr><td>KLARF 格式入门（行业博客若干）</td><td class="num">B</td><td>缺陷坐标与电测对照用，S2 前完成</td></tr>
+          <tr><td>IEEE 1838-2019（3D 裸片堆叠测试访问标准）· SEMI E142（基板映射）</td><td class="num">A</td><td>先进封装测试的标准语境；wrapper / BIST 术语锚点</td></tr>
+        </tbody>
+      </table>
+      <h3>S2–S3 · 统计、模型与论文</h3>
+      <table>
+        <thead><tr><th style="width:30%">资源</th><th style="width:10%">级别</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td>Roehr, ITC 2000（GDBN）· O'Neill ITC 2008 / Sakamoto IEEE TSM 2017 / Katragadda ICMTS 2018 / Niranjan IEEE VTS 2023（无监督离群四法）</td><td class="num">A</td><td>统计基线引擎的方法依据</td></tr>
+          <tr><td>AEC-Q001 / AEC-Q002（付费标准；方法论按文献共识改写，如 Advantest CSTIC 2024, DOI 10.1109/cstic61820.2024.10531864）</td><td class="num">A</td><td>PAT 动态限值的统计方法论（k 值由样本量与方法确定，不是固定 3）</td></tr>
+          <tr><td>Cunningham IEEE TSM 1990 · Stapper IBM JRD 1987（良率模型）</td><td class="num">A</td><td>负二项良率模型的原始出处</td></tr>
+          <tr><td>Pan et al., JETTA 40(3), 2024（DOI 10.1007/s10836-024-06125-7，双预测器）· Wan &amp; McLoone（GPR, IEEE TSM）</td><td class="num">A</td><td>测试结果预测试点的方法模板</td></tr>
+          <tr><td>WM-811K 数据集（Wu 2015）· Bao et al., arXiv:2411.11029, 2024（标注子集可溯源最高 98.56%）</td><td class="num">A</td><td>晶圆图 CNN 的能力基线；产线数据重训后另行评测</td></tr>
+        </tbody>
+      </table>
+      <h3>全程 · 行业跟踪</h3>
+      <table>
+        <thead><tr><th style="width:30%">资源</th><th style="width:10%">级别</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td>SemiEngineering：Test Costs Spiking（2020-03）· Chasing Test Escapes（2021-05）· Adaptive Test Gaining Ground（2025-12）· HBM Shifts Testing Left（2026-05）</td><td class="num">B</td><td>测试经济学 / 逃逸 / 自适应 / 测试左移的四篇主线</td></tr>
+          <tr><td>SemiEngineering / PDF Solutions：AI-Driven Data Feed Forward（2026-07）· The Petabyte Problem（2026）</td><td class="num">B</td><td>chiplet 数据链与制造业数据量级的最新方向</td></tr>
+          <tr><td>本仓库：《<a href="/notes/hbm/hbm3e-hbm4e-process/">HBM3E 与 HBM4E 工艺调研</a>》·《<a href="/notes/hbm/hbm-fact-check-log/">数据核对与落地评估报告</a>》· <a href="/reports/hbm3e-hbm4e/part00-justification.html">PART 00–03 平台四篇</a></td><td class="num">A/B</td><td>已核对的工艺与平台事实源；个人计划与公司蓝图的对齐基准</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ═══════════════ 09 可信度 ═══════════════ -->
+    <section>
+      <div class="sec-head"><span class="sec-no">09</span><h2>数据可信度与设计假设</h2></div>
+      <table>
+        <thead><tr><th style="width:18%">级别</th><th>范围</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>A · 可溯源</b></td>
+            <td>STDF V4 规范、IEEE 1838-2019、SEMI E142、AEC-Q001/Q002 方法论、Roehr ITC 2000、Cunningham 1990 / Stapper 1987、Pan JETTA 2024、Bao arXiv 2024、WM-811K 主体数字、1-10-100（Labovitz &amp; Chang 1992）、良率逃逸算术（0.95¹⁶ ≈ 44%）——均经 2026-09-19 全量核对</td>
+          </tr>
+          <tr>
+            <td><b>B · 行业口径</b></td>
+            <td>SemiEngineering 各文（2020–2026）、PDF Solutions DFF 与 PB 级数据口径、pystdf/pystdf4 选型、Yieldhub 入门——方向性引用，数字不直接进对客材料</td>
+          </tr>
+          <tr>
+            <td><b>C · 设计假设</b></td>
+            <td>能力起点评估、全部 KPI 目标值（覆盖率 90%、取数 -50%、周活 5 人等）、24 个月阶段划分、数据量级锚点中的机台数（64 台为平台蓝图假设）——入岗 30 天内以实测基线重校</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.8rem;color:var(--color-soft);margin-top:1rem;line-height:1.7">
+        与既有材料的关系：本报告是职业视角的单人执行计划；公司平台视角的立项 / 组织 / 架构 / 蓝图见 PART 00–03。
+        两者共享同一套已核对事实与治理设计（建议闸门、IP 分级、触发阈值），数字口径以《数据核对与落地评估报告》为准。
+      </p>
+    </section>
+
+  </div>
+</body>
+</html>
