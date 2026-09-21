@@ -30,9 +30,9 @@
     <text x="446" y="260" font-size="13" font-weight="600" fill="#1c1917">网关机</text>
     <text x="446" y="278" font-size="10.5" fill="#6f665f">SFTP drop · 校验和 · 不合格文件隔离区</text>
     <!-- 生产网区 -> DMZ -->
-    <polyline points="234,130 234,264 426,264" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <polyline points="234,130 234,264 428,264" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
     <text x="150" y="250" font-size="9.5" fill="#6f665f">WPFile / STDF.zip</text>
-    <polyline points="914,130 914,264 734,264" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <polyline points="914,130 914,264 732,264" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
     <text x="922" y="250" font-size="9.5" fill="#6f665f">低置信 ~5% + 缩略图</text>
 
     <!-- 分析区 -->
@@ -65,13 +65,14 @@
     <text x="692" y="576" font-size="10.5" fill="#6f665f">2× 16 TB 镜像</text>
     <text x="692" y="592" font-size="10.5" fill="#6f665f">Silver/Gold 快照 · 3-2-1</text>
     <!-- arrows 分析区 -->
-    <polyline points="580,290 580,352 453,352 453,392" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
-    <text x="588" y="336" font-size="9.5" fill="#6f665f">合格明细</text>
+    <polyline points="580,290 580,327 453,327 453,394" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <text x="498" y="321" font-size="9.5" fill="#6f665f">合格明细</text>
     <line x1="314" y1="434" x2="334" y2="434" stroke="#57534e" stroke-width="1.2"/>
-    <line x1="453" y1="472" x2="453" y2="526" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
-    <polyline points="707,472 707,504 560,504 560,526" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
-    <polyline points="961,472 961,514 644,514 644,526" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
-    <polyline points="568,510 642,510 642,568 672,568" fill="none" stroke="#57534e" stroke-width="1.2" marker-end="url(#arr3)"/>
+    <line x1="420" y1="472" x2="420" y2="528" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <polyline points="707,472 707,500 488,500 488,528" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <polyline points="961,472 961,514 580,514 580,528" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <line x1="638" y1="568" x2="672" y2="568" stroke="#57534e" stroke-width="1.2" marker-end="url(#arr3)"/>
+    <text x="655" y="558" text-anchor="middle" font-size="9.5" fill="#6f665f">快照</text>
 
     <!-- legend -->
     <text x="60" y="686" font-size="11.5" fill="#6f665f">（Y1）（Y2）= 硬件进场年份 · 箭头为数据流向 · 虚线框/虚线区 = 隔离边界或在线流程件 · 详见《配套硬件准备》正文</text>
