@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import ChipStack3D from '../components/viz/ChipStack3D.tsx';
+import HBMStack3D from '../components/viz/HBMStack3D.tsx';
 ---
 
 <Base title="3D 结构" description="CoWoS 型 2.5D 封装剖面交互模型：爆炸视图与图层点选。">
@@ -22,4 +23,16 @@ import ChipStack3D from '../components/viz/ChipStack3D.tsx';
       <li>配合笔记《HBM3E 与 HBM4E 工艺调研》看键合工艺（MR-MUF / TC-NCF / Hybrid Bonding）如何作用于这一结构。</li>
     </ol>
   </section>
+
+  <section class="mt-16">
+    <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Interactive 3D · HBM</p>
+    <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">HBM 三代堆叠对比</h2>
+    <p class="mt-3 max-w-2xl text-slate-600">
+      切换 HBM3E / HBM4 / HBM4E 观察堆叠演进：base die 从存储工艺转向逻辑工艺、供电 TSV 环形分布、
+      16 层混合键合模式下的 775 μm 高度上限。详细解读见笔记
+      <a href="/notes/hbm/hbm-generations-3d/" class="text-cyan-700 underline decoration-cyan-300 underline-offset-2 hover:text-cyan-900">《HBM 三代堆叠的 3D 对比》</a>。
+    </p>
+  </section>
+
+  <HBMStack3D client:visible />
 </Base>

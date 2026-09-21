@@ -1,0 +1,41 @@
+---
+title: 'HBM 三代堆叠的 3D 对比：HBM3E → HBM4 → HBM4E'
+description: '切换三代规格的交互式堆叠模型：base die 从存储工艺转向逻辑工艺、micro-bump 收紧、MR-MUF 改良与 16 层混合键合模式（775 μm 上限）。'
+date: 2026-09-24
+tags: ['HBM', 'HBM3E', 'HBM4E', '混合键合', '3D 可视化']
+---
+
+import HBMStack3D from '../../../components/viz/HBMStack3D.tsx';
+
+## 交互模型
+
+顶部切换 HBM3E / HBM4 / HBM4E 三代；点击任一物理层（DRAM 裸片、键合层、Base Die、micro-bump、封装基板、TSV）查看该代说明；右下表格为逐项规格（口径同《[HBM3E 与 HBM4E 工艺调研](/notes/hbm/hbm3e-hbm4e-process/)》2026-09-19 核对版）。
+
+<HBMStack3D client:visible />
+
+## 模型里可以看到什么
+
+**1. Base Die 的颜色变化是三代最本质的结构差异。** HBM3E 的 base die 用存储工艺（与 DRAM 同代节点）制造；HBM4 起改用逻辑工艺（TSMC 12FFC+/N5、三星自研 4nm）；HBM4E 支持可定制 base die（C-HBM4E，3nm 级，目标 2027 年 12.8 GT/s）。节点越先进，控制器越快、越凉——这决定了整包速率与能效的上限。
+
+**2. TSV 布局差异对应供电演进。** HBM3E 引入 all-around power TSV：供电通孔数量增至约 6 倍，IR drop 降低最高 75%（Siemens 汇总口径）。模型中 HBM3E 的通孔呈四周环状分布，HBM4/4E 保留中心区域布局。
+
+**3. 键合层在 16 层模式消失。** HBM4E 默认 12 层仍用先进 MR-MUF（热阻较 HBM4 改善约 17%）；切换到"16 层 · 混合键合模式"后，层间 MR-MUF 消失、裸片变薄直接 Cu-Cu 键合——因为 16 层堆叠高度逼近 775 μm 上限，MR-MUF 工艺无法满足，这是 SK 海力士在 Hot Chips 2026 表态混合键合推迟到 HBM5 之后仍要为其储备的动因。
+
+## 三代规格对照（核对口径）
+
+| 维度 | HBM3E | HBM4 | HBM4E |
+|---|---|---|---|
+| JEDEC | JESD238 系列 | JESD270-4（2025-04） | 基于 JESD270-4 扩展 |
+| 接口 | 1024-bit | 2048-bit | 2048-bit |
+| 引脚速率 | 9.2–9.8 Gbps | 6.4–12.8 Gbps | 14 / 最高 16 Gbps |
+| 单堆栈带宽 | >1.2 TB/s | >2.0 TB/s | 3.6–4.0 TB/s |
+| 容量 | 24–36GB | 36GB（16 层 64GB） | 48GB（12 层） |
+| DRAM | 1b · 24Gb | 1b（SK）/ 1c（三星） | 1c · 32Gb |
+| Base Die | 存储工艺 | 逻辑工艺 12nm/N5 · 4nm | 3nm 级（可定制）/ 4nm |
+| 键合 | MR-MUF / TC-NCF | 延续 | MR-MUF（−17% 热阻）；HB 候选 |
+
+## 延伸阅读
+
+- 工艺细节与可信度分级：《[HBM3E 与 HBM4E 工艺调研](/notes/hbm/hbm3e-hbm4e-process/)》
+- 九步封装链路图解：《[HBM 先进封装工艺图解](/reports/hbm3e-hbm4e/hbm-packaging-process.html)》
+- 堆栈所处的 2.5D 封装环境：《[CoWoS：2.5D 封装的旗舰平台](/notes/2-5d/cowos/)》
