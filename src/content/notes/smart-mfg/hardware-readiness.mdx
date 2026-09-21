@@ -5,7 +5,6 @@ date: 2026-09-24
 tags: ['智能制造', '硬件', '数据平台', '基础设施', '路线图']
 ---
 
-import Mermaid from '../../../components/Mermaid.astro';
 
 > 定位：本文是路线图的**硬件配套视角**，与《[数据科学在先进封装厂的落地方案](/notes/smart-mfg/data-science-roadmap/)》逐阶段对应；
 > 数据量锚点沿用《[数据核对与落地评估报告](/notes/hbm/hbm-fact-check-log/)》已核对口径。不考虑采购价格，但明确"不买什么"的触发条件。
@@ -19,11 +18,11 @@ import Mermaid from '../../../components/Mermaid.astro';
 
 ## 数据量推演：存储采购的依据
 
-锚点：64 台 tester × 12.5 万 die/日 × 6 KB ≈ 48 GB/日（STDF raw，已核对口径；64 台为平台蓝图假设，以实测替换）。
+锚点：64 台 tester × 12.5 万 die/日 × 6 KB ≈ 48 GB/日（WPFile/STDF raw——广立微链路的 WPFile 与国际 STDF 字段语义同构，量级估算与文件封装无关；已核对口径；64 台为平台蓝图假设，以实测替换）。
 
 | 数据流 | 增速推演 | Y1 末累计 | Y2 末累计 |
 |---|---|---|---|
-| STDF raw（Bronze） | 48 GB/日 ≈ 17 TB/年 | 17 TB | 34 TB |
+| CP/FT 测试数据 raw（WPFile / STDF，Bronze） | 48 GB/日 ≈ 17 TB/年 | 17 TB | 34 TB |
 | Parquet 明细（Silver/Gold，列存压缩约 1/5） | ≈ 3.5 TB/年 | 3.5 TB | 7 TB |
 | KLARF + 过程量测 + FDC 轨迹 | ≈ 4 TB/年（假设 FDC 每机台 200 参数 × 1 Hz） | 4 TB | 8 TB |
 | AOI 图像留样（S3 起：低置信/异常全图 ~5% + 全量缩略图） | ≈ 35 TB/年（假设 2 张/die × 5 MB） | — | 35 TB |
@@ -37,7 +36,7 @@ import Mermaid from '../../../components/Mermaid.astro';
 
 | 硬件 | 数量 | 配置 | 为什么是这个阶段/这个配置 | 升级触发条件 |
 |---|---|---|---|---|
-| 开发工作站 | 1 | 16 核桌面级 CPU · 128 GB DDR5 · 2+4 TB NVMe · RTX 5090 32 GB | S0 解析器开发（STDF 明细的 DuckDB 大内存聚合吃内存）、S2 统计引擎与 notebook 分析；32 GB 卡供原型级 CNN 微调与可视化，不必等 GPU 服务器 | 长期满载或需要 48 GB+ 显存实验 → 迁移到 GPU 服务器 |
+| 开发工作站 | 1 | 16 核桌面级 CPU · 128 GB DDR5 · 2+4 TB NVMe · RTX 5090 32 GB | S0 解析器开发（WPFile/STDF 明细的 DuckDB 大内存聚合吃内存）、S2 统计引擎与 notebook 分析；32 GB 卡供原型级 CNN 微调与可视化，不必等 GPU 服务器 | 长期满载或需要 48 GB+ 显存实验 → 迁移到 GPU 服务器 |
 | 虚拟化宿主服务器 | 1 | 48 核 EPYC/Xeon · 384 GB DDR5 ECC · 2× 960 GB 系统盘（RAID1）· 2× 4 TB NVMe 缓存 | 承载 S0–S2 全部常驻服务（对象存储单节点、Postgres、看板、cron 管道、数据质量门，约 10 个以内）；384 GB 内存给 DuckDB 查询与多 VM 冗余；Proxmox 虚拟化把服务按 VM 隔离 | 常驻服务 >10 或 CPU 持续 >70% → 下拉第二计算节点 |
 | 存储节点 | 1 | 12 盘位 · 6× 16 TB NL-SAS（ZFS RAIDZ2，可用约 64 TB）· 2× 2 TB NVMe 缓存 | 覆盖 Y1 末 25 TB 数据 × 重处理余量与快照；Bronze 不可变层放这里，解析器升级可全量回放 | 可用容量用量 >60%（约 38 TB）→ 启动 Y2 扩容采购 |
 | 备份 NAS | 1 | 4 盘位 · 2× 16 TB（镜像，可用 16 TB） | Silver/Gold 快照 + 数据字典 + 配置的 3-2-1 备份线；Bronze 原始档不做双副本——原始数据可从机台重拉，双倍存储不如清单校验 | 快照增量 >50% 空间 → 加盘 |
@@ -83,33 +82,7 @@ import Mermaid from '../../../components/Mermaid.astro';
 
 ## 部署拓扑
 
-<Mermaid code={`graph TB
-  subgraph PN[生产网区 · IT 管辖]
-    ATE[tester 机台 x64]
-    AOI[AOI / 量测设备]
-    EDGE[边缘推理盒 Y2<br/>低置信过滤]
-  end
-  subgraph DMZ[DMZ 隔离区]
-    GW[网关机<br/>SFTP drop / 校验和 / 隔离区]
-  end
-  subgraph AN[分析区 · 数据科学团队]
-    WS[开发工作站 Y1]
-    SRV[虚拟化宿主 Y1]
-    C2[计算节点 Y2]
-    GPU[GPU 训练服务器 Y2<br/>2 x 96GB]
-    ST[存储节点 Y1 / 扩容 Y2]
-    NAS[备份 NAS Y1]
-  end
-  ATE -->|STDF.zip| GW
-  AOI -->|图像 / 元数据| EDGE
-  EDGE -->|低置信 5% + 缩略图| GW
-  GW --> SRV
-  SRV --> ST
-  SRV --> NAS
-  WS --> SRV
-  C2 --> ST
-  GPU --> ST
-`} />
+<img src="/diagrams/hw-topology.svg" alt="硬件部署拓扑：三区与数据流" />
 
 ## 假设与可信度
 

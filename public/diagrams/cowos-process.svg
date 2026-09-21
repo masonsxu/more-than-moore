@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 230" role="img" aria-label="CoWoS 简化工艺流程：六步">
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#57534e"/>
+    </marker>
+  </defs>
+  <g font-family="Geist, PingFang SC, Microsoft YaHei, sans-serif">
+    <!-- step numbers -->
+    <g font-family="Geist Mono, Menlo, monospace" font-size="10" letter-spacing="1" fill="#6f665f">
+      <text x="125" y="56" text-anchor="middle">01</text>
+      <text x="307" y="56" text-anchor="middle">02</text>
+      <text x="489" y="56" text-anchor="middle" fill="#c2410c">03</text>
+      <text x="671" y="56" text-anchor="middle">04</text>
+      <text x="853" y="56" text-anchor="middle">05</text>
+      <text x="1035" y="56" text-anchor="middle">06</text>
+    </g>
+    <!-- boxes -->
+    <g fill="#ffffff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2">
+      <rect x="50" y="66" width="150" height="96" rx="8"/>
+      <rect x="232" y="66" width="150" height="96" rx="8"/>
+      <rect x="414" y="66" width="150" height="96" rx="8" fill="rgba(194,65,12,0.07)" stroke="#c2410c" stroke-width="1.8"/>
+      <rect x="596" y="66" width="150" height="96" rx="8"/>
+      <rect x="778" y="66" width="150" height="96" rx="8"/>
+      <rect x="960" y="66" width="150" height="96" rx="8"/>
+    </g>
+    <!-- titles + subs -->
+    <g text-anchor="middle" fill="#1c1917" font-size="13.5" font-weight="600">
+      <text x="125" y="108">晶圆制备</text>
+      <text x="307" y="108">Interposer 制备</text>
+      <text x="489" y="108" fill="#9a3412">C2W 键合</text>
+      <text x="671" y="108">Underfill</text>
+      <text x="853" y="108">C4 键合</text>
+      <text x="1035" y="108">塑封 · 焊球</text>
+    </g>
+    <g text-anchor="middle" fill="#6f665f" font-size="11">
+      <text x="125" y="132">SoC · HBM</text>
+      <text x="307" y="132">TSV + RDL</text>
+      <text x="489" y="132">micro-bump · 热压</text>
+      <text x="671" y="132">研磨露头</text>
+      <text x="853" y="132">封装基板</text>
+      <text x="1035" y="132">切割</text>
+    </g>
+    <!-- arrows -->
+    <g stroke="#57534e" stroke-width="1.4">
+      <line x1="202" y1="114" x2="228" y2="114" marker-end="url(#arr)"/>
+      <line x1="384" y1="114" x2="410" y2="114" marker-end="url(#arr)"/>
+      <line x1="566" y1="114" x2="592" y2="114" marker-end="url(#arr)"/>
+      <line x1="748" y1="114" x2="774" y2="114" marker-end="url(#arr)"/>
+      <line x1="930" y1="114" x2="956" y2="114" marker-end="url(#arr)"/>
+    </g>
+    <text x="580" y="205" text-anchor="middle" font-size="11.5" fill="#6f665f">橙色 = Chip-to-Wafer 键合，CoWoS 良率的关键工序（micro-bump 对准精度 + 热压参数）</text>
+  </g>
+</svg>

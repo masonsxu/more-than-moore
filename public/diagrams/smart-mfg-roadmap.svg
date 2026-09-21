@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 250" role="img" aria-label="智能制造 24 个月路线图：S0 到 S4 五阶段">
+  <defs>
+    <marker id="arr2" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#57534e"/>
+    </marker>
+  </defs>
+  <g font-family="Geist, PingFang SC, Microsoft YaHei, sans-serif">
+    <!-- arrows -->
+    <g stroke="#57534e" stroke-width="1.4">
+      <line x1="238" y1="120" x2="258" y2="120" marker-end="url(#arr2)"/>
+      <line x1="458" y1="120" x2="478" y2="120" marker-end="url(#arr2)"/>
+      <line x1="678" y1="120" x2="698" y2="120" marker-end="url(#arr2)"/>
+      <line x1="898" y1="120" x2="918" y2="120" marker-end="url(#arr2)"/>
+    </g>
+    <!-- S0 -->
+    <rect x="42" y="30" width="196" height="180" rx="10" fill="#ffffff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <circle cx="64" cy="54" r="6" fill="#a8a29e"/>
+    <text x="78" y="59" font-size="14" font-weight="600" fill="#1c1917">S0 数据地基</text>
+    <text x="64" y="82" font-family="Geist Mono, Menlo, monospace" font-size="10.5" fill="#6f665f">M0–3</text>
+    <line x1="64" y1="92" x2="216" y2="92" stroke="rgba(28,25,23,0.12)"/>
+    <text x="64" y="114" font-size="10.5" fill="#57534e">设备联网 · 主数据统一</text>
+    <text x="64" y="131" font-size="10.5" fill="#57534e">统一数据字典 v1</text>
+    <rect x="64" y="168" width="76" height="22" rx="11" fill="rgba(168,162,158,0.16)"/>
+    <text x="102" y="183" text-anchor="middle" font-family="Geist Mono, Menlo, monospace" font-size="10" fill="#57534e">阶梯 L1</text>
+    <!-- S1 -->
+    <rect x="262" y="30" width="196" height="180" rx="10" fill="#ffffff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <circle cx="284" cy="54" r="6" fill="#4e6e81"/>
+    <text x="298" y="59" font-size="14" font-weight="600" fill="#1c1917">S1 可视化</text>
+    <text x="284" y="82" font-family="Geist Mono, Menlo, monospace" font-size="10.5" fill="#6f665f">M3–6</text>
+    <line x1="284" y1="92" x2="436" y2="92" stroke="rgba(28,25,23,0.12)"/>
+    <text x="284" y="114" font-size="10.5" fill="#57534e">三张核心看板</text>
+    <text x="284" y="131" font-size="10.5" fill="#57534e">日报自动化 · 异常推送</text>
+    <rect x="284" y="168" width="76" height="22" rx="11" fill="rgba(78,110,129,0.14)"/>
+    <text x="322" y="183" text-anchor="middle" font-family="Geist Mono, Menlo, monospace" font-size="10" fill="#4e6e81">阶梯 L1</text>
+    <!-- S2 -->
+    <rect x="482" y="30" width="196" height="180" rx="10" fill="#ffffff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <circle cx="504" cy="54" r="6" fill="#a16207"/>
+    <text x="518" y="59" font-size="14" font-weight="600" fill="#1c1917">S2 统计能力</text>
+    <text x="504" y="82" font-family="Geist Mono, Menlo, monospace" font-size="10.5" fill="#6f665f">M6–12</text>
+    <line x1="504" y1="92" x2="656" y2="92" stroke="rgba(28,25,23,0.12)"/>
+    <text x="504" y="114" font-size="10.5" fill="#57534e">SPC · PAT/DPAT · FDC 雏形</text>
+    <text x="504" y="131" font-size="10.5" fill="#57534e">统计基线引擎 + 追溯 CLI</text>
+    <rect x="504" y="168" width="76" height="22" rx="11" fill="rgba(161,98,7,0.14)"/>
+    <text x="542" y="183" text-anchor="middle" font-family="Geist Mono, Menlo, monospace" font-size="10" fill="#a16207">阶梯 L2</text>
+    <!-- S3 -->
+    <rect x="702" y="30" width="196" height="180" rx="10" fill="#ffffff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <circle cx="724" cy="54" r="6" fill="#c2410c"/>
+    <text x="738" y="59" font-size="14" font-weight="600" fill="#1c1917">S3 预测与优化</text>
+    <text x="724" y="82" font-family="Geist Mono, Menlo, monospace" font-size="10.5" fill="#6f665f">M12–18</text>
+    <line x1="724" y1="92" x2="876" y2="92" stroke="rgba(28,25,23,0.12)"/>
+    <text x="724" y="114" font-size="10.5" fill="#57534e">良率预测 · AOI CNN · PdM</text>
+    <text x="724" y="131" font-size="10.5" fill="#57534e">3 个模型试点报告</text>
+    <rect x="724" y="168" width="76" height="22" rx="11" fill="rgba(194,65,12,0.14)"/>
+    <text x="762" y="183" text-anchor="middle" font-family="Geist Mono, Menlo, monospace" font-size="10" fill="#c2410c">阶梯 L3</text>
+    <!-- S4 -->
+    <rect x="922" y="30" width="196" height="180" rx="10" fill="#ffffff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <circle cx="944" cy="54" r="6" fill="#9a3412"/>
+    <text x="958" y="59" font-size="14" font-weight="600" fill="#1c1917">S4 闭环智能</text>
+    <text x="944" y="82" font-family="Geist Mono, Menlo, monospace" font-size="10.5" fill="#6f665f">M18–24</text>
+    <line x1="944" y1="92" x2="1096" y2="92" stroke="rgba(28,25,23,0.12)"/>
+    <text x="944" y="114" font-size="10.5" fill="#57534e">APS · 知识库 · 自适应闸门</text>
+    <text x="944" y="131" font-size="10.5" fill="#57534e">闭环试点 + 孪生数据集</text>
+    <rect x="944" y="168" width="76" height="22" rx="11" fill="rgba(154,52,18,0.13)"/>
+    <text x="982" y="183" text-anchor="middle" font-family="Geist Mono, Menlo, monospace" font-size="10" fill="#9a3412">阶梯 L4</text>
+    <text x="580" y="236" text-anchor="middle" font-size="11.5" fill="#6f665f">每一级为下一级供数：没有 S0 的采集覆盖率，S2 的统计限值就是空谈；没有 S2 的基线，S3 的模型没有可信标签</text>
+  </g>
+</svg>

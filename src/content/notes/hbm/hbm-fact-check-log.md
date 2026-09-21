@@ -157,3 +157,12 @@ tags: ['HBM', '事实核查', '数据可信度']
 - SemiEngineering：Test Costs Spiking（2020-03-10）、Chasing Test Escapes（2021-05-11）、Adaptive Test Gaining Ground（2025-12-09）、HBM Shifts Testing Left（2026-05-12）
 - 平台：LinkedIn Kafka 基准（2014-04）、Kafka at LinkedIn（2015-09）、Aiven 基准（2017-03）、endoflife.date（Kafka/Spark/Flink/Prometheus 支持线，2026-09）、GitHub minio/minio（archived，2026-04）、Vantage/instances.vantage.sh（p4d 价格，2026-09）、AWS 定价 API、Lambda 云定价（2026-09）、Databricks medallion glossary、teamtopologies.com/key-concepts
 - 公司：落地主体的工商/招聘/供应链公开调研在项目沟通中完成；名称与出处属敏感信息，不入材料
+
+## 8. 2026-09-24 复核增补（二次网络核验）
+
+应用户要求对关键事实做二次核验并留存引用，方法为官方新闻稿直查 + 多家独立媒体交叉，结果见归档文件：[`public/sources/hbm3e-hbm4e/2026-09-24_source-check-addendum.md`](/sources/hbm3e-hbm4e/2026-09-24_source-check-addendum.md)。
+
+- SK 海力士 HBM4E 送样口径（2026-06-18、12 层、16 Gbps、能效 +20%、Advanced MR-MUF 热阻 −17%）：经官方新闻稿 + 朝鲜日报 + Asia Business Daily + HotHardware 四个独立渠道交叉确认，维持 A 级
+- SEMI E134（Data Collection Management）、SEMI E164（EDA Common Metadata）标准号在 SEMI 官方商店核对确认
+- 广立微 DataExp-YMS 产品口径（CP/FT/WAT/Inline/Defect/WIP 数据分析）经官网确认
+- WPFile 未检索到公开格式规范，按厂内/测试机私有格式保守处理；术语对照见《[术语对照与使用指南](/notes/method/terminology-and-usage/)》

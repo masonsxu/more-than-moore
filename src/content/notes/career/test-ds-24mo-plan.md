@@ -5,6 +5,8 @@ date: 2026-09-24
 tags: ['职业发展', '测试数据', '数据平台', 'PAT']
 ---
 
+> 术语按厂内实际栈（WPFile / MES / EAP / EDA / 广立微 DataExp）对照与材料使用指南见《[术语对照与使用指南](/notes/method/terminology-and-usage/)》。
+>
 > 本文是计划摘要。完整版（含六层架构全景图、24 个月甘特图、能力雷达图）见精排报告
 > 《[测试数据科学工程师 · 从零开始 24 个月发展计划](/reports/career/test-data-scientist-24mo-plan.html)》。
 

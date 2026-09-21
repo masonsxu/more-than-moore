@@ -5,7 +5,6 @@ date: 2026-09-24
 tags: ['智能制造', '数据科学', '路线图', '先进封装', 'SPC']
 ---
 
-import Mermaid from '../../../components/Mermaid.astro';
 
 > 定位说明：本文是**技术落地视角**。公司平台视角（立项/组织/架构/蓝图）见 [PART 00–03](/reports/)，
 > 个人职业视角见《[测试数据科学工程师：24 个月发展计划](/notes/career/test-ds-24mo-plan/)》，
@@ -29,12 +28,7 @@ import Mermaid from '../../../components/Mermaid.astro';
 
 ## 总路线图
 
-<Mermaid code={`graph LR
-  S0[S0 数据地基<br/>M0-3<br/>设备联网+治理] --> S1[S1 可视化<br/>M3-6<br/>看板+自动报表]
-  S1 --> S2[S2 统计能力<br/>M6-12<br/>SPC+PAT+FDC 雏形]
-  S2 --> S3[S3 预测与优化<br/>M12-18<br/>良率/AOI/PdM 模型试点]
-  S3 --> S4[S4 闭环智能<br/>M18-24<br/>调度/知识库/自适应闸门]
-`} />
+<img src="/diagrams/smart-mfg-roadmap.svg" alt="智能制造 24 个月路线图：S0-S4 五阶段" />
 
 每一级都为下一级供数：没有 S0 的采集覆盖率，S2 的统计限值就是空谈；没有 S2 的稳定基线，S3 的模型没有可信的标签与特征。
 
@@ -44,8 +38,8 @@ import Mermaid from '../../../components/Mermaid.astro';
 
 **做什么**
 
-1. 设备联网盘点：按 SEMI E5/E30 逐台确认 SECS/GEM 接口开放情况，产出《接口可用性台账》；不开放的机台列清单走厂商开通或文件落地（STDF/CSV）兜底
-2. 三类数据源接入原型：测试结果（STDF V4）、缺陷/检图（KLARF、AOI 图像索引）、过程量测（厚度/翘曲/凸点高度）
+1. 设备联网盘点：EAP（SECS/GEM，SEMI E5/E30）与 EDA（SEMI E134/E164）两条通道逐台确认接口开放情况，产出《接口可用性台账》；不开放的机台列清单走厂商开通或文件落地（WPFile/STDF）兜底
+2. 三类数据源接入原型：测试结果（厂内 WPFile / 国际 STDF，字段语义同构，解析器按厂内实际格式选型）、缺陷/检图（KLARF、AOI 图像索引）、过程量测（厚度/翘曲/凸点高度）
 3. 主数据统一：机台、产品、批次、lot/wafer/die/插入点谱系、测试程序版本——一张主键表
 4. 数据分级 L1–L4 落地：客户 IP 数据的存储路径与权限从第一天就隔离（封测厂审厂必查项）
 

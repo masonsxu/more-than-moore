@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 710" role="img" aria-label="硬件部署拓扑：生产网区、DMZ 隔离区、分析区">
+  <defs>
+    <marker id="arr3" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#57534e"/>
+    </marker>
+  </defs>
+  <g font-family="Geist, PingFang SC, Microsoft YaHei, sans-serif">
+    <!-- 生产网区 -->
+    <rect x="60" y="14" width="1040" height="140" rx="10" fill="#faf9f7" stroke="rgba(28,25,23,0.14)"/>
+    <text x="76" y="38" font-family="Geist Mono, Menlo, monospace" font-size="11" letter-spacing="1.5" fill="#6f665f">生产网区 · IT 管辖</text>
+    <rect x="84" y="54" width="300" height="76" rx="8" fill="#ffffff" stroke="rgba(28,25,23,0.22)"/>
+    <text x="100" y="80" font-size="13" font-weight="600" fill="#1c1917">tester 机台 ×64</text>
+    <text x="100" y="100" font-size="10.5" fill="#6f665f">CP · FT · SLT</text>
+    <text x="100" y="116" font-size="10.5" fill="#6f665f">测试数据文件（WPFile / STDF）</text>
+    <rect x="424" y="54" width="260" height="76" rx="8" fill="#ffffff" stroke="rgba(28,25,23,0.22)"/>
+    <text x="440" y="80" font-size="13" font-weight="600" fill="#1c1917">AOI / 量测设备</text>
+    <text x="440" y="100" font-size="10.5" fill="#6f665f">缺陷图像 · 过程量测</text>
+    <text x="440" y="116" font-size="10.5" fill="#6f665f">FDC 参数轨迹</text>
+    <rect x="764" y="54" width="300" height="76" rx="8" fill="#ffffff" stroke="rgba(28,25,23,0.22)" stroke-dasharray="5 4"/>
+    <text x="780" y="80" font-size="13" font-weight="600" fill="#1c1917">边缘推理盒（Y2）</text>
+    <text x="780" y="100" font-size="10.5" fill="#6f665f">Jetson AGX Orin 64 GB</text>
+    <text x="780" y="116" font-size="10.5" fill="#6f665f">在线初筛 · 低置信过滤</text>
+    <line x1="684" y1="92" x2="760" y2="92" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <text x="722" y="82" text-anchor="middle" font-size="9.5" fill="#6f665f">原图</text>
+
+    <!-- DMZ -->
+    <rect x="60" y="200" width="1040" height="104" rx="10" fill="rgba(194,65,12,0.05)" stroke="rgba(28,25,23,0.35)" stroke-dasharray="7 5"/>
+    <text x="76" y="224" font-family="Geist Mono, Menlo, monospace" font-size="11" letter-spacing="1.5" fill="#9a3412">DMZ 隔离区 · 唯一入口</text>
+    <rect x="430" y="238" width="300" height="52" rx="8" fill="#ffffff" stroke="rgba(28,25,23,0.28)"/>
+    <text x="446" y="260" font-size="13" font-weight="600" fill="#1c1917">网关机</text>
+    <text x="446" y="278" font-size="10.5" fill="#6f665f">SFTP drop · 校验和 · 不合格文件隔离区</text>
+    <!-- 生产网区 -> DMZ -->
+    <polyline points="234,130 234,264 426,264" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <text x="150" y="250" font-size="9.5" fill="#6f665f">WPFile / STDF.zip</text>
+    <polyline points="914,130 914,264 734,264" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <text x="922" y="250" font-size="9.5" fill="#6f665f">低置信 ~5% + 缩略图</text>
+
+    <!-- 分析区 -->
+    <rect x="60" y="350" width="1040" height="300" rx="10" fill="#ffffff" stroke="rgba(28,25,23,0.3)"/>
+    <text x="76" y="374" font-family="Geist Mono, Menlo, monospace" font-size="11" letter-spacing="1.5" fill="#6f665f">分析区 · 数据科学团队</text>
+    <!-- row 1 -->
+    <rect x="84" y="396" width="230" height="76" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.22)"/>
+    <text x="100" y="422" font-size="13" font-weight="600" fill="#1c1917">开发工作站（Y1）</text>
+    <text x="100" y="442" font-size="10.5" fill="#6f665f">16 核 · 128 GB · RTX 5090</text>
+    <text x="100" y="458" font-size="10.5" fill="#6f665f">解析 · Notebook · 原型</text>
+    <rect x="338" y="396" width="230" height="76" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.22)"/>
+    <text x="354" y="422" font-size="13" font-weight="600" fill="#1c1917">虚拟化宿主（Y1）</text>
+    <text x="354" y="442" font-size="10.5" fill="#6f665f">48 核 · 384 GB</text>
+    <text x="354" y="458" font-size="10.5" fill="#6f665f">常驻服务 ≤10 · 管道 · 看板</text>
+    <rect x="592" y="396" width="230" height="76" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.22)"/>
+    <text x="608" y="422" font-size="13" font-weight="600" fill="#1c1917">计算节点（Y2）</text>
+    <text x="608" y="442" font-size="10.5" fill="#6f665f">48 核 · 256 GB</text>
+    <text x="608" y="458" font-size="10.5" fill="#6f665f">FDC/PdM 流式 · 调度求解</text>
+    <rect x="846" y="396" width="230" height="76" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.22)"/>
+    <text x="862" y="422" font-size="13" font-weight="600" fill="#1c1917">GPU 服务器（Y2）</text>
+    <text x="862" y="442" font-size="10.5" fill="#6f665f">2× RTX PRO 6000 · 96 GB</text>
+    <text x="862" y="458" font-size="10.5" fill="#6f665f">训练区隔离 · 不落地终端</text>
+    <!-- row 2 -->
+    <rect x="338" y="530" width="300" height="76" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.22)"/>
+    <text x="354" y="556" font-size="13" font-weight="600" fill="#1c1917">存储节点（Y1 → Y2 扩容）</text>
+    <text x="354" y="576" font-size="10.5" fill="#6f665f">ZFS RAIDZ2 · 可用约 149 TB</text>
+    <text x="354" y="592" font-size="10.5" fill="#6f665f">Bronze 不可变 · 解析升级可回放</text>
+    <rect x="676" y="530" width="230" height="76" rx="8" fill="#faf9f7" stroke="rgba(28,25,23,0.22)"/>
+    <text x="692" y="556" font-size="13" font-weight="600" fill="#1c1917">备份 NAS（Y1）</text>
+    <text x="692" y="576" font-size="10.5" fill="#6f665f">2× 16 TB 镜像</text>
+    <text x="692" y="592" font-size="10.5" fill="#6f665f">Silver/Gold 快照 · 3-2-1</text>
+    <!-- arrows 分析区 -->
+    <polyline points="580,290 580,352 453,352 453,392" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <text x="588" y="336" font-size="9.5" fill="#6f665f">合格明细</text>
+    <line x1="314" y1="434" x2="334" y2="434" stroke="#57534e" stroke-width="1.2"/>
+    <line x1="453" y1="472" x2="453" y2="526" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <polyline points="707,472 707,504 560,504 560,526" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <polyline points="961,472 961,514 644,514 644,526" fill="none" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr3)"/>
+    <polyline points="568,510 642,510 642,568 672,568" fill="none" stroke="#57534e" stroke-width="1.2" marker-end="url(#arr3)"/>
+
+    <!-- legend -->
+    <text x="60" y="686" font-size="11.5" fill="#6f665f">（Y1）（Y2）= 硬件进场年份 · 箭头为数据流向 · 虚线框/虚线区 = 隔离边界或在线流程件 · 详见《配套硬件准备》正文</text>
+  </g>
+</svg>

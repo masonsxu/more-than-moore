@@ -6,7 +6,6 @@ tags: ['2.5D', 'CoWoS', 'Interposer', 'HBM']
 ---
 
 import ChipStack3D from '../../../components/viz/ChipStack3D.tsx';
-import Mermaid from '../../../components/Mermaid.astro';
 
 ## 结构总览
 
@@ -25,12 +24,7 @@ die 间互连密度是 2.5D 的核心诉求。硅中介层沿用晶圆工艺做�
 
 ## 工艺流程（简化）
 
-<Mermaid code={`graph LR
-  A[晶圆制备<br/>SoC / HBM] --> B[Interposer 制备<br/>TSV + RDL]
-  B --> C[Chip-to-Wafer 键合<br/>micro-bump + 热压]
-  C --> D[Underfill + 研磨露头]
-  D --> E[C4 键合到基板]
-  E --> F[塑封 + 焊球 + 切割]`} />
+<img src="/diagrams/cowos-process.svg" alt="CoWoS 简化工艺流程（六步）" />
 
 ## 热管理：堆叠的代价
 
