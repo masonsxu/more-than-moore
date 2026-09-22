@@ -25,7 +25,7 @@ tags: ['职业发展', '测试数据', '数据平台', 'PAT']
 
 | 信号 | 级别 | 对计划的推论 |
 |---|---|---|
-| Chiplet/2.5D 拉长测试数据链，Data Feed Forward 让 CP 测量供给 FT/SLT 跨插入点使用（PDF Solutions, 2026） | B | 谱系建模（lot/wafer/die/insert/程序版本）从第 1 个月开始，不做事后补 |
+| HBM 3D 堆叠把测试数据链拉长：晶圆 CP → 堆叠 PSWT → KGSD → 2.5D 组装联测的多插入点结构（HBM 测试左移，SemiEngineering, 2026）；Data Feed Forward 让 CP 测量供给 FT/SLT 跨插入点使用（PDF Solutions, 2026） | B | 谱系建模（lot/wafer/die/insert/程序版本）从第 1 个月开始，不做事后补 |
 | 自适应测试从试点走向产线标配（SemiEngineering, 2025-12） | B | 统计基线（PAT/DPAT/GDBN）是前置技能，模型是增量 |
 | 制造业数据只有一小部分被分析，先进封装测试进入 PB 量级（SemiEngineering, 2026） | B | 瓶颈顺序：管道 → 存储 → 模型；工程能力先行 |
 | 测试成本占营收约 2%，拦截越靠前越便宜（SemiEngineering 2020；1-10-100 法则） | A/B | 个人价值叙事锚定拦截成本：交付换算成 DPPM 或测试时长 |
@@ -87,5 +87,6 @@ tags: ['职业发展', '测试数据', '数据平台', 'PAT']
 - AEC-Q001/Q002 方法论（Advantest CSTIC 2024, DOI 10.1109/cstic61820.2024.10531864）— PAT 动态限值
 - Roehr ITC 2000（GDBN）、Cunningham 1990 / Stapper 1987（良率模型）、Pan JETTA 2024（双预测器）、Bao arXiv:2411.11029（WM-811K 98.56% 基线）
 - SemiEngineering 四篇主线：Test Costs Spiking（2020-03）/ Chasing Test Escapes（2021-05）/ Adaptive Test Gaining Ground（2025-12）/ HBM Shifts Testing Left（2026-05）
+- 行业语境材料底座：《[材料地图：HBM 先进封装-3D 封装材料收集](/notes/hbm/materials-map-3d/)》（全部来源带真实链接与抓取日期）
 
 完整清单与可信度分级见精排报告第 08–09 节。

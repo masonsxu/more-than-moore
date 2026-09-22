@@ -166,3 +166,14 @@ tags: ['HBM', '事实核查', '数据可信度']
 - SEMI E134（Data Collection Management）、SEMI E164（EDA Common Metadata）标准号在 SEMI 官方商店核对确认
 - 广立微 DataExp-YMS 产品口径（CP/FT/WAT/Inline/Defect/WIP 数据分析）经官网确认
 - WPFile 未检索到公开格式规范，按厂内/测试机私有格式保守处理；术语对照见《[术语对照与使用指南](/notes/method/terminology-and-usage/)》
+
+## 9. 2026-09-25 聚焦调整增补（HBM 先进封装-3D 封装）
+
+项目从 2.5D 优先调整为 **HBM 先进封装-3D 封装优先**。本轮调整的材料收集与改动留痕：
+
+- 新增材料收集 6 份（全文抓取或官方页索引核验），归档于 [`public/sources/hbm-3d/`](/sources/hbm-3d/)；总目录见《[材料地图](/notes/hbm/materials-map-3d/)》
+- 删除《CoWoS：2.5D 封装的旗舰平台》笔记，改写为《[HBM 堆栈的集成环境](/notes/hbm/integration-context/)》（3D 为主、2.5D 为宾；2.5D 相关事实全部保留且带源）
+- 《Chiplet 互连》笔记改写为《[HBM 堆栈内外：互连密度阶梯](/notes/hbm/interconnect-density/)》（UCIe 降为堆栈外语境）
+- 新增口径冲突记录：HBM4 微凸点 pitch 存在两种媒体口径——Hot Chips 2026 一手口径约 30 μm vs Semiconductor Engineering（2025-12）"HBM4 pad pitch 10 μm"；本项目正文采用 Hot Chips 口径，分歧留痕见 [`sources/hbm-3d/2026-09-25_semiengineering_hbm4-microbumps-postponing-hb.md`](/sources/hbm-3d/2026-09-25_semiengineering_hbm4-microbumps-postponing-hb.md)
+- 新增修正：SK 海力士 MR-MUF 长文确认"12 层 HBM3E 散热 +10%"的对比基数为 8 层 HBM3（非 HBM3 12 层版），引用时必须写明基数（A级，官方原文）；HBM2E 散热较 HBM2 +36%、Advanced MR-MUF EMC 热导率 1.6× 为新增可引用官方口径
+- 403 说明：TSMC 3DFabric 官方页、JEDEC 新闻稿页直接抓取返回 403（反爬），页面真实存在（搜索引擎索引正文 + 既有归档），引用不受影响

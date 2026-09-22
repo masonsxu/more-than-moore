@@ -8,8 +8,8 @@ tags: ['HBM', 'HBM3E', 'HBM4E', 'TSV', '混合键合', '封装工艺']
 # HBM3E 与 HBM4E 工艺调研笔记
 
 - 调研日期：2026-09-18
-- 核对日期：2026-09-19（逐条网络核对后修正，修正留痕见《数据核对与落地评估报告》(/notes/hbm/hbm-fact-check-log/)）
-- 调研方式：公开网络来源（厂商新闻稿、行业媒体、EDA 厂商技术指南、JEDEC 标准动态），原始摘录见 [`public/sources/hbm3e-hbm4e/`](/sources/hbm3e-hbm4e/) 目录
+- 核对日期：2026-09-19（逐条网络核对后修正，修正留痕见《数据核对与落地评估报告》(/notes/hbm/hbm-fact-check-log/)；2026-09-25 聚焦调整增补见同报告 §9）
+- 调研方式：公开网络来源（厂商新闻稿、行业媒体、EDA 厂商技术指南、JEDEC 标准动态），原始摘录见 [`public/sources/hbm3e-hbm4e/`](/sources/hbm3e-hbm4e/) 与 [`public/sources/hbm-3d/`](/sources/hbm-3d/) 目录；来源总目录见《[材料地图](/notes/hbm/materials-map-3d/)》
 - 适用范围：DRAM 核心裸片制程节点、base die（基础裸片）逻辑制程、堆叠与封装工艺（TSV / MR-MUF / TC-NCF / Hybrid Bonding）、电气规格、量产时间线
 
 ---

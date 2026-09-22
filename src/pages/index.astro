@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import ChipStack3D from '../components/viz/ChipStack3D.tsx';
+import HBMStack3D from '../components/viz/HBMStack3D.tsx';
 
 const notes = (await getCollection('notes', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
@@ -10,14 +10,14 @@ const notes = (await getCollection('notes', ({ data }) => !data.draft))
 
 <Base title="首页">
   <section class="py-8">
-    <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Advanced Packaging Notes</p>
+    <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">HBM Advanced Packaging · 3D</p>
     <h1 class="mt-2 text-4xl font-bold tracking-tight text-slate-900">More than Moore</h1>
     <p class="mt-4 max-w-2xl text-lg text-slate-600">
-      先进封装学习笔记。以 Markdown 记录 HBM、2.5D/3D 集成、Chiplet、TSV、混合键合的学习过程；重点主题用交互式可视化与精排报告展开。
+      HBM 先进封装-3D 封装学习笔记：TSV 堆叠、micro-bump、MR-MUF/TC-NCF/混合键合、KGD/KGSD 测试左移；2.5D/bridge 仅作堆栈的宿主环境语境。全部材料带真实链接与可信度分级。
     </p>
   </section>
 
-  <ChipStack3D client:visible />
+  <HBMStack3D client:visible />
 
   <section class="mt-12">
     <div class="flex items-baseline justify-between">

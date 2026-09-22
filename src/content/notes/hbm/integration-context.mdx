@@ -1,0 +1,48 @@
+---
+title: 'HBM 堆栈的集成环境：3D 是主体，2.5D 是宿主'
+description: '从 HBM 堆栈视角看集成链路：堆栈作为 3D 集成对象如何落到 interposer 或 bridge 上、外部约束（reticle、应力、热、凸点间距）如何反过来决定堆栈设计。'
+date: 2026-09-25
+tags: ['HBM', '3D 封装', '2.5D', '集成环境']
+---
+
+import ChipStack3D from '../../../components/viz/ChipStack3D.tsx';
+
+## 定位声明
+
+本项目聚焦 **HBM 先进封装-3D 封装**（TSV 堆叠、键合、KGSD，见《[材料地图](/notes/hbm/materials-map-3d/)》）。2.5D（硅中介层）与 bridge 不是本项目的主体，而是 HBM 堆栈出厂后接入系统的**宿主环境**——理解它，是为了知道堆栈的外部约束从哪里来。SK 海力士在 Hot Chips 2026 的官方叙事正是这个次序：HBM 是"base die + 最多 16 片 core die"的 3D 堆叠结构，2.5D 封装只是堆栈与 GPU 同封装互连的环境（[ServeTheHome 现场报道](https://www.servethehome.com/sk-hynix-hbm-packaging-at-hot-chips-2026/)，摘录见 [`sources/hbm-3d/`](/sources/hbm-3d/2026-09-25_skhynix_hotchips2026-packaging_servethehome.md)）。
+
+## 堆栈视角的集成链路
+
+<ChipStack3D client:visible />
+
+自上而下看一个 CoWoS 型封装，注意**哪些层属于 HBM、哪些不属于**：
+
+| 层 | 归属 | 说明 |
+|---|---|---|
+| HBM 堆栈（base die + N 层 DRAM，TSV + micro-bump + MR-MUF/TC-NCF） | **HBM 3D 封装**（本项目主体） | 出厂形态是 KGSD 堆栈（Known Good Stacked Die） |
+| micro-bump（堆栈底面 → interposer/bridge） | 封装集成 | HBM3E 世代 40–55 μm，HBM4 约 30 μm（Hot Chips 2026 口径） |
+| 硅中介层 / silicon bridge | **宿主环境（2.5D）** | RDL 布线 + TSV，或 EMIB 类桥接 |
+| C4 凸点 → 封装基板 → BGA | 宿主环境 | 常规倒装封装链路 |
+
+TSMC 官方对 CoWoS 的定义同样以 HBM 为集成对象："By integrating multiple SoCs and high-bandwidth memory stacks, CoWoS empowers products with high-performance compute and memory bandwidth"（[CoWoS 官方页](https://3dfabric.tsmc.com/english/dedicatedFoundry/technology/cowos.htm)，摘录归档 [`sources/hbm-3d/2026-09-25_tsmc-3dfabric-official-pages.md`](/sources/hbm-3d/2026-09-25_tsmc-3dfabric-official-pages.md)）。
+
+## 宿主环境反哺堆栈设计的四个约束
+
+**1. 组装顺序反转：HBM 先装。** SK 海力士在 Hot Chips 2026 明确：先进封装时代 HBM 从"最后组装"变成"最先组装"，堆栈与中介层因此承受更强的可靠性压力（同上 ServeTheHome 报道）。KGSD 的意义随之放大——坏堆栈不能流向昂贵的中介层（"preventing defective units from consuming costly interposer real estate"）。
+
+**2. 面积与 reticle。** 硅中介层沿用晶圆光刻，单片 reticle 26 mm × 33 mm（≈858 mm²）；CoWoS-S 靠拼接做到约 3.3 倍 reticle（~2700 mm²，TSMC 官方口径）。堆栈数量与 GPU 面积一起瓜分这块预算，直接决定单封装 HBM 颗数。
+
+**3. 应力随平台变化。** 不同 2.5D 平台对堆栈的机械/热应力不同——SK 海力士在 Hot Chips 2026 对比了 CoWoS-S、CoWoS-L、EMIB 各自加在 HBM 颗粒与中介层上的应力（ServeTheHome 报道）。堆栈内部减薄（DRAM 裸片已做到 30–50 μm 量级，[Semiconductor Engineering](https://semiengineering.com/hbm4-sticks-with-microbumps-postponing-hybrid-bonding/)）越激进，对外部应力越敏感。
+
+**4. 热路径串联。** 堆栈自身热阻（层数 ↑ 热阻 ↑）叠加宿主的热流路径，构成整封装热预算。SK 海力士的应对在堆栈内部：Advanced MR-MUF 热阻较 HBM4 改善约 17%（HBM4E 官方口径）、i-HBM 在 die-to-die PHY 热区嵌入高热导绝缘冷却件、目标热阻降低 >30%（Hot Chips 2026 演示口径）。
+
+## 为什么聚焦 3D 而不是 2.5D
+
+- **差异化在堆栈内部**：2026–2027 年代际竞争（HBM4→HBM4E）的胜负手全部在 3D 堆叠内部——base die 逻辑工艺化、层数（12→16）、键合（MR-MUF/TC-NCF→混合键合储备）、供电 TSV。2.5D 平台（CoWoS/EMIB）是成熟供给侧，迭代节奏慢于堆栈。
+- **数据侧的复杂性在堆栈**：测试插入点（晶圆 CP→堆叠→KGSD→组装联测）、良率复利、键合参数监测，全部发生在堆栈制造环节——这是后续数据科学规划的主战场（见《[材料地图](/notes/hbm/materials-map-3d/)》的衔接一节）。
+
+## 参考
+
+- 结构与键合全景：《[HBM3E 与 HBM4E 工艺调研](/notes/hbm/hbm3e-hbm4e-process/)》、报告《[HBM 先进封装工艺图解](/reports/hbm3e-hbm4e/hbm-packaging-process.html)》
+- 互连密度阶梯：《[HBM 堆栈内外：互连密度阶梯](/notes/hbm/interconnect-density/)》
+- 测试与良率：《[HBM 测试的 3D 结构](/notes/hbm/hbm-test-3d/)》

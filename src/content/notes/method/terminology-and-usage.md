@@ -46,8 +46,11 @@ tags: ['术语', '广立微', 'DataExp', 'EAP', 'EDA', '学习方法']
 
 **预算分配建议：70% 方法论与厂内栈（WPFile→管道→统计基线），30% 行业语境**。判断一条材料值不值得深学：问"下个月的管道/基线工作用不用得上"——HBM4E 引脚速率是 14 还是 16 Gbps，不影响你写解析器；PAT 限值怎么按 lot 分层，影响。
 
-## 五、相关笔记
+## 五、项目聚焦与相关笔记
 
+项目聚焦已调整为 **HBM 先进封装-3D 封装**（2026-09-25）：行业语境材料以 HBM 3D 堆叠（TSV/键合/KGSD）为主线，2.5D/bridge 降为堆栈的宿主环境语境。术语对照不变。
+
+- 行业语境总底座：《[材料地图：HBM 先进封装-3D 封装材料收集](/notes/hbm/materials-map-3d/)》
 - 《[数据科学在先进封装厂的落地方案](/notes/smart-mfg/data-science-roadmap/)》（S0 已按 WPFile/EAP/EDA 修正）
 - 《[配套硬件准备](/notes/smart-mfg/hardware-readiness/)》（拓扑图已按厂内栈重绘）
 - 《[数据核对与落地评估报告](/notes/hbm/hbm-fact-check-log/)》（可信度分级的完整方法论）

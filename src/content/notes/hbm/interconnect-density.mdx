@@ -1,0 +1,43 @@
+---
+title: 'HBM 堆栈内外：互连密度阶梯——从 micro-bump 到 hybrid bonding'
+description: '以 HBM 为主线的互连密度阶梯：堆栈内 micro-bump pitch 逐代收紧（55→40→30 μm）、混合键合的亚 10 μm 前景、HB 对测试流程的颠覆，以及 UCIe/D2D 在 HBM 语境中的位置。'
+date: 2026-09-25
+tags: ['HBM', '混合键合', 'Micro-bump', 'D2D', '互连']
+---
+
+## 主线：HBM 堆栈内的凸点密度竞赛
+
+HBM 的带宽和层数上限，物理上由堆栈内的互连密度决定。以 HBM 为主线的 pitch 阶梯（均已核对，口径与出处见《[材料地图](/notes/hbm/materials-map-3d/)》主题二）：
+
+| 世代 | 堆栈内 micro-bump pitch | 状态 | 口径来源 |
+|---|---|---|---|
+| HBM2（2017 实测） | 55 μm（27.5×48 μm 交错） | 量产（历史基线） | SWTest 2017 联合论文（SK 海力士/FormFactor/Advantest） |
+| HBM3E | 40–55 μm | 量产 | 项目 2026-09 核对口径 |
+| HBM4 | 约 30 μm | 量产爬坡 | SK 海力士 Hot Chips 2026（Tom's Hardware 2026-08-24） |
+| HBM4E/HBM5 路线 | &lt;18 μm（混合键合可达，MR-MUF 无法管理） | 开发中 | SK 海力士 Hot Chips 2026（ServeTheHome 现场报道） |
+| 混合键合（无凸点 Cu-Cu） | 亚 10 μm | 逻辑芯片已量产，HBM 推迟至 HBM5 | Tom's Hardware 混合键合路线图（2026-09-02） |
+
+> 口径分歧记录：Semiconductor Engineering（2025-12）称 "The HBM4 pad pitch is 10µm"；与 Hot Chips 一手口径（HBM4 微凸点约 30 μm）存在定义/转述差异。本项目正文采用 Hot Chips 口径，分歧留痕见 [`sources/hbm-3d/2026-09-25_semiengineering_hbm4-microbumps-postponing-hb.md`](/sources/hbm-3d/2026-09-25_semiengineering_hbm4-microbumps-postponing-hb.md)。
+
+**为什么 pitch 收紧会倒逼键合换工艺**：凸点自身有体积，pitch 越小凸点越小、间隙越窄，MR-MUF 的 gap-fill 窗口越窄；SK 海力士给出的量化边界是混合键合可把 pitch 压到 18 μm 以下而 MR-MUF 无法管理（Hot Chips 2026）。JEDEC 把堆栈高度上限从 720 μm 修到 775 μm 后，HBM4 在 16 层内暂时保住微凸点路线（[Semiconductor Engineering](https://semiengineering.com/hbm4-sticks-with-microbumps-postponing-hybrid-bonding/)，B 级多受访方一致）。
+
+## 混合键合：HBM 3D 封装的下一站
+
+- **工艺机理**：室温 pick-and-place + >200 °C 退火形成 SiO₂-SiO₂ 与 Cu-Cu 键合，去掉凸点与 gap-fill（Hot Chips 2026 演示口径）；
+- **路线图**：TSMC SoIC 量产 6 μm、2029 年规划 4.5 μm；Intel Foveros Direct 9 μm 已随 Clearwater Forest 出货（2026 上半年）；AMD 3D V-Cache 起量产在用（Tom's Hardware 2026-09-02 汇总）；
+- **HBM 节奏**：SK 海力士表态混合键合对 HBM4E 不就绪、最早 HBM5（Hot Chips 2026，VP Jaesik Lee）；16 层 775 μm 内继续 TCB/MR-MUF 路线；
+- **对测试的颠覆**：HB 键合面不允许颗粒，"Testing is a particle source"（UMC 具名引语）——测试后需表面平整化修复再键合，KGD 流程必须重新设计。这是 HBM 测试数据链在工艺切换期的最大变量。
+
+## HBM 语境下的 D2D 接口：UCIe 的位置
+
+堆栈内部（DRAM↔base die）的接口由 JEDEC HBM 标准定义，不走 UCIe；UCIe 的 HBM 相关场景在**堆栈之外**：
+
+- GPU/base die 之间、或未来逻辑 base die 承载自定义接口（C-HBM4E 支持挂 UCIe 类 D2D）时的 chiplet 互连；
+- UCIe 要点（1.0 版）：4–32 Gt/s、先进 2D 封装 bump pitch 25–45 μm、亚 pJ/bit 能效——设计逻辑是砍掉长距 SerDes 的"均衡器税"，用并行宽接口换带宽密度。
+
+单片大芯片撞墙（良率随面积断崖下跌、reticle 26×33 mm 上限）是 chiplet 化的动因；对 HBM 而言，这条逻辑同样解释了为什么堆栈层数、容量竞赛发生在"已切好的合格裸片"（KGD）层面——《[HBM 测试的 3D 结构](/notes/hbm/hbm-test-3d/)》的 KGD/KGSD 体系正是为此服务。
+
+## 来源
+
+- 主题一/二的全部 URL 与抓取日期：《[材料地图：HBM 先进封装-3D 封装材料收集](/notes/hbm/materials-map-3d/)》
+- 摘录归档：[`public/sources/hbm-3d/`](/sources/hbm-3d/)、[`public/sources/hbm-test/`](/sources/hbm-test/)、[`public/sources/hbm3e-hbm4e/`](/sources/hbm3e-hbm4e/)

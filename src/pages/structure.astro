@@ -5,24 +5,21 @@ import HBMStack3D from '../components/viz/HBMStack3D.tsx';
 import HBMTest3D from '../components/viz/HBMTest3D.tsx';
 ---
 
-<Base title="3D 结构" description="CoWoS 型 2.5D 封装剖面交互模型：爆炸视图与图层点选。">
+<Base title="3D 结构" description="HBM 3D 封装结构交互模型：三代堆叠对比、测试视图与宿主集成环境。">
   <section class="py-4">
-    <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Interactive 3D</p>
-    <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">2.5D 封装剖面交互模型</h1>
+    <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Interactive 3D · HBM Stack</p>
+    <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">HBM 3D 堆叠结构</h1>
     <p class="mt-3 max-w-2xl text-slate-600">
-      拖拽旋转、滚轮缩放；点击图层或下方标签查看说明，右上角按钮切换爆炸视图。结构为示意比例，不代表真实尺寸。
+      本页主体是 HBM 3D 封装：堆叠结构、测试视图与集成环境三类交互模型。拖拽旋转、滚轮缩放；点击图层或下方标签查看说明，右上角按钮切换爆炸视图。结构为示意比例，不代表真实尺寸。
     </p>
   </section>
 
-  <ChipStack3D client:visible />
-
-  <section class="prose prose-slate mt-10 max-w-none">
+  <section class="prose prose-slate max-w-none">
     <h2>阅读顺序建议</h2>
     <ol>
-      <li>先看<strong>爆炸视图</strong>，自上而下辨认：裸片（SoC + HBM）→ micro-bump → 硅中介层（含 TSV）→ C4 凸点 → 封装基板。</li>
-      <li>切回<strong>合拢视图</strong>，理解各层在真实堆叠中的贴合约束：凸点被压扁、层间只有几十微米。</li>
-      <li>配合笔记《HBM3E 与 HBM4E 工艺调研》看键合工艺（MR-MUF / TC-NCF / Hybrid Bonding）如何作用于这一结构。</li>
-      <li>往下看测试维度：《<a href="/notes/hbm/hbm-test-3d/" class="text-cyan-700 underline decoration-cyan-300 underline-offset-2 hover:text-cyan-900">HBM 测试的 3D 结构</a>》——探针扎针区域、ATE 信号链路与良率失效分析。</li>
+      <li>先看<strong>HBM 三代堆叠对比</strong>：base die 从存储工艺转向逻辑工艺、供电 TSV 演进、16 层混合键合模式——这是 HBM 3D 封装的主线。</li>
+      <li>再看<strong>测试区域 vs GPU 通讯区域</strong>：堆栈的扎针区域、ATE 信号链路与良率失效分析。</li>
+      <li>最后看<strong>集成环境模型</strong>：堆栈出厂（KGSD）后落入 2.5D 封装的外部约束——reticle、应力、热与组装顺序。</li>
     </ol>
   </section>
 
@@ -42,11 +39,23 @@ import HBMTest3D from '../components/viz/HBMTest3D.tsx';
     <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Interactive 3D · HBM Test</p>
     <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">测试区域 vs GPU 通讯区域</h2>
     <p class="mt-3 max-w-2xl text-slate-600">
-      12 层堆栈在 CoWoS 型封装语境下的测试视图：探针卡扎针区域（牺牲焊盘 / JEDEC 直接访问凸点 / PSWT 背面铝焊盘）
+      12 层堆栈的测试视图：探针卡扎针区域（牺牲焊盘 / JEDEC 直接访问凸点 / PSWT 背面铝焊盘）
       与 GPU 通讯凸点场的物理分区，以及 ATE 信号的完整链路。详细解读见笔记
       <a href="/notes/hbm/hbm-test-3d/" class="text-cyan-700 underline decoration-cyan-300 underline-offset-2 hover:text-cyan-900">《HBM 测试的 3D 结构》</a>。
     </p>
   </section>
 
   <HBMTest3D client:visible />
+
+  <section class="mt-16">
+    <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Interactive 3D · 集成环境</p>
+    <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">堆栈出厂后的宿主：2.5D 封装环境</h2>
+    <p class="mt-3 max-w-2xl text-slate-600">
+      HBM 堆栈（KGSD）落入 CoWoS 型 2.5D 封装的剖面：爆炸视图与图层点选。堆栈是 3D 集成主体，
+      中介层/bridge 是宿主环境——reticle、应力、热与组装顺序如何反哺堆栈设计，见笔记
+      <a href="/notes/hbm/integration-context/" class="text-cyan-700 underline decoration-cyan-300 underline-offset-2 hover:text-cyan-900">《HBM 堆栈的集成环境》</a>。
+    </p>
+  </section>
+
+  <ChipStack3D client:visible />
 </Base>
