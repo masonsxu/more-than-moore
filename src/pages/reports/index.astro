@@ -3,6 +3,14 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ReportCard from '../../components/ReportCard.astro';
 
+interface Report {
+  title: string;
+  sub?: string;
+  href: string;
+  desc: string;
+  level: string;
+}
+
 const career: Report[] = [
   {
     title: '测试数据科学工程师 · 从零开始 24 个月发展计划',

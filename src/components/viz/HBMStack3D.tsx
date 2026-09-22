@@ -16,6 +16,7 @@ interface GenSpec {
   baseLabel: string;
   bonding: 'mrmuf' | 'hb';
   bondingColor: string;
+  powerTsv?: 'around' | 'center';
   specs: [string, string][];
   layerDesc: Record<LayerId, { name: string; desc: string }>;
 }
@@ -31,6 +32,7 @@ const SPECS: Record<Gen, GenSpec> = {
     baseLabel: 'Base Die · 存储工艺',
     bonding: 'mrmuf',
     bondingColor: '#8fa3b8',
+    powerTsv: 'around',
     specs: [
       ['JEDEC', 'JESD238 系列（速率上限 9.6 Gbps）'],
       ['接口', '1024-bit · 16 通道 / 32 伪通道'],
