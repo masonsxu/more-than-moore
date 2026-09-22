@@ -52,7 +52,7 @@ tags: ['HBM', '3D 封装', '材料收集', '来源清单']
 | AD5520/AD5522 手册：每引脚 PMU/SMU（钳位 + 窗口比较器，ATE 应用） | 芯片厂商一手 | 2026-09-25 | https://www.analog.com/media/en/technical-documentation/data-sheets/AD5520.pdf |
 | US5365180A：接触电阻测量（对 pin–GND 二极管加流测压降） | 专利 | 2026-09-25 索引核验 | https://patents.google.com/patent/US5365180A/en |
 
-（以上电路级来源的摘录与可引用论断集中归档于 [`public/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md`](/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md)。）
+（以上电路级来源的摘录与可引用论断集中归档于 [`public/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md`](/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md)；这些来源的教学化重组见笔记《[测试电路的三张图](/notes/hbm/test-circuit-diagrams/)》。）
 
 对应笔记：《[HBM 测试的 3D 结构](/notes/hbm/hbm-test-3d/)》（含 10 项来源的完整表）。
 

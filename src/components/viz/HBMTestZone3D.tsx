@@ -226,10 +226,10 @@ function useDamp(target: number, speed = 4) {
 /** 相机随级别推近 */
 function CameraRig({ level }: { level: Level }) {
   const POSE: Record<Level, { pos: [number, number, number]; target: [number, number, number] }> = {
-    0: { pos: [9, 6.5, 13], target: [0, 2.2, 0] },
+    0: { pos: [9, 7.5, 14], target: [0, 2.8, 0] },
     1: { pos: [0, 10.5, 6.5], target: [0, 0, 0] },
     2: { pos: [3.5, 5.5, 7], target: [0, 0.4, 0] },
-    3: { pos: [2.5, 3.4, 6.2], target: [0, 0.5, 0] },
+    3: { pos: [3.2, 4.4, 8], target: [0, 0.5, 0] },
   };
   const kPos = useRef(new THREE.Vector3(...POSE[0].pos));
   const kTgt = useRef(new THREE.Vector3(...POSE[0].target));
@@ -257,7 +257,11 @@ const PITCH = 0.23;
 const N_DIE = 12;
 const FIRST_DIE_Y = BASE_Y + 0.13 + DIE_H / 2;
 const STACK_TOP = FIRST_DIE_Y + (N_DIE - 1) * PITCH + DIE_H / 2;
-const FLIP_LIFT = 5.2;
+// 爆炸几何：翻转姿态下层片向地面展开，抬升量与层间距必须联立求解才不穿模——
+// lift(e) = FIRST_DIE_Y + (N-1)·(PITCH+e·EXPLODE_STEP) + DIE_H/2 + 底部安全距离
+const EXPLODE_STEP = 0.2;
+const LIFT_BASE = 5.2;
+const LIFT_EXPLODED = FIRST_DIE_Y + (N_DIE - 1) * (PITCH + EXPLODE_STEP) + DIE_H / 2 + 0.62;
 
 const FIELD: [number, number][] = (() => {
   const g: [number, number][] = [];
@@ -293,23 +297,34 @@ const TSV_COL: [number, number][] = [
   [-0.9, 0.8], [0.9, 0.8], [-0.9, -0.8], [0.9, -0.8],
 ];
 
+/** 爆炸系数阻尼驱动（0→1），由各级共享，保证抬升/层距/探针卡同步运动 */
+function ExplodeDriver({ exploded, explodeRef }: { exploded: boolean; explodeRef: { current: number } }) {
+  useFrame((_, dt) => {
+    explodeRef.current = THREE.MathUtils.damp(explodeRef.current, exploded ? 1 : 0, 3.2, dt);
+  });
+  return null;
+}
+
 function StackFlipL0({
-  flipped,
-  exploded,
   active,
   onSelect,
+  explodeRef,
 }: {
-  flipped: boolean;
-  exploded: boolean;
   active: PartId | null;
   onSelect: (id: PartId | null) => void;
+  explodeRef: { current: number };
 }) {
-  const kf = useDamp(flipped ? 1 : 0, 3.2);
   const grp = useRef<THREE.Group>(null!);
+  const dieRefs = useRef<(THREE.Group | null)[]>([]);
   useFrame(() => {
     if (!grp.current) return;
-    grp.current.rotation.x = Math.PI * kf.current;
-    grp.current.position.y = FLIP_LIFT * kf.current;
+    const e = explodeRef.current;
+    grp.current.rotation.x = Math.PI; // 探针姿态恒定翻转，露 base die 背面
+    grp.current.position.y = LIFT_BASE + (LIFT_EXPLODED - LIFT_BASE) * e;
+    for (let i = 0; i < N_DIE; i++) {
+      const g = dieRefs.current[i];
+      if (g) g.position.y = FIRST_DIE_Y + i * (PITCH + EXPLODE_STEP * e);
+    }
   });
   return (
     <group ref={grp} onClick={() => onSelect(null)}>
@@ -345,10 +360,15 @@ function StackFlipL0({
         ))}
       </Instances>
       {Array.from({ length: N_DIE }, (_, i) => {
-        const center = FIRST_DIE_Y + i * PITCH + (exploded ? i * 0.3 : 0);
         const isTop = i === N_DIE - 1;
         return (
-          <group key={i} position={[0, center, 0]}>
+          <group
+            key={i}
+            ref={(el) => {
+              dieRefs.current[i] = el;
+            }}
+            position={[0, FIRST_DIE_Y + i * PITCH, 0]}
+          >
             <RoundedBox args={[3.6, DIE_H, 3.6]} radius={0.02} smoothness={2} position={[STACK_X, 0, 0]} {...pickProps({ id: 'dram', active, onSelect })}>
               <meshStandardMaterial color="#2f4a6e" metalness={0.35} roughness={0.4} {...dimMaterial(active !== null && active !== 'dram' && active !== 'tsv', active === 'dram')} />
             </RoundedBox>
@@ -368,19 +388,18 @@ function StackFlipL0({
   );
 }
 
-function ProbeRigL0({ active, onSelect, flipped }: { active: PartId | null; onSelect: (id: PartId | null) => void; flipped: boolean }) {
-  const kf = useDamp(flipped ? 1 : 0, 3.2);
-  const g = useRef<THREE.Group>(null!);
+function ProbeRigL0({ active, onSelect, explodeRef }: { active: PartId | null; onSelect: (id: PartId | null) => void; explodeRef: { current: number } }) {
+  const rig = useRef<THREE.Group>(null!);
   useFrame(() => {
-    if (!g.current) return;
-    g.current.position.y = 6.7 - 1.1 * kf.current;
+    if (rig.current) rig.current.position.y = explodeRef.current * (LIFT_EXPLODED - LIFT_BASE); // 探针卡/针/线缆/ATE 同步抬升
   });
   return (
-    <group>
+    <group ref={rig}>
       <RoundedBox args={[4.0, 0.35, 4.0]} radius={0.05} smoothness={3} position={[STACK_X, 6.05, 0]} {...pickProps({ id: 'probecard', active, onSelect })}>
         <meshStandardMaterial color="#2a3344" metalness={0.35} roughness={0.45} {...dimMaterial(active !== null && active !== 'probecard' && active !== 'needle', active === 'probecard')} />
       </RoundedBox>
-      <group ref={g} {...pickProps({ id: 'needle', active, onSelect })}>
+      {/* 针组：局部 y 固定，随 rig 抬升后针尖始终贴住暴露面（face = lift - 0.755） */}
+      <group position={[0, 5.55, 0]} {...pickProps({ id: 'needle', active, onSelect })}>
         <Instances limit={16}>
           <coneGeometry args={[0.045, 1.05, 8]} />
           <meshStandardMaterial color="#9aa7b8" metalness={0.85} roughness={0.25} {...dimMaterial(active !== null && active !== 'needle', active === 'needle')} />
@@ -406,7 +425,7 @@ function ProbeRigL0({ active, onSelect, flipped }: { active: PartId | null; onSe
   );
 }
 
-function Level0({ exploded, active, onSelect }: { exploded: boolean; active: PartId | null; onSelect: (id: PartId | null) => void }) {
+function Level0({ active, onSelect, explodeRef }: { active: PartId | null; onSelect: (id: PartId | null) => void; explodeRef: { current: number } }) {
   return (
     <group>
       <RoundedBox args={[11, 0.4, 7.5]} radius={0.05} smoothness={3} position={[0, 0.2, 0]}>
@@ -415,10 +434,10 @@ function Level0({ exploded, active, onSelect }: { exploded: boolean; active: Par
       <RoundedBox args={[9.4, 0.3, 6]} radius={0.04} smoothness={3} position={[0, 0.55, 0]}>
         <meshStandardMaterial color="#a8b3c8" metalness={0.45} roughness={0.35} transparent opacity={0.5} />
       </RoundedBox>
-      <StackFlipL0 flipped exploded={exploded} active={active} onSelect={onSelect} />
-      <ProbeRigL0 active={active} onSelect={onSelect} flipped />
-      <InfoLabel show position={[STACK_X, 6.9, 0]} text="翻转姿态：探针从 base die 背面（PSWT 铝焊盘）下针" tone="red" />
-      <InfoLabel show position={[STACK_X, 3.4, 2.2]} text="红色 = JEDEC 直接访问凸点（测试专用入口）" tone="cyan" />
+      <StackFlipL0 active={active} onSelect={onSelect} explodeRef={explodeRef} />
+      <ProbeRigL0 active={active} onSelect={onSelect} explodeRef={explodeRef} />
+      <InfoLabel show position={[4.9, 4.9, 0]} text="翻转姿态：探针从 base die 背面（PSWT 铝焊盘）下针" tone="red" />
+      <InfoLabel show position={[STACK_X, 3.4, 2.6]} text="红色 = JEDEC 直接访问凸点（测试专用入口）" tone="cyan" />
     </group>
   );
 }
@@ -545,6 +564,11 @@ interface DefectSpec {
   bin: string;
   action: string;
   circuit: string;
+  // 表头读数（示意量级，非特定器件 spec）
+  forced: string;
+  reading: string;
+  limit: string;
+  verdict: 'FAIL' | 'FAIL→REPAIR';
 }
 
 const DEFECTS: DefectSpec[] = [
@@ -559,6 +583,10 @@ const DEFECTS: DefectSpec[] = [
     bin: 'Bin1 · Open/Short（DC 致命类）',
     action: 'fail-stop：立即终止，不进修复，直接淘汰',
     circuit: '针尖–焊盘接触电阻或焊盘本身开路',
+    forced: 'I = +100 μA',
+    reading: 'V = 1.50 V（顶到钳位）',
+    limit: 'V ∈ 0.45 – 0.75 V',
+    verdict: 'FAIL',
   },
   {
     id: 'padshort',
@@ -571,6 +599,10 @@ const DEFECTS: DefectSpec[] = [
     bin: 'Bin1 · Open/Short',
     action: 'fail-stop：立即终止',
     circuit: '刻蚀残留 / 金属桥连把焊盘短到地',
+    forced: 'I = +100 μA',
+    reading: 'V = 0.02 V（被短路拉平）',
+    limit: 'V ∈ 0.45 – 0.75 V',
+    verdict: 'FAIL',
   },
   {
     id: 'powershort',
@@ -583,6 +615,10 @@ const DEFECTS: DefectSpec[] = [
     bin: 'Bin1/2 · DC 致命类（Power Short）',
     action: 'fail-stop：立即终止，不进修复',
     circuit: '电源网络–地之间被缺陷短接（PowerShort 的物理根因）',
+    forced: 'V = 0.5 V（安全电平）',
+    reading: 'I = 180 mA（远超限）',
+    limit: 'I ≤ 10 mA',
+    verdict: 'FAIL',
   },
   {
     id: 'leak',
@@ -595,6 +631,10 @@ const DEFECTS: DefectSpec[] = [
     bin: 'Bin1/2 · Leakage（DC 三件套之三）',
     action: 'fail-stop 或计入 DC 失效类',
     circuit: '栅氧缺陷 / 阱漏电 / 焊盘沾污',
+    forced: 'V = VIH（spec 高电平）',
+    reading: 'I = 12 μA（灵敏量程抓出）',
+    limit: 'I ≤ 1 μA',
+    verdict: 'FAIL',
   },
   {
     id: 'func',
@@ -607,6 +647,10 @@ const DEFECTS: DefectSpec[] = [
     bin: 'Bin4 · Function',
     action: '可修 → 冗余替换（激光/e-fuse/PPR）+ 复验；不可修 → 淘汰',
     circuit: '单元电容弱位 / 读出放大失配 / 字线桥连',
+    forced: '图形：写 0 → 读 0',
+    reading: '读出 1（位图坏位）',
+    limit: '读出 = 期望',
+    verdict: 'FAIL→REPAIR',
   },
   {
     id: 'tsv',
@@ -619,18 +663,24 @@ const DEFECTS: DefectSpec[] = [
     bin: 'Bin4 · Function（lane/TSV 类）',
     action: 'lane repair / TSV repair：JEDEC 标准含坏通道重映射',
     circuit: 'TSV 铜填充空洞 / 减薄露头损伤',
+    forced: '链脉冲 + 图形复测',
+    reading: '列无响应（整列开路）',
+    limit: '连通 + 延迟在限内',
+    verdict: 'FAIL→REPAIR',
   },
 ];
 
 const STEPS = ['① Contact（开路/短路）', '② PowerShort', '③ Leakage / Idd', '④ MBiST 功能 + 修复', '⑤ Margin'];
 
-/** 缺陷形态 + 电流粒子动画 + 电压表读数 */
+/** 缺陷形态 + 电流粒子动画 + 表头读数：①施加 → ②路径 → ③读数 → ④判定 */
 function CircuitStage({
   defect,
+  spec,
   active,
   onSelect,
 }: {
   defect: DefectId | null;
+  spec: DefectSpec | null;
   active: PartId | null;
   onSelect: (id: PartId | null) => void;
 }) {
@@ -666,7 +716,34 @@ function CircuitStage({
           </Html>
         ))}
       </group>
-      <InfoLabel show position={[-3.3, 1.45, 0]} text="PMU：FVMI / FIMV + 钳位 + 窗口比较器" tone="cyan" />
+      {/* ① 施加：PMU 数字表头（读数 + 判定，随选中失效更新） */}
+      <Html position={[-3.3, 2.05, 0]} center style={{ pointerEvents: 'none' }}>
+        <div className="w-52 rounded-lg border border-slate-700 bg-slate-900/95 px-3 py-2 font-mono text-[10px] leading-relaxed text-slate-100 shadow-lg">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-[9px] font-semibold uppercase tracking-widest text-cyan-300">③ 表头 · PMU</span>
+            <span className="text-[9px] text-slate-400">示意量级</span>
+          </div>
+          {spec ? (
+            <>
+              <div>模式: <span className="text-cyan-300">{spec.mode}</span></div>
+              <div>① 强制: <span className="text-amber-300">{spec.forced}</span></div>
+              <div>③ 读数: <span className="text-red-300">{spec.reading}</span></div>
+              <div>　 限值: <span className="text-emerald-300">{spec.limit}</span></div>
+              <div className="mt-1 border-t border-slate-700 pt-1">
+                ④ 判定: <span className="font-bold text-red-400">✗ {spec.verdict === 'FAIL' ? 'FAIL' : 'FAIL → 进修复'}</span>
+              </div>
+              <div className="text-slate-400">{spec.bin}</div>
+            </>
+          ) : (
+            <div className="text-slate-400">在下方选择一种失效类型</div>
+          )}
+        </div>
+      </Html>
+      <group position={[-3.3, 0.55, 0]}>
+        <Html position={[0, 0.78, 0]} center style={{ pointerEvents: 'none' }}>
+          <span className="whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800 ring-1 ring-amber-300">① 施加：DAC 设定电压/电流</span>
+        </Html>
+      </group>
 
       {/* 针 → 焊盘 */}
       <mesh position={[-1.55, 0.62, 0.35]} rotation={[0, 0, -0.35]}>
@@ -679,6 +756,9 @@ function CircuitStage({
           <meshStandardMaterial color="#d9e2ec" metalness={0.8} roughness={0.25} {...dimMaterial(active !== null && active !== 'mPad', active === 'mPad')} />
         </mesh>
       </group>
+      <Html position={[-1.1, -0.42, 0.35]} center style={{ pointerEvents: 'none' }}>
+        <span className="whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800 ring-1 ring-amber-300">② 被测路径：针→焊盘→二极管→轨</span>
+      </Html>
 
       {/* ESD 二极管对：焊盘 → VDD（上轨）/ VSS（下轨） */}
       {[
@@ -717,7 +797,18 @@ function CircuitStage({
           </mesh>
         ))}
       </group>
-      <InfoLabel show position={[2.5, 1.25, 0.35]} text="DRAM 阵列列（MBiST 对象）" />
+      <InfoLabel show position={[2.5, 1.25, 0.35]} text="功能测试对象：DRAM 阵列列（MBiST）" />
+      {spec && (
+        <Html position={[2.5, -0.45, 0.35]} center style={{ pointerEvents: 'none' }}>
+          <span
+            className={`whitespace-nowrap rounded-md px-2 py-1 text-[10px] font-bold text-white shadow ${
+              spec.verdict === 'FAIL' ? 'bg-red-600' : 'bg-purple-600'
+            }`}
+          >
+            {spec.verdict === 'FAIL' ? '④ fail-stop 淘汰' : '④ 冗余替换 → 复验'}
+          </span>
+        </Html>
+      )}
 
       {/* 电流粒子（探针 → 焊盘 → 二极管路径） */}
       <group ref={dots}>
@@ -778,13 +869,13 @@ function CircuitStage({
           <InfoLabel show position={[1.9, 1.3, 0.7]} text="TSV 开路 → 整列 column fail" tone="red" />
         </group>
       )}
-      {flowing && <InfoLabel show position={[-1.9, 1.3, 0.35]} text="施加以 PMU 为源的激励" tone="amber" />}
+      {flowing && <InfoLabel show position={[-1.9, 1.35, 0.35]} text="激励以 PMU 为源，沿②路径流动" tone="amber" />}
     </group>
   );
 }
 
-function Level3({ defect, active, onSelect }: { defect: DefectId | null; active: PartId | null; onSelect: (id: PartId | null) => void }) {
-  return <CircuitStage defect={defect} active={active} onSelect={onSelect} />;
+function Level3({ defect, spec, active, onSelect }: { defect: DefectId | null; spec: DefectSpec | null; active: PartId | null; onSelect: (id: PartId | null) => void }) {
+  return <CircuitStage defect={defect} spec={spec} active={active} onSelect={onSelect} />;
 }
 
 /* ═════════════════════════ 页面组件 ═════════════════════════ */
@@ -802,23 +893,25 @@ export default function HBMTestZone3D() {
   const [active, setActive] = useState<PartId | null>(null);
   const [defect, setDefect] = useState<DefectId | null>('open');
   const [exploded, setExploded] = useState(false);
+  const explodeRef = useRef(0);
   const info = active ? PART_INFO[active] : null;
   const spec = DEFECTS.find((d) => d.id === defect) ?? null;
 
   return (
     <figure className="not-prose my-8">
       <div className="h-[520px] w-full overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white">
-        <Canvas camera={{ position: [9, 6.5, 13], fov: 35 }} dpr={[1, 2]}>
+        <Canvas camera={{ position: [9, 7.5, 14], fov: 35 }} dpr={[1, 2]}>
           <ambientLight intensity={0.75} />
           <directionalLight position={[6, 10, 6]} intensity={1.5} />
           <directionalLight position={[-6, 4, -6]} intensity={0.4} />
+          <ExplodeDriver exploded={exploded} explodeRef={explodeRef} />
           <CameraRig level={level} />
-          <OrbitControls makeDefault enablePan={false} minDistance={3.5} maxDistance={26} maxPolarAngle={1.85} target={[0, 2.2, 0]} />
+          <OrbitControls makeDefault enablePan={false} minDistance={3.5} maxDistance={26} maxPolarAngle={1.85} target={[0, 2.8, 0]} />
           <ContactShadows position={[0, -0.32, 0]} opacity={0.28} scale={18} blur={2.4} far={6} />
-          {level === 0 && <Level0 exploded={exploded} active={active} onSelect={setActive} />}
+          {level === 0 && <Level0 active={active} onSelect={setActive} explodeRef={explodeRef} />}
           {level === 1 && <Level1 active={active} onSelect={setActive} />}
           {level === 2 && <Level2 active={active} onSelect={setActive} />}
-          {level === 3 && <Level3 defect={defect} active={active} onSelect={setActive} />}
+          {level === 3 && <Level3 defect={defect} spec={spec} active={active} onSelect={setActive} />}
         </Canvas>
       </div>
 

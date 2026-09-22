@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 430" role="img" aria-label="设计电路图：PMU 测量环路 + 被测电路的设计意图">
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#57534e"/>
+    </marker>
+    <marker id="arrO" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#c2410c"/>
+    </marker>
+  </defs>
+  <g font-family="Geist, PingFang SC, Microsoft YaHei, sans-serif">
+    <text x="20" y="24" font-size="15" font-weight="700" fill="#1c1917">设计电路图（设计意图层）：测试怎么「问」，芯片怎么「答」</text>
+    <text x="20" y="42" font-size="11" fill="#6f665f">每个方块回答一个「为什么需要它」。机制依据：ADI MAX9979 设计笔记 · AD5520 手册 · Marvin Test KB Q200207（摘录已归档 sources/hbm-test/）</text>
+
+    <!-- ══ 左：ATE 侧 PMU ══ -->
+    <rect x="20" y="56" width="540" height="330" rx="10" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.25)" stroke-dasharray="5 4"/>
+    <text x="36" y="78" font-size="12.5" font-weight="600" fill="#1c1917">ATE 侧：PMU（每引脚一个）——「问」的电路</text>
+
+    <!-- DAC -->
+    <rect x="46" y="96" width="104" height="48" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <text x="98" y="116" text-anchor="middle" font-size="12" font-weight="600" fill="#1c1917">DAC 设定值</text>
+    <text x="98" y="132" text-anchor="middle" font-size="10" fill="#6f665f">施加大小的刻度</text>
+
+    <!-- 运放 -->
+    <line x1="150" y1="120" x2="196" y2="120" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+    <polygon points="200,98 200,142 252,120" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <text x="219" y="115" text-anchor="middle" font-size="11" font-weight="600" fill="#1c1917">运放</text>
+    <text x="219" y="129" text-anchor="middle" font-size="9.5" fill="#6f665f">闭环跟随</text>
+    <line x1="252" y1="120" x2="298" y2="120" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+
+    <!-- Force 节点 -->
+    <circle cx="310" cy="120" r="6" fill="#c2410c"/>
+    <text x="310" y="106" text-anchor="middle" font-size="10.5" font-weight="600" fill="#c2410c">Force 端口</text>
+    <text x="310" y="92" text-anchor="middle" font-size="9.5" fill="#6f665f">FVMI 加压 · FIMV 加流</text>
+
+    <!-- RRANGE -->
+    <line x1="310" y1="126" x2="310" y2="168" stroke="#57534e" stroke-width="1.4"/>
+    <rect x="248" y="168" width="124" height="44" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <text x="310" y="186" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1c1917">RRANGE 感测电阻</text>
+    <text x="310" y="202" text-anchor="middle" font-size="9.5" fill="#6f665f">量程档 ±2μA – ±50mA</text>
+    <text x="310" y="230" text-anchor="middle" font-size="9.5" fill="#c2410c">量程越小分辨率越高——漏电要切 μA 档</text>
+    <line x1="310" y1="212" x2="310" y2="248" stroke="#57534e" stroke-width="1.4"/>
+    <text x="310" y="262" text-anchor="middle" font-size="10.5" fill="#6f665f">回流到地（测电流 = 在这里采样）</text>
+
+    <!-- 测量表：电压 ADC -->
+    <rect x="46" y="150" width="130" height="44" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <text x="111" y="168" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1c1917">ADC 测电压</text>
+    <text x="111" y="184" text-anchor="middle" font-size="9.5" fill="#6f665f">FIMV：加流后的压降</text>
+    <line x1="176" y1="172" x2="304" y2="132" stroke="#57534e" stroke-width="1" stroke-dasharray="3 3"/>
+
+    <!-- 测量表：电流 -->
+    <rect x="46" y="206" width="130" height="44" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <text x="111" y="224" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1c1917">ADC 测电流</text>
+    <text x="111" y="240" text-anchor="middle" font-size="9.5" fill="#6f665f">FVMI：加压后的电流</text>
+    <line x1="176" y1="228" x2="248" y2="195" stroke="#57534e" stroke-width="1" stroke-dasharray="3 3"/>
+
+    <!-- 钳位 -->
+    <rect x="396" y="150" width="144" height="52" rx="8" fill="rgba(194,65,12,0.07)" stroke="#c2410c" stroke-width="1.8"/>
+    <text x="468" y="170" text-anchor="middle" font-size="11.5" font-weight="600" fill="#9a3412">钳位 CLAMP HI / LO</text>
+    <text x="468" y="186" text-anchor="middle" font-size="9.5" fill="#9a3412">保护 DUT + 开路判别的上界</text>
+    <text x="468" y="220" text-anchor="middle" font-size="9.5" fill="#c2410c">FI 模式钳电压：开路时 V 顶到钳位</text>
+    <line x1="316" y1="116" x2="396" y2="160" stroke="#c2410c" stroke-width="1" stroke-dasharray="3 3"/>
+
+    <!-- 窗口比较器 -->
+    <rect x="396" y="248" width="144" height="52" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <text x="468" y="268" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1c1917">窗口比较器</text>
+    <text x="468" y="284" text-anchor="middle" font-size="9.5" fill="#6f665f">读数落在限值窗内？</text>
+    <line x1="176" y1="252" x2="396" y2="272" stroke="#57534e" stroke-width="1" stroke-dasharray="3 3"/>
+    <line x1="468" y1="202" x2="468" y2="248" stroke="#57534e" stroke-width="1" stroke-dasharray="3 3"/>
+    <rect x="420" y="316" width="96" height="30" rx="15" fill="#1c1917"/>
+    <text x="468" y="335" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">PASS / FAIL</text>
+    <line x1="468" y1="300" x2="468" y2="316" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+    <text x="468" y="368" text-anchor="middle" font-size="9.5" fill="#6f665f">硬件直接出判定——测试程序只读这个结果</text>
+
+    <!-- ══ 右：DUT 侧 ══ -->
+    <rect x="600" y="56" width="540" height="330" rx="10" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.25)" stroke-dasharray="5 4"/>
+    <text x="616" y="78" font-size="12.5" font-weight="600" fill="#1c1917">DUT 侧：被测电路——「答」的电路（芯片里本来就有的设计）</text>
+
+    <!-- VDD / VSS 轨 -->
+    <line x1="700" y1="120" x2="1100" y2="120" stroke="#e07b39" stroke-width="5" stroke-linecap="round"/>
+    <text x="1104" y="124" font-size="10.5" font-weight="600" fill="#c2410c">VDD</text>
+    <line x1="700" y1="300" x2="1100" y2="300" stroke="#3c4658" stroke-width="5" stroke-linecap="round"/>
+    <text x="1104" y="304" font-size="10.5" font-weight="600" fill="#3c4658">VSS</text>
+
+    <!-- 焊盘 -->
+    <rect x="660" y="196" width="44" height="28" rx="4" fill="#d9e2ec" stroke="rgba(28,25,23,0.3)" stroke-width="1.2"/>
+    <text x="682" y="240" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1c1917">焊盘 Pad</text>
+
+    <!-- ESD 二极管对 -->
+    <line x1="704" y1="202" x2="760" y2="202" stroke="#57534e" stroke-width="1.4"/>
+    <line x1="760" y1="202" x2="760" y2="152" stroke="#57534e" stroke-width="1.4"/>
+    <polygon points="760,146 750,166 770,166" fill="#4ade80" stroke="rgba(28,25,23,0.3)"/>
+    <line x1="760" y1="146" x2="760" y2="120" stroke="#57534e" stroke-width="1.4"/>
+    <line x1="704" y1="218" x2="760" y2="218" stroke="#57534e" stroke-width="1.4"/>
+    <line x1="760" y1="218" x2="760" y2="266" stroke="#57534e" stroke-width="1.4"/>
+    <polygon points="760,272 750,252 770,252" fill="#4ade80" stroke="rgba(28,25,23,0.3)"/>
+    <line x1="760" y1="272" x2="760" y2="300" stroke="#57534e" stroke-width="1.4"/>
+    <text x="784" y="160" font-size="10" fill="#6f665f">D1（到 VDD）</text>
+    <text x="784" y="266" font-size="10" fill="#6f665f">D2（到 VSS）</text>
+    <text x="700" y="168" font-size="9.5" fill="#c2410c">接触测试的「已知二极管」</text>
+
+    <!-- PMU → 焊盘 的力线 -->
+    <line x1="340" y1="126" x2="392" y2="126" stroke="#c2410c" stroke-width="2"/>
+    <text x="366" y="118" text-anchor="middle" font-size="10" font-weight="600" fill="#c2410c">探针</text>
+    <line x1="392" y1="126" x2="392" y2="210" stroke="#c2410c" stroke-width="2"/>
+    <line x1="392" y1="210" x2="656" y2="210" stroke="#c2410c" stroke-width="2" marker-end="url(#arrO)"/>
+    <text x="520" y="202" text-anchor="middle" font-size="10" fill="#c2410c">力与测量走同一端口（读回 V 或 I）</text>
+
+    <!-- 内部电路 -->
+    <rect x="900" y="176" width="180" height="70" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <text x="990" y="204" text-anchor="middle" font-size="12" font-weight="600" fill="#1c1917">内部电路 / DRAM 阵列列</text>
+    <text x="990" y="222" text-anchor="middle" font-size="9.5" fill="#6f665f">功能测试（MBiST）的对象</text>
+    <line x1="820" y1="210" x2="896" y2="210" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+    <text x="858" y="200" text-anchor="middle" font-size="9.5" fill="#6f665f">信号</text>
+
+    <!-- 底部注解 -->
+    <text x="616" y="336" font-size="10" fill="#c2410c">PowerShort 测的就是 VDD–VSS 这对轨之间的阻抗状态</text>
+    <text x="616" y="356" font-size="10" fill="#6f665f">漏电（IIL/IIH）测的是「焊盘节点 → 内部」这条入口的微小电流</text>
+
+    <text x="20" y="412" font-size="11" fill="#6f665f">读图顺序：DAC/运放（施加）→ Force → 被测路径 → RRANGE/ADC（读回）→ 钳位与窗口比较器（判定）。右半边全部是芯片原有设计，测试只是「借用」。</text>
+  </g>
+</svg>

@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 620" role="img" aria-label="逻辑图：测试程序 fail-stop 判定流">
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#57534e"/>
+    </marker>
+    <marker id="arrR" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrP" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#7c5cd6"/>
+    </marker>
+  </defs>
+  <g font-family="Geist, PingFang SC, Microsoft YaHei, sans-serif">
+    <text x="20" y="24" font-size="15" font-weight="700" fill="#1c1917">逻辑图（测试程序层）：fail-stop 判定流——先致命，后边角，第一个 fail 即停</text>
+    <text x="20" y="42" font-size="11" fill="#6f665f">程序逻辑 = 测量电路的「使用说明书」：每一步读上一步幸存者，bin 顺序对应物理失效域（Edusemi-Plus bin 体系，摘录已归档）</text>
+
+    <!-- 左侧图例 -->
+    <rect x="20" y="60" width="230" height="330" rx="10" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.25)" stroke-dasharray="5 4"/>
+    <text x="36" y="84" font-size="12" font-weight="600" fill="#1c1917">为什么叫 fail-stop</text>
+    <g font-size="10.5" fill="#6f665f">
+      <text x="36" y="106">致命类（开路/短路）最便宜、最快，</text>
+      <text x="36" y="122">所以最先测；测出即停（fail-stop），</text>
+      <text x="36" y="138">后面的步骤不再花时间。</text>
+      <text x="36" y="166">好处一：省测试时间（坏 die 不跑全流程）。</text>
+      <text x="36" y="182">好处二：bin 分母干净——</text>
+      <text x="36" y="198">bin2 的数量只反映「过了 bin1 的 die」</text>
+      <text x="36" y="214">里的问题，归因不混淆。</text>
+      <text x="36" y="242" fill="#1c1917" font-weight="600">bin → 物理含义对照</text>
+      <text x="36" y="262">Bin1 Open/Short · 布线/桥连</text>
+      <text x="36" y="280">Bin2 Standby Idd · 关态漏电</text>
+      <text x="36" y="298">Bin3 Active Idd · 工作电流</text>
+      <text x="36" y="316">Bin4 Function · 读写/译码</text>
+      <text x="36" y="334">Bin5/6 Refresh · 保持/扰动</text>
+      <text x="36" y="352">Bin7 Margin · 电压/时序余量</text>
+      <text x="36" y="378" fill="#c2410c">读数据的口诀：bin 应读作</text>
+      <text x="36" y="394" fill="#c2410c">「底层物理损伤的电学症状」</text>
+    </g>
+
+    <!-- 主流程 -->
+    <!-- Start -->
+    <rect x="400" y="62" width="240" height="40" rx="20" fill="#1c1917"/>
+    <text x="520" y="87" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">晶圆上的一颗 die（CP / EDS 插入点）</text>
+    <line x1="520" y1="102" x2="520" y2="126" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+
+    <!-- 步骤模板：rect + 判定 + 右侧淘汰 -->
+    <g>
+      <rect x="400" y="130" width="240" height="52" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+      <text x="520" y="152" text-anchor="middle" font-size="12" font-weight="600" fill="#1c1917">① 接触测试 Contact</text>
+      <text x="520" y="170" text-anchor="middle" font-size="10" fill="#6f665f">FIMV 加流测压：好 ≈ 0.6–0.7V · 开路顶钳位 · 短路 ≈ 0V</text>
+      <polygon points="700,130 790,156 700,182 610,156" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+      <text x="700" y="160" text-anchor="middle" font-size="10.5" fill="#1c1917">开路 / 短路？</text>
+      <line x1="640" y1="156" x2="640" y2="156" stroke="#57534e"/>
+      <line x1="640" y1="156" x2="610" y2="156" stroke="#57534e"/>
+      <line x1="640" y1="156" x2="640" y2="156" stroke="#57534e"/>
+      <line x1="520" y1="182" x2="520" y2="206" stroke="#57534e" stroke-width="1.4"/>
+      <text x="536" y="200" font-size="10" fill="#6f665f">否</text>
+      <line x1="700" y1="156" x2="700" y2="156" stroke="#57534e"/>
+      <line x1="790" y1="156" x2="830" y2="156" stroke="#dc2626" stroke-width="1.4" marker-end="url(#arrR)"/>
+      <text x="812" y="146" text-anchor="middle" font-size="10" fill="#dc2626">是</text>
+      <rect x="834" y="136" width="180" height="40" rx="8" fill="rgba(220,38,38,0.08)" stroke="#dc2626" stroke-width="1.4"/>
+      <text x="924" y="154" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">Bin1 淘汰</text>
+      <text x="924" y="170" text-anchor="middle" font-size="9.5" fill="#dc2626">fail-stop：不进修复</text>
+    </g>
+
+    <g>
+      <rect x="400" y="210" width="240" height="52" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+      <text x="520" y="232" text-anchor="middle" font-size="12" font-weight="600" fill="#1c1917">② PowerShort</text>
+      <text x="520" y="250" text-anchor="middle" font-size="10" fill="#6f665f">FVMI 加压测流：电源轨对地阻抗</text>
+      <polygon points="700,210 790,236 700,262 610,236" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+      <text x="700" y="240" text-anchor="middle" font-size="10.5" fill="#1c1917">I 超限？</text>
+      <line x1="520" y1="262" x2="520" y2="286" stroke="#57534e" stroke-width="1.4"/>
+      <text x="536" y="280" font-size="10" fill="#6f665f">否</text>
+      <line x1="790" y1="236" x2="830" y2="236" stroke="#dc2626" stroke-width="1.4" marker-end="url(#arrR)"/>
+      <text x="812" y="226" text-anchor="middle" font-size="10" fill="#dc2626">是</text>
+      <rect x="834" y="216" width="180" height="40" rx="8" fill="rgba(220,38,38,0.08)" stroke="#dc2626" stroke-width="1.4"/>
+      <text x="924" y="234" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">Bin1/2 淘汰</text>
+      <text x="924" y="250" text-anchor="middle" font-size="9.5" fill="#dc2626">fail-stop：不进修复</text>
+    </g>
+
+    <g>
+      <rect x="400" y="290" width="240" height="52" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+      <text x="520" y="312" text-anchor="middle" font-size="12" font-weight="600" fill="#1c1917">③ Leakage / Standby-Active Idd</text>
+      <text x="520" y="330" text-anchor="middle" font-size="10" fill="#6f665f">FVMI 灵敏量程：漏电与关态/工作电流</text>
+      <polygon points="700,290 790,316 700,342 610,316" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+      <text x="700" y="320" text-anchor="middle" font-size="10.5" fill="#1c1917">超 spec？</text>
+      <line x1="520" y1="342" x2="520" y2="366" stroke="#57534e" stroke-width="1.4"/>
+      <text x="536" y="360" font-size="10" fill="#6f665f">否</text>
+      <line x1="790" y1="316" x2="830" y2="316" stroke="#dc2626" stroke-width="1.4" marker-end="url(#arrR)"/>
+      <text x="812" y="306" text-anchor="middle" font-size="10" fill="#dc2626">是</text>
+      <rect x="834" y="296" width="180" height="40" rx="8" fill="rgba(220,38,38,0.08)" stroke="#dc2626" stroke-width="1.4"/>
+      <text x="924" y="314" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">Bin2/3 淘汰</text>
+      <text x="924" y="330" text-anchor="middle" font-size="9.5" fill="#dc2626">DC 失效类</text>
+    </g>
+
+    <g>
+      <rect x="400" y="370" width="240" height="58" rx="8" fill="rgba(8,145,178,0.07)" stroke="#0e7490" stroke-width="1.6"/>
+      <text x="520" y="392" text-anchor="middle" font-size="12" font-weight="600" fill="#0e7490">④ MBiST：写 → 读 → 比较</text>
+      <text x="520" y="410" text-anchor="middle" font-size="10" fill="#0e7490">APG 图形 + 失效捕获存储；诊断到 bank/行/列</text>
+      <polygon points="700,370 790,399 700,428 610,399" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+      <text x="700" y="395" text-anchor="middle" font-size="10.5" fill="#1c1917">位图坏位？</text>
+      <text x="700" y="412" text-anchor="middle" font-size="9.5" fill="#6f665f">（含 TSV/lane 链路）</text>
+      <line x1="520" y1="428" x2="520" y2="452" stroke="#57534e" stroke-width="1.4"/>
+      <text x="536" y="446" font-size="10" fill="#6f665f">否</text>
+      <line x1="790" y1="399" x2="820" y2="399" stroke="#dc2626" stroke-width="1.4"/>
+      <text x="806" y="390" text-anchor="middle" font-size="10" fill="#dc2626">是</text>
+      <polygon points="900,362 990,388 900,414 810,388" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+      <text x="900" y="392" text-anchor="middle" font-size="10.5" fill="#1c1917">可修？</text>
+      <line x1="900" y1="414" x2="900" y2="452" stroke="#7c5cd6" stroke-width="1.4" marker-end="url(#arrP)"/>
+      <text x="916" y="438" font-size="10" fill="#7c5cd6">是</text>
+      <line x1="810" y1="388" x2="780" y2="388" stroke="#dc2626" stroke-width="0"/>
+      <!-- 不可修 -->
+      <line x1="990" y1="388" x2="1030" y2="388" stroke="#dc2626" stroke-width="1.4" marker-end="url(#arrR)"/>
+      <text x="1010" y="378" text-anchor="middle" font-size="10" fill="#dc2626">否</text>
+      <rect x="1034" y="368" width="106" height="40" rx="8" fill="rgba(220,38,38,0.08)" stroke="#dc2626" stroke-width="1.4"/>
+      <text x="1087" y="386" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">Bin4 淘汰</text>
+      <text x="1087" y="402" text-anchor="middle" font-size="9.5" fill="#dc2626">不可修</text>
+    </g>
+
+    <!-- 修复回路 -->
+    <rect x="820" y="456" width="170" height="42" rx="8" fill="rgba(124,92,214,0.08)" stroke="#7c5cd6" stroke-width="1.5"/>
+    <text x="905" y="474" text-anchor="middle" font-size="11" font-weight="600" fill="#7c5cd6">冗余替换（激光/e-fuse/PPR）</text>
+    <text x="905" y="490" text-anchor="middle" font-size="9.5" fill="#7c5cd6">fuse box 重映射坏行/列/lane</text>
+    <path d="M 905 456 L 905 444" stroke="#7c5cd6" stroke-width="0" />
+    <path d="M 905 456 C 905 430 900 420 880 408" stroke="#7c5cd6" stroke-width="1.4" fill="none" marker-end="url(#arrP)"/>
+    <text x="978" y="446" font-size="9.5" fill="#7c5cd6">修复后回到 ④ 复验</text>
+
+    <g>
+      <rect x="400" y="456" width="240" height="52" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+      <text x="520" y="478" text-anchor="middle" font-size="12" font-weight="600" fill="#1c1917">⑤ Margin（电压/时序余量）</text>
+      <text x="520" y="496" text-anchor="middle" font-size="10" fill="#6f665f">功能全对，但余量不足也算 fail</text>
+      <polygon points="700,456 790,482 700,508 610,482" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+      <text x="700" y="486" text-anchor="middle" font-size="10.5" fill="#1c1917">余量不足？</text>
+      <line x1="790" y1="482" x2="830" y2="482" stroke="#dc2626" stroke-width="1.4" marker-end="url(#arrR)"/>
+      <text x="812" y="472" text-anchor="middle" font-size="10" fill="#dc2626">是</text>
+      <rect x="834" y="516" width="180" height="0" fill="none"/>
+    </g>
+    <rect x="834" y="516" width="150" height="36" rx="8" fill="rgba(220,38,38,0.08)" stroke="#dc2626" stroke-width="1.4"/>
+    <text x="909" y="532" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">Bin5/6/7</text>
+    <text x="909" y="548" text-anchor="middle" font-size="9.5" fill="#dc2626">保持/扰动/余量</text>
+
+    <!-- PASS -->
+    <line x1="520" y1="508" x2="520" y2="532" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+    <text x="536" y="526" font-size="10" fill="#6f665f">否</text>
+    <rect x="400" y="536" width="240" height="40" rx="20" fill="rgba(22,163,74,0.12)" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="520" y="561" text-anchor="middle" font-size="12" font-weight="700" fill="#16a34a">PASS → 下一颗 die / 下一插入点</text>
+
+    <text x="20" y="600" font-size="11" fill="#6f665f">读数据的对应关系：STDF/WPFile 里每个 die 的「第一个 fail bin」就是这条流上它停下的位置；bin 分布的形状直接反映各物理失效域的占比。</text>
+  </g>
+</svg>
