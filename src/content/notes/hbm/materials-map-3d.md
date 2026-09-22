@@ -47,6 +47,12 @@ tags: ['HBM', '3D 封装', '材料收集', '来源清单']
 | SWTest 2025 海报：die carrier 式 HBM 测试单元（FormFactor/Advantest） | 会议一手 | 2025-06 | https://www.swtest.org/library/2025proc/pdf/P01_04_%20LIAO_SWTest-2025.pdf |
 | FormFactor 博客：HBM 早期测试策略 | 测试厂商 | 2026 | https://www.formfactor.com/blog/2026/high-bandwidth-memory-testing-why-early-test-strategies-are-critical-for-yield-cost-and-performance/ |
 | Semiconductor Engineering：DRAM 测试与检查越来越难 | 行业媒体 | 访问 2026-09-25 | https://semiengineering.com/dram-test-and-inspection-just-gets-tougher/ |
+| ADI 设计笔记：PMU 电压/电流钳位（MAX9979，FVMI/FIMV 模式与量程） | 芯片厂商一手 | 2026-09-25 全文抓取 | https://www.analog.com/en/resources/design-notes/how-to-set-pmu-voltage-and-current-clamps.html |
+| Marvin Test KB Q200207：DC 参数测试（PMU 两模式、按 spec 判定） | 测试设备商文档 | 2026-09-25 全文抓取 | https://www.marvintest.com/KB/Q200207/DC-Characterization-of-ICs-Using-PXI-Instrumentation |
+| AD5520/AD5522 手册：每引脚 PMU/SMU（钳位 + 窗口比较器，ATE 应用） | 芯片厂商一手 | 2026-09-25 | https://www.analog.com/media/en/technical-documentation/data-sheets/AD5520.pdf |
+| US5365180A：接触电阻测量（对 pin–GND 二极管加流测压降） | 专利 | 2026-09-25 索引核验 | https://patents.google.com/patent/US5365180A/en |
+
+（以上电路级来源的摘录与可引用论断集中归档于 [`public/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md`](/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md)。）
 
 对应笔记：《[HBM 测试的 3D 结构](/notes/hbm/hbm-test-3d/)》（含 10 项来源的完整表）。
 

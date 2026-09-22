@@ -1,98 +1,123 @@
 ---
-title: 'HBM 测试的 3D 结构：扎针区域、ATE 信号链路与良率失效分析'
-description: '探针卡扎针区域与 GPU 通讯区域电路的物理分区（牺牲焊盘 / 直接访问凸点 / PSWT 背面铝焊盘）、12 层堆栈中 ATE 信号的完整传递路径、PowerShort / SealRing / Crack / Bridge 的测试区分方法，以及设计良率与封装良率各自的测试手段和失效分析流程。'
+title: 'HBM 测试的 3D 结构：测试区域与 GPU 通讯区域（下钻到电路设计与测试程序）'
+description: '两个可下钻模型：测试区域四级（扎针姿态→版图分区→DFT 电路→PMU 测量与判定）与 GPU 通讯区域四级（装配→通道版图→PHY 电路→眼图与测试边界）；核心回答「KGSD 测试怎么用电压/电流/电阻判定失效」——电路设计 × 测试程序逻辑的组合。'
 date: 2026-09-25
-tags: ['HBM', '测试', 'KGD', '探针卡', '良率', '失效分析', '3D 可视化']
+tags: ['HBM', '测试', 'KGD', 'KGSD', 'PMU', '电路设计', '测试程序', '3D 可视化']
 ---
 
-import HBMTest3D from '../../../components/viz/HBMTest3D.tsx';
+import HBMTestZone3D from '../../../components/viz/HBMTestZone3D.tsx';
+import HBMCommZone3D from '../../../components/viz/HBMCommZone3D.tsx';
 
-## 交互模型
+## 0. 这组模型的用途：看清「数据是在哪里被设计成这个样子的」
 
-三个模式对应本文三个问题：「探针扎针区域」（堆栈自动翻转，露出 base die 背面的下针面）、「GPU 通讯区域」（装配姿态，高亮通道凸点场与 base die 通道走线）、「ATE 信号链路」（动画演示信号从 ATE 到第 12 层再读出的完整路径）。点击任一部件查看带出处的说明；下方表格随模式切换。
+看测试数据（bin 分布、位图、参数直方图）时，每个数字背后都有三层设计：
 
-<HBMTest3D client:visible />
+```
+物理结构（焊盘/二极管/电源轨/TSV/阵列）
+  → 测量电路（PMU：加压测流 / 加流测压 + 钳位 + 窗口比较器）
+    → 测试程序（fail-stop 顺序、限值 spec、bin 赋值、修复决策）
+      → 你看到的数据（bin1/4 分布、DPPM、行/列位图）
+```
+
+所以本页把原来混在一起的「测试 vs 通讯」拆成**两个独立模型**，各自四级下钻：
+
+| 模型 | 回答的问题 | 下钻终点 |
+|---|---|---|
+| **测试区域**（HBMTestZone3D） | 测试电路在哪、怎么施压、怎么判 bin | 电路设计级：PMU 测量与判定链 |
+| **GPU 通讯区域**（HBMCommZone3D） | 功能电路怎么连、为什么测试要借道 | PHY 电路级：眼图与测试边界 |
 
 ---
 
-## 1. 测试区域 vs GPU 通讯区域：同一颗堆栈的两个面
+## 1. 两个区域的物理分界：同一颗堆栈的两个电路面
 
-HBM 堆栈的**通讯电路**和**测试电路**在版图上是物理分区的。最权威的量化口径来自 SWTest 2017 上 SK hynix + FormFactor + Advantest 的联合论文，他们对 JEDEC HBM2 版图做了完整普查：
+最权威的量化口径仍是 SWTest 2017 上 SK hynix + FormFactor + Advantest 的联合论文对 JEDEC HBM2 版图的普查：
 
 | 凸点类别（HBM2，每堆栈） | 数量 | 归属 |
 |---|---|---|
-| IO micro-bump | 1728 | **GPU 通讯区域**：1024-bit 数据 + 控制，经 base die → interposer → GPU |
-| 电源 / 地 micro-bump | 1056 / 1030 | 供电网络（3 组电源域） |
-| **直接访问（Direct Access）micro-bump** | **176** | **测试专用**：ATE 对堆栈做 at-speed 原生模式测试的入口 |
+| IO micro-bump | 1728 | **GPU 通讯区域**：1024-bit 数据 + 控制，经 base die PHY → interposer → GPU |
+| 电源 / 地 micro-bump | 1056 / 1030 | 供电网络（通讯与测试共用的"地基"） |
+| **直接访问（Direct Access）micro-bump** | **176** | **测试区域**：ATE 对堆栈做 at-speed 原生模式测试的专用入口 |
 | 合计 | 3990（55 μm 间距，27.5×48 μm 交错；阵列 6022×2832 μm） | — |
 
 （来源：[SWTest 2017，S09_01](https://www.swtest.org/swtw_library/2017proc/PDF/S09_01_Nhin_SWTW2017R2.pdf)；摘录归档 [`public/sources/hbm-test/2017-06_swtw_hbm2-kgs-test-cell.md`](/sources/hbm-test/2017-06_swtw_hbm2-kgs-test-cell.md)）
 
-探针从哪里下针，按工序分三个位置：
+**分界的本质**：通讯电路按功能规格设计（JEDEC 电气 spec、时序预算），测试电路按"可观测性"设计（每个需要判 bin 的参数，都有一路对应的焊盘/二极管/感测电路把它变成电压或电流）。DA 端口是两个区域的连接点——at-speed 测试借 DA 入口、复用通讯 PHY。
+
+### 扎针位置按工序分三处
 
 | 扎针位置 | 工序 | 说明 |
 |---|---|---|
-| DRAM 裸片正面的 DFT / **牺牲测试焊盘** | 预堆叠晶圆 CP | JEDEC 在 HBM micro-bump 版图中预留了牺牲测试焊盘空间（semiengineering，2026）；量产用它、开发阶段直接扎 micro-bump（FormFactor，2026） |
+| DRAM 裸片正面的 DFT / **牺牲测试焊盘** | 预堆叠晶圆 CP | JEDEC 在 micro-bump 版图中预留牺牲测试焊盘（semiengineering，2026）；量产用它、开发阶段直接扎 micro-bump（FormFactor，2026） |
 | **JEDEC 直接访问凸点**（176 个） | 堆栈 at-speed 测试 | 8 通道同时原生模式功能/性能测试，>2.4 Gbps（2017 年实测口径） |
-| **base die 背面的铝焊盘** | PSWT（堆叠后晶圆测试） | 铝焊盘布在 base die 背面 micro-bump 版图的预留空间里，测试时堆叠晶圆翻转、从背面下针（Teradyne / semiengineering，2026） |
+| **base die 背面的铝焊盘** | PSWT（堆叠后晶圆测试） | 铝焊盘布在 base die 背面 bump 版图预留空间，测试时堆叠晶圆翻转、从背面下针（Teradyne / semiengineering，2026） |
 
-两处关键取舍，都有数字：
-
-- **焊盘 vs 凸点**：SWTest 2025 的对照——micro-bump 直接扎针「8 通道可同时测、接近实际使用条件」，但「deep coining 无法用于量产、并行度低」；DFT 焊盘「不伤凸点、可大并行」，但「测试条件偏离实际使用」。Aehr Test 给出成本口径：牺牲焊盘拉开间距后，**探针卡可省约 80% 成本**（免掉 50 万美元级探针卡）（均见 semiengineering 2026 与 SWTest 2025，摘录已归档）。
-- **与 GPU 通讯区域的物理隔离**：测试焊盘/凸点在版图上是独立预留资源，通讯走 IO 凸点场。这就是模型里红色（直接访问凸点）、银色（PSWT 铝焊盘）、金色（GPU 通讯 IO 场）三种颜色分开的原因。
+两处关键取舍：**焊盘 vs 凸点**——micro-bump 直接扎针「8 通道可同时测、接近实际使用条件」但并行度低；牺牲焊盘「不伤凸点、可大并行」但偏离实际使用条件；Aehr Test 成本口径：焊盘拉开间距后探针卡省约 80%（均见 semiengineering 2026 与 SWTest 2025，摘录已归档）。
 
 ---
 
-## 2. 电路级：12 层堆栈里 ATE 信号怎么走
+## 2. 测试区域：四级下钻（模型一）
 
-### 2.1 先看全流程有哪些插入点
+<HBMTestZone3D client:visible />
 
-| 插入点 | 测什么 | 速度 / 并行度 | 出处 |
-|---|---|---|---|
-| DRAM 核心晶圆 CP（每层各自） | DC 参数、弱位、修复 | ~100 MHz 弱位筛选 + 修复；64–128 site；单针 2.5 g、整片约 50 kg | Neumonda，via semiengineering |
-| 晶圆级烧灼 WBI | 早期失效 / 氧化层弱项 | 高温 + AC/DC 应力 | Samsung EDS、Aehr Test |
-| base die 晶圆测试 | DFT 链路：IEEE 1500 / direct access、MBiST、TSV 连通性、PHY | 逻辑 ATE 内容 | semiengineering，2026 |
-| Pre/Post Laser 修复 | 冗余替换与复验 | — | Samsung EDS |
-| PSWT（堆叠后晶圆测试） | 整链 DC→高低温→高频 | 逐级淘汰保持效率；12 层全流程 3–12 次插入 | SWTest 2025 / semiengineering |
-| 单颗堆栈测试（die carrier） | 全速、多温、单次接触全覆盖 | 4 GHz、对准 ±1.4 μm、64 并行 15 W 时 Tj 升 ≤3 ℃ | SWTest 2025 |
-| 封装最终测试 | 整包验证 | 诊断透明度最差，失效可能来自单颗裸片、层间连接或堆栈交互 | FormFactor，2026 |
+### L1 版图分区 → L2 电路模块：分区背后是电路
 
-### 2.2 一次测试的信号路径（对应模型的「ATE 信号链路」模式）
+L1 的四个分区（IO/电源/地/DA）在 L2 里对应 base die 上的电路模块：DA 端口与电平位移 → IEEE 1500 包装（指令译码）→ MBiST 引擎（图形发生器 + 比较器 + 失效捕获存储）→ 修复 Steering（fuse box：激光 / e-fuse / PPR）→ TSV 感测 → PHY（与通讯区共享）；版图边缘是焊盘 ESD 保护二极管对与 VDD/VSS 电源轨——**这排绿色二极管就是接触测试的"靶子"**。
 
-以 12 层堆栈（D0 贴 base die，D11 在顶）为例：
+### L3 核心问题：电压/电流/电阻怎么变成一个 bin
 
-1. **ATE**：算法图形发生器（APG）产生存储测试图形，失效捕获存储（error catch RAM）实时记录失效位——修复分析在线完成（Advantest Oda，via semiengineering）。
-2. **探针卡**：CP 阶段悬臂/垂直 MEMS 针落在 DFT/牺牲焊盘上；高速堆栈测试用 MEMS 垂直针直接接触直接访问凸点（HFTAP 已在量产验证 >3 GHz、128 DUT，FormFactor）。
-3. **下针面**：焊盘 →（堆叠后测试则经 base die 背面铝焊盘翻转进入）。
-4. **base die 的 DFT 电路**：JEDEC direct access 总线 / IEEE 1500 包装接入——base die 是堆栈唯一访问通路，MBiST（通常可编程）接管各层 DRAM 测试，同时验证 TSV 连通性与 PHY。
-5. **TSV 链上行**：测试激励经 TSV 逐层穿过 D0→D11，每层的阵列/读出电路被依次激励；任何一层失效都能在失效捕获存储里留下位图。
-6. **诊断读出**：MBiST 报告到 bank / 行 / 列粒度（Synopsys），支撑冗余修复（激光修复在晶圆级、e-fuse 到封装级、JEDEC PPR 每 bank 一行）与 TSV/lane 修复；修复后复测。
-7. **读出回程**：沿同一链路返回 ATE 比对；8 通道同时跑数据时输出眼图明显收缩（SWTest 2017 实测），所以 at-speed 筛选必须在全通道激活条件下做。
+**测量电路：PMU（参数测量单元）。** ATE 每个引脚配一个 PMU，两种基本模式（ADI MAX9979 设计笔记；Marvin Test KB Q200207，均全文归档于 [`public/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md`](/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md)）：
 
-两速原则贯穿始终：第一插入低速（~100 MHz）抓弱位做修复，第二插入（KGD）走高速接口全速跑——「KGD 通常不支持最高速度档」的原因是低并行高速探针卡的成本约束（Neumonda）。
+- **FVMI（加压测流）**：DAC 强制电压、ADC 回测电流——漏电、Idd、PowerShort 用它；
+- **FIMV（加流测压）**：强制电流、回测电压——接触测试用它；
+- 钳位（FI 模式钳电压、FV 模式钳电流）+ 窗口比较器出 pass/fail——**开路时电压顶到钳位**正是判别上界的来源。
+
+**判定链（模型 L3 交互表的内容）**：
+
+| 失效类型 | PMU 模式 | 健康读数 | 失效读数 | 判定与处置 |
+|---|---|---|---|---|
+| 焊盘/接触开路 | FIMV：对 pin–GND 保护二极管加约 100 μA 量级电流 | V ≈ 二极管导通压降（硅 PN 结约 0.6–0.7 V 量级） | 电流无路可走，V 顶到电压钳位 | Bin1 Open/Short，fail-stop，不进修复 |
+| 焊盘对地短路 | 同一接触测试 | 同上 | V ≈ 0 V（二极管被旁路） | Bin1，fail-stop |
+| PowerShort（VDD–VSS） | FVMI：电源轨加安全电平电压 | I 呈 μA–mA 量级漏电 | I 大幅超限 → R = V/I 塌到 Ω 量级 | Bin1/2 DC 致命类，fail-stop |
+| 输入漏电（IIL/IIH） | FVMI：输入加 spec 电平 | I < 1 μA 量级（spec 内） | 超 spec——PMU 切 μA 级灵敏量程回测 | DC 三件套之三 |
+| 功能位失效 | 数字通道：APG 图形 + 失效捕获存储 | 读出与期望一致 | DC 全过但位图坏位 → bank/行/列归因 | Bin4：可修走冗余替换 + 复验，不可修淘汰 |
+| TSV 开路 / lane | MBiST + TSV 感测（经 DA 链） | 连通与延迟在限内 | 整列 column fail（HBM 最常见失效来源之一，Synopsys） | lane repair / TSV repair（JEDEC 标准含坏通道重映射） |
+
+依据与口径：接触测试「对 pin 与地间典型存在的二极管强制电流、测压降，接触不良则压降增大」出自 US5365180A 摘要；Power Short / Contact / Leakage 是存储 DC 参数测试的标准三件套（项目既有归档）；fail-stop bin 顺序（Open/Short → Standby Idd → Active Idd → Function → Pause/Disturb Refresh → Margin）与「bin 应读作底层物理损伤的电学症状」出自 Edusemi-Plus（项目既有归档）；三星 EDS 的 ET 测试即对「晶体管/电阻/电容/二极管」做 DC 参数测试。读数中的量级为示意——具体限值随器件 spec 与测试机量程档（±2 μA–±50 mA，ADI MAX9979）变化。
+
+**测试程序逻辑**（fail-stop：先致命后边角）：Contact → PowerShort → Leakage/Idd → MBiST 功能 + 修复 → Margin。每一步只放行上一步的幸存者——这就是为什么 bin1 的数量能"解释"后面所有 bin 的分母。
 
 ---
 
-## 3. 失效分类：如何区分 PowerShort、SealRing、Crack、Bridge（及 FRL、FSA）
+## 3. GPU 通讯区域：四级下钻（模型二）
 
-区分的原理是同一个：**每类物理失效在「电测签名 × 空间签名 × 首次暴露的插入点」三个维度上有稳定组合**。能查到公开依据的四类如下：
+<HBMCommZone3D client:visible />
+
+- **L1 通道版图**：HBM3E 1024-bit = 16 独立通道 × 64-bit（32 伪通道）；HBM4 翻倍到 2048-bit / 32 通道（JEDEC JESD270-4；Siemens 汇总口径）。版图上每通道一条条带，CK/DQS 差分对在条带端部，电源/地海填充条带间隙，DA 端口独占边缘一列。
+- **L2 PHY 电路**：每通道的驱动/接收（按 JEDEC 电气 spec 设计）、DLL/时序对准（bin7 Margin 的测试对象）、TSV 落点阵列穿透各层。
+- **L3 信号与测试边界**：SWTest 2017 实测——8 通道同时跑数据时输出眼图明显收缩，所以 at-speed 筛选必须全通道激活；坏 lane 由 JEDEC lane repair 重映射到冗余通道；**测试借 DA 端口复用通讯 PHY**——这就是「通讯区域」和「测试区域」在电路设计层面的连接。
+
+---
+
+## 4. 失效分类：如何区分 PowerShort、SealRing、Crack、Bridge（及 FRL、FSA）
+
+区分的原理与 L3 判定链同构：**每类物理失效在「电测签名 × 空间签名 × 首次暴露的插入点」三个维度上有稳定组合**。能查到公开依据的四类如下：
 
 | 失效类型 | 物理根因 | 电测如何区分 | 空间/检查签名 | 首次暴露点 |
 |---|---|---|---|---|
-| **PowerShort** | 电源网络与地之间被缺陷（金属/粒子/键合材料挤压溢出）短接 | DC 参数测试三件套之一（Power Short / Contact / Leakage）：加压测流或加流测压，电流远超限即判——属 bin 分类的第一格「Open/Short」致命类，fail-stop 流程最先测 | 无位置结构，整片任意分布；**不进修复流程，直接淘汰** | 预堆叠 CP 最早暴露 |
-| **SealRing** | 裸片边缘密封环（应力保护 + 阻挡裂纹与腐蚀的金属环结构）受损：探痕、崩边、切割微裂纹延伸 | 边缘结构相关的开路/漏电在 CP 的 OS/漏电项暴露；IPFA 2021 实证：inline E-test 在划片线结构上的探痕可在晶圆分选阶段诱发失效，「即使探针与有源区保持安全距离」 | **沿裸片周边分布**的失效环/边缘聚簇是判别特征；与探针卡针位布局相关 | CP（探痕型）；切割/减薄后复测（应力型） |
-| **Crack** | 减薄与切割引入机械应力，「加剧已有裂纹、滑移与划伤」（semiengineering 原句）；薄化到 30–60 μm 的 DRAM 裸片更敏感 | 电测签名随裂纹路径：跨线切割→开路簇、穿氧化层→漏电簇；与 SealRing 的区别在**穿芯**而非沿边 | X-ray/SAT 检查：Bruker 在 die-attach 后做 100% X-ray 检查 HBM 隐藏缺陷——30% 采样把 excursion 缩到约 7 天，100% 采样再拿 1.7% 良率、缩到 2 天 | 减薄/切割后、PSWT/FT 阶段放大 |
-| **Bridge** | 相邻凸点/走线桥连：TC 键合「造成开路、短路、head-in-pillow 和高阻连接」（semiengineering 原句）；凸点形变、焊料挤出 | 邻网短路在 DC（邻针间测阻）与功能图形（相邻位翻转）都能暴露；键合类桥连在**预堆叠 CP 通过、堆叠后失败**——跨插入点差分即定位到键合 | 凸点 CD/高度量测 + 凸点顶残留检测（Onto）；BLT 失衡→non-wet / 焊料挤出（Bruker）；通道失效走 lane repair | PSWT / 堆栈测试新暴露 |
+| **PowerShort** | 电源网络与地之间被缺陷（金属/粒子/键合材料挤压溢出）短接 | DC 三件套之一（Power Short / Contact / Leakage）：FVMI 加压测流，电流远超限即判——fail-stop 流程最先测 | 无位置结构，整片任意分布；**不进修复流程，直接淘汰** | 预堆叠 CP 最早暴露 |
+| **SealRing** | 裸片边缘密封环受损：探痕、崩边、切割微裂纹延伸 | 边缘结构相关的开路/漏电在 CP 的 OS/漏电项暴露；IPFA 2021 实证：inline E-test 探痕可在晶圆分选阶段诱发失效，「即使探针与有源区保持安全距离」 | **沿裸片周边分布**的失效环/边缘聚簇；与探针卡针位布局相关 | CP（探痕型）；切割/减薄后复测（应力型） |
+| **Crack** | 减薄与切割引入机械应力；薄化到 30–60 μm 的 DRAM 裸片更敏感 | 电测签名随裂纹路径：跨线切割→开路簇、穿氧化层→漏电簇；与 SealRing 的区别在**穿芯**而非沿边 | X-ray/SAT：Bruker 在 die-attach 后 100% X-ray——30% 采样把 excursion 缩到约 7 天，100% 采样再拿 1.7% 良率、缩到 2 天 | 减薄/切割后、PSWT/FT 阶段放大 |
+| **Bridge** | 相邻凸点/走线桥连：TC 键合「造成开路、短路、head-in-pillow 和高阻连接」；凸点形变、焊料挤出 | 邻网短路在 DC（邻针间测阻）与功能图形（相邻位翻转）都能暴露；键合类桥连在**预堆叠 CP 通过、堆叠后失败**——跨插入点差分即定位到键合 | 凸点 CD/高度量测 + 凸点顶残留检测（Onto）；BLT 失衡→non-wet / 焊料挤出（Bruker）；通道失效走 lane repair | PSWT / 堆栈测试新暴露 |
 
-> **Blocked: need confirmation on FRL / FSA 的全称与判定条件。** 截至 2026-09-25 的公开检索（英文/日文/韩文，含 SWTest 论文库、IEEE、专利库）未找到这两个缩写在 HBM/DRAM 测试语境下的权威定义，不排除是产线内部 bin 名。按同一判别框架，它们应落在「电测签名 × 空间签名 × 插入点」的组合上：拿到全称与 bin 定义后即可填入上表，方法不变。本笔记不猜测、不杜撰。
+> **Blocked: need confirmation on FRL / FSA 的全称与判定条件。** 截至 2026-09-25 的公开检索未找到这两个缩写在 HBM/DRAM 测试语境下的权威定义，不排除是产线内部 bin 名。按同一判别框架，它们应落在「电测签名 × 空间签名 × 插入点」的组合上。本笔记不猜测、不杜撰。
 
-共同的分析流程：**bin 分布（哪一项先 fail）→ 位图/晶圆图空间签名（点/环/边/聚簇）→ 跨插入点差分（CP 过了 PSWT 挂 = 键合类；CP 即挂 = 裸片类）→ 物理失效分析（X-ray / SAT / 切片）闭环**。这套「电测症状 → 物理损伤」的投影关系是行业通用方法论（Edusemi bin 分类：晶圆测试 bin 应读作「底层物理损伤的电学症状」，归档见来源清单）。
+共同的分析流程：**bin 分布 → 位图/晶圆图空间签名 → 跨插入点差分 → 物理失效分析（X-ray / SAT / 切片）闭环**（Edusemi bin 分类：「晶圆测试 bin 应读作底层物理损伤的电学症状」）。
 
 ---
 
-## 4. 设计良率 vs 封装良率：测试手段与失效分析
+## 5. 设计良率 vs 封装良率：测试手段与失效分析
 
-### 4.1 两者的边界
+### 5.1 两者的边界
 
 | | 设计良率（晶圆/裸片侧） | 封装良率（堆叠/组装侧） |
 |---|---|---|
@@ -100,58 +125,64 @@ HBM 堆栈的**通讯电路**和**测试电路**在版图上是物理分区的�
 | 典型限制 | 随机缺陷 + 系统性/设计边缘性（先进节点系统性问题主导） | 对准（单微米级）、键合质量（开路/短路/HIP/高阻）、裂纹/空洞/分层、翘曲 |
 | 复利效应 | 单颗裸片良率 | **堆叠放大**：单 die 95% 时 16 层综合良率 44%（0.95¹⁶）；base die 坏一颗，上面 8–16 层全报废（Aehr Test） |
 
-### 4.2 设计良率：测试手段
+### 5.2 设计良率：测试手段
 
-1. **EDS/CP 全流程**（三星官方口径的五步）：ET 参数测试 + WBI 烧灼 → Pre-Laser 高低温双温 → 激光修复 + Post Laser 复验 → 贴膜减薄 → Inking 标记。目的明确：「尽早发现晶圆制造工序或设计的问题，反馈给工艺与设计团队」。
-2. **Bin 分类体系**：fail-stop 顺序 Open/Short → Standby/Active Idd → Function → Pause/Disturb Refresh → Margin，每个 bin 对应独立物理失效域（0.25 μm 世代骨架沿用至今）。
-3. **修复率管理**：冗余行/列占裸片面积 5–10%；晶圆级激光修复、封装级 e-fuse、JEDEC PPR 每 bank 一行——「没有冗余，晶圆级良率会显著更低」。
+1. **EDS/CP 全流程**（三星官方口径五步）：ET 参数测试 + WBI 烧灼 → Pre-Laser 高低温双温 → 激光修复 + Post Laser 复验 → 贴膜减薄 → Inking 标记。
+2. **Bin 分类体系**：fail-stop 顺序（见 §2 L3），每个 bin 对应独立物理失效域。
+3. **修复率管理**：冗余行/列占裸片面积 5–10%；晶圆级激光修复、封装级 e-fuse、JEDEC PPR 每 bank 一行。
 4. **统计筛查与图形识别**：PAT/DPAT/GDBN 离群剔除、SPC（详见站内报告[《测试数据分析：从 ATE 到筛选决策》](/reports/hbm3e-hbm4e/test-data-analytics.html)）；ML 空间图形识别（SPR）把工艺/机台系统性问题自动归类，SkyWater 案例**工程师效率 +25%**。
-5. **系统性良率优先**：先进节点「系统性缺陷与参数波动在量产初期就存在」，GF 14nm 案例——设计版图弱点（weak point）分析 + OPC 修正拿回晶圆边缘 >5% 良率损失（PDF Solutions / GF ASMC，via semiengineering）。
+5. **系统性良率优先**：先进节点「系统性缺陷与参数波动在量产初期就存在」，GF 14nm 案例——版图弱点分析 + OPC 修正拿回晶圆边缘 >5% 良率损失（PDF Solutions / GF，via semiengineering）。
 
-### 4.3 封装良率：测试手段
+### 5.3 封装良率：测试手段
 
-1. **多插入点递进筛选**：12 层堆栈全流程 3–12 次插入（视封装厂质量档位）；每层堆叠后或每 2/4 层插入一次测试；逐级淘汰保持效率（SWTest 2025：90/80/70% vs 单次 100% 的取舍）。
+1. **多插入点递进筛选**：12 层堆栈全流程 3–12 次插入；逐级淘汰保持效率（SWTest 2025：90/80/70% vs 单次 100% 的取舍）。
 2. **PSWT / KGS**：翻转扎针 base die 背面铝焊盘，DC → 高低温 → 高频逐级；MBiST/direct access 测整链，每次插入做 TSV 修复。
 3. **单颗堆栈测试**（die carrier）：全速 4 GHz、多温、单次接触全覆盖；对准 ±1.4 μm；64 并行 15 W 时 Tj 升 ≤3 ℃（FormFactor/Advantest 2025）。
-4. **检查互补**：凸点 CD/高度量测、凸点顶残留检测（Onto）；X-ray 采样率与良率/excursion 的量化关系（Bruker：30% 采样→约 7 天 excursion，100%→+1.7% 良率、2 天）；SAT 查裂纹/空洞/分层。
+4. **检查互补**：凸点 CD/高度量测、凸点顶残留检测（Onto）；X-ray 采样率与良率/excursion 的量化关系（Bruker）；SAT 查裂纹/空洞/分层。
 5. **终测前的经济学**：HBM 占 AI 芯片成本近一半；典型 1 GPU + 8 堆栈，坏一颗在终测才暴露代价最高——这是「测试左移」的全部动因（Teradyne / semiengineering）。
 
-### 4.4 失效分析：数据与物理双轨
+### 5.4 失效分析：数据与物理双轨
 
-- **数据侧**：STDF 逐 die 参数 + bin 分布 → 位图/晶圆图空间签名（点失效/边缘环/聚簇/条带）→ 跨插入点差分定位责任工序 → 良率模型（负二项）与批次限（SYL/SBL）监控。
-- **物理侧**：X-ray（隐藏缺陷、键合偏移）→ SAT/C-SAM（空洞、分层、裂纹）→ 切片/EMMI 类定位到点 → 与 MBiST 的 bank/行/列诊断对齐（Synopsys：诊断必须「differentiate and isolate to do physical failure analysis」）。
-- **闭环**：Onto McIntyre——BiST 位图 + 位图模式分类器仍是「把在线缺陷匹配到单元级影响」的金标准；追溯与性能匹配（慢内存装进高性能封装会拖垮整包 ASP）跨厂区贯穿。
+- **数据侧**：STDF 逐 die 参数 + bin 分布 → 位图/晶圆图空间签名 → 跨插入点差分定位责任工序 → 良率模型（负二项）与批次限（SYL/SBL）监控。
+- **物理侧**：X-ray → SAT/C-SAM → 切片/EMMI 类定位到点 → 与 MBiST 的 bank/行/列诊断对齐（Synopsys）。
+- **闭环**：Onto McIntyre——BiST 位图 + 位图模式分类器仍是「把在线缺陷匹配到单元级影响」的金标准；追溯与性能匹配跨厂区贯穿。
 
 ---
 
-## 来源清单
+## 6. 来源清单
 
 原始摘录归档于 [`public/sources/hbm-test/`](/sources/hbm-test/)。
 
 | # | 来源 | 时间 | URL |
 |---|---|---|---|
-| 1 | SWTest Workshop 2017，S09_01：Verification of Singulated HBM2 stacks with a KGS Test Cell（SK hynix/FormFactor/Advantest；3990 凸点普查、176 直接访问凸点、8 通道眼图、扎痕数据） | 2017-06 | https://www.swtest.org/swtw_library/2017proc/PDF/S09_01_Nhin_SWTW2017R2.pdf |
-| 2 | SWTest 2025 海报 P01_04：HBM test cell by Die Carrier（FormFactor/Advantest；DFT 焊盘 vs μbump 对照、对准 ±1.4 μm、热数据） | 2025-06 | https://www.swtest.org/library/2025proc/pdf/P01_04_%20LIAO_SWTest-2025.pdf |
-| 3 | Semiconductor Engineering：HBM Shifts Testing Left To Preserve AI Chip Yield（JEDEC 牺牲焊盘、−80% 探针卡成本、3–12 次插入、base die 唯一通路、PSWT 背面铝焊盘、MBiST 诊断粒度） | 2026-05 | https://semiengineering.com/hbm-shifts-testing-left-to-preserve-ai-chip-yield/ |
-| 4 | Semiconductor Engineering：DRAM Test And Inspection Just Gets Tougher（两速插入、100 MHz/2 万针/2.5 g、APG+失效捕获、冗余 5–10% 面积、lane repair、BLT/non-wet、X-ray 采样率） | 访问 2026-09-25 | https://semiengineering.com/dram-test-and-inspection-just-gets-tougher/ |
-| 5 | FormFactor 博客：HBM Testing — Why Early Test Strategies Are Critical（牺牲焊盘 vs 直接扎 μbump 的取舍、WLB、终测局限） | 2026 | https://www.formfactor.com/blog/2026/high-bandwidth-memory-testing-why-early-test-strategies-are-critical-for-yield-cost-and-performance/ |
-| 6 | IEEE IPFA 2021：E-test Probe Mark Topology-induced Failure（划片线探痕致晶圆分选失效的实证） | 2021-09 | https://doi.org/10.1109/ipfa53173.2021.9617372 |
-| 7 | 三星 Newsroom：EDS（Electrical Die Sorting）五步科普 | ~2021-07 | https://news.samsungsemiconductor.com/kr/반도체-8대-공정-8탄-합격으로-가는-첫-번째-관문-edselectrical-die-sorting/ |
+| 1 | SWTest Workshop 2017，S09_01：Verification of Singulated HBM2 stacks with a KGS Test Cell（SK hynix/FormFactor/Advantest） | 2017-06 | https://www.swtest.org/swtw_library/2017proc/PDF/S09_01_Nhin_SWTW2017R2.pdf |
+| 2 | SWTest 2025 海报 P01_04：HBM test cell by Die Carrier（FormFactor/Advantest） | 2025-06 | https://www.swtest.org/library/2025proc/pdf/P01_04_%20LIAO_SWTest-2025.pdf |
+| 3 | Semiconductor Engineering：HBM Shifts Testing Left To Preserve AI Chip Yield | 2026-05 | https://semiengineering.com/hbm-shifts-testing-left-to-preserve-ai-chip-yield/ |
+| 4 | Semiconductor Engineering：DRAM Test And Inspection Just Gets Tougher | 访问 2026-09-25 | https://semiengineering.com/dram-test-and-inspection-just-gets-tougher/ |
+| 5 | FormFactor 博客：HBM Testing — Why Early Test Strategies Are Critical | 2026 | https://www.formfactor.com/blog/2026/high-bandwidth-memory-testing-why-early-test-strategies-are-critical-for-yield-cost-and-performance/ |
+| 6 | IEEE IPFA 2021：E-test Probe Mark Topology-induced Failure | 2021-09 | https://doi.org/10.1109/ipfa53173.2021.9617372 |
+| 7 | 三星 Newsroom：EDS（Electrical Die Sorting）五步科普（ET = 对晶体管/电阻/电容/二极管做 DC 参数测试） | ~2021-07 | https://news.samsungsemiconductor.com/kr/반도체-8대-공정-8탄-합격으로-가는-첫-번째-관문-edselectrical-die-sorting/ |
 | 8 | Edusemi-Plus：DRAM 晶圆测试 bin 分类（fail-stop 与 bin1–7 物理含义） | 访问 2026-09-25 | https://samizo-aitl.github.io/Edusemi-Plus/archive/legacy/dram_025um/wafer_test_bin/ |
-| 9 | 专利对 seal ring 结构的定义（US8334582B2、US9117831、US8125052B2） | — | https://patents.google.com/patent/US8334582B2/en |
-| 10 | Semiconductor Engineering：Systematic Yield Issues Now Top Priority At Advanced Nodes（系统性良率、SPR +25%、GF weak point 案例、Bruker X-ray 采样） | 访问 2026-09-25 | https://semiengineering.com/systematic-yield-issues-now-top-priority-at-advanced-nodes/ |
+| 9 | 专利对 seal ring 结构的定义（US8334582B2 等） | — | https://patents.google.com/patent/US8334582B2/en |
+| 10 | Semiconductor Engineering：Systematic Yield Issues Now Top Priority At Advanced Nodes | 访问 2026-09-25 | https://semiengineering.com/systematic-yield-issues-now-top-priority-at-advanced-nodes/ |
+| 11 | ADI 设计笔记：How to Set PMU Voltage and Current Clamps（MAX9979；FVMI/FIMV 等 6 模式、钳位机制、±2 μA–±50 mA 量程） | 2026-09-25 全文抓取 | https://www.analog.com/en/resources/design-notes/how-to-set-pmu-voltage-and-current-clamps.html |
+| 12 | Marvin Test Solutions KB Q200207：DC Characterization of ICs（PMU 两种模式、μA 级灵敏量程、按 spec 判定） | 2026-09-25 全文抓取 | https://www.marvintest.com/KB/Q200207/DC-Characterization-of-ICs-Using-PXI-Instrumentation |
+| 13 | AD5520/AD5521 数据手册：Per-Pin PMU/SMU（FIMV/FVMI/FVMV/FIMI + 钳位电路 + 窗口比较器，ATE 应用） | 2026-09-25 URL 200 | https://www.analog.com/media/en/technical-documentation/data-sheets/AD5520.pdf |
+| 14 | US5365180A：Method for measuring contact resistance（对 pin–GND 二极管加流测压降，接触不良压降增大） | 2026-09-25 索引核验 | https://patents.google.com/patent/US5365180A/en |
+| 15 | ServeTheHome：SK hynix HBM Packaging at Hot Chips 2026（KGSD 晶圆级流、TSV/凸点量化） | 2026-08 | https://www.servethehome.com/sk-hynix-hbm-packaging-at-hot-chips-2026/ |
 
 ## 数据可信度分级
 
-- **厂商/会议一手口径**：HBM2 凸点普查与 8 通道实测（来源 1，带致谢 SK hynix）；die carrier 指标（来源 2）；EDS 五步（来源 7，厂商官方科普）。
-- **媒体综述中的厂商访谈引语**：3–12 次插入、−80% 探针卡成本、PSWT 背面铝焊盘、MBiST 诊断粒度等均出自 semiengineering 采访原话（Teradyne/FormFactor/Aehr/Synopsys/Amkor 高管具名引语），可信度较高但为二手转述。
-- **方法论口径**：bin 分类与 fail-stop（来源 8）为教学整理，代表通用实践而非某厂现行程序。
-- **未能溯源（不采用）**：FRL、FSA 的全称与判定条件——公开渠道未检索到，已按 Blocked 项标注，待产线术语确认。
-- 本文 3D 模型为示意比例；翻转姿态仅示意 PSWT 下针面，实际由探针台完成。
+- **厂商/会议一手口径**：HBM2 凸点普查与 8 通道实测（来源 1）；die carrier 指标（来源 2）；EDS 五步（来源 7）；PMU 模式/钳位/量程（来源 11/12/13，芯片厂商一手文档）。
+- **媒体综述中的厂商访谈引语**：3–12 次插入、−80% 探针卡成本、PSWT 背面铝焊盘、MBiST 诊断粒度等（semiengineering 具名引语，二手转述）。
+- **专利与方法论文献**：接触测试方法（来源 14）；bin 分类与 fail-stop（来源 8，教学整理，代表通用实践而非某厂现行程序）。
+- **示意量级（明确标注）**：模型中的电压/电流读数数量级（约 0.6–0.7 V 二极管压降为器件物理教科书量级；μA/mA 漏电量级）——具体限值以器件 spec 与测试机量程档为准。
+- **未能溯源（不采用）**：FRL、FSA 的全称与判定条件——已按 Blocked 项标注，本笔记不猜测、不杜撰。
+- 3D 模型为示意比例；眼图动画为概念示意，非实测波形。
 
 ## 延伸阅读
 
 - 三代堆叠结构本身：《[HBM 三代堆叠的 3D 对比](/notes/hbm/hbm-generations-3d/)》
-- 行业语境材料底座（全部带真实链接）：《[材料地图](/notes/hbm/materials-map-3d/)》
+- 通讯区域的宿主环境：《[HBM 堆栈的集成环境](/notes/hbm/integration-context/)》
 - ATE 数据下游（STDF/PAT/良率模型/机器学习）：《[测试数据分析：从 ATE 到筛选决策](/reports/hbm3e-hbm4e/test-data-analytics.html)》
 - 测试数据职业路径：见「职业」笔记《测试数据科学家 24 个月计划》

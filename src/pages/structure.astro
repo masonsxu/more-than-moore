@@ -2,15 +2,16 @@
 import Base from '../layouts/Base.astro';
 import ChipStack3D from '../components/viz/ChipStack3D.tsx';
 import HBMStack3D from '../components/viz/HBMStack3D.tsx';
-import HBMTest3D from '../components/viz/HBMTest3D.tsx';
+import HBMTestZone3D from '../components/viz/HBMTestZone3D.tsx';
+import HBMCommZone3D from '../components/viz/HBMCommZone3D.tsx';
 ---
 
-<Base title="3D 结构" description="HBM 3D 封装结构交互模型：三代堆叠对比、测试视图与宿主集成环境。">
+<Base title="3D 结构" description="HBM 3D 封装结构交互模型：三代堆叠对比、测试区域下钻、GPU 通讯区域下钻与集成环境。">
   <section class="py-4">
     <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Interactive 3D · HBM Stack</p>
-    <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">HBM 3D 堆叠结构</h1>
+    <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">HBM 3D 封装结构</h1>
     <p class="mt-3 max-w-2xl text-slate-600">
-      本页主体是 HBM 3D 封装：堆叠结构、测试视图与集成环境三类交互模型。拖拽旋转、滚轮缩放；点击图层或下方标签查看说明，右上角按钮切换爆炸视图。结构为示意比例，不代表真实尺寸。
+      本页主体是 HBM 3D 封装：堆叠结构、测试区域与 GPU 通讯区域两类下钻模型、集成环境。拖拽旋转、滚轮缩放；点击图层或部件查看说明。结构为示意比例，不代表真实尺寸。
     </p>
   </section>
 
@@ -18,8 +19,9 @@ import HBMTest3D from '../components/viz/HBMTest3D.tsx';
     <h2>阅读顺序建议</h2>
     <ol>
       <li>先看<strong>HBM 三代堆叠对比</strong>：base die 从存储工艺转向逻辑工艺、供电 TSV 演进、16 层混合键合模式——这是 HBM 3D 封装的主线。</li>
-      <li>再看<strong>测试区域 vs GPU 通讯区域</strong>：堆栈的扎针区域、ATE 信号链路与良率失效分析。</li>
-      <li>最后看<strong>集成环境模型</strong>：堆栈出厂（KGSD）后落入 2.5D 封装的外部约束——reticle、应力、热与组装顺序。</li>
+      <li>再看<strong>测试区域（四级下钻）</strong>：扎针姿态 → 版图分区 → base die 内 DFT 电路 → 电压/电流/电阻如何被 PMU 施加、读数如何经测试程序判成 bin。</li>
+      <li>对照看<strong>GPU 通讯区域（四级下钻）</strong>：装配 → 通道版图 → PHY 电路 → 眼图与 lane 修复，理解测试为什么必须借道 DA 端口。</li>
+      <li>最后看<strong>集成环境模型</strong>：堆栈出厂（KGSD）后落入 2.5D 封装的外部约束。</li>
     </ol>
   </section>
 
@@ -36,16 +38,30 @@ import HBMTest3D from '../components/viz/HBMTest3D.tsx';
   <HBMStack3D client:visible />
 
   <section class="mt-16">
-    <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Interactive 3D · HBM Test</p>
-    <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">测试区域 vs GPU 通讯区域</h2>
+    <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Interactive 3D · 测试区域（下钻）</p>
+    <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">测试区域：从扎针面到测量与判定</h2>
     <p class="mt-3 max-w-2xl text-slate-600">
-      12 层堆栈的测试视图：探针卡扎针区域（牺牲焊盘 / JEDEC 直接访问凸点 / PSWT 背面铝焊盘）
-      与 GPU 通讯凸点场的物理分区，以及 ATE 信号的完整链路。详细解读见笔记
+      四级下钻：L0 翻转堆栈看三个下针位置（牺牲焊盘 / JEDEC 直接访问凸点 / PSWT 背面铝焊盘）→ L1 base die 版图分区与资源占比（HBM2 普查口径）→
+      L2 打开 base die 看 DFT 电路模块（DA 端口、IEEE 1500、MBiST、修复 Steering、TSV 感测、ESD 二极管）→
+      L3 选一种失效类型，看 PMU 怎么施电压/电流、读数怎么经 fail-stop 测试程序判成 bin。详细解读见笔记
       <a href="/notes/hbm/hbm-test-3d/" class="text-cyan-700 underline decoration-cyan-300 underline-offset-2 hover:text-cyan-900">《HBM 测试的 3D 结构》</a>。
     </p>
   </section>
 
-  <HBMTest3D client:visible />
+  <HBMTestZone3D client:visible />
+
+  <section class="mt-16">
+    <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Interactive 3D · GPU 通讯区域（下钻）</p>
+    <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">GPU 通讯区域：从凸点场到信号与测试边界</h2>
+    <p class="mt-3 max-w-2xl text-slate-600">
+      四级下钻：L0 装配全貌（堆栈 ↔ 中介层 ↔ GPU）→ L1 bump 场按 HBM3E 16 通道切分（CK/DQS 对、电源海、DA 边界列）→
+      L2 每通道 PHY 驱动/接收、DLL 时序与 TSV 落点 → L3 眼图与 8 通道同步代价（SWTest 2017 实测口径）、lane 修复重映射，
+      以及功能电路与测试电路共用设计的边界。详细解读见笔记
+      <a href="/notes/hbm/hbm-test-3d/" class="text-cyan-700 underline decoration-cyan-300 underline-offset-2 hover:text-cyan-900">《HBM 测试的 3D 结构》</a>。
+    </p>
+  </section>
+
+  <HBMCommZone3D client:visible />
 
   <section class="mt-16">
     <p class="text-sm font-medium uppercase tracking-widest text-cyan-700">Interactive 3D · 集成环境</p>

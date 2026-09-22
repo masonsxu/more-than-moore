@@ -177,3 +177,12 @@ tags: ['HBM', '事实核查', '数据可信度']
 - 新增口径冲突记录：HBM4 微凸点 pitch 存在两种媒体口径——Hot Chips 2026 一手口径约 30 μm vs Semiconductor Engineering（2025-12）"HBM4 pad pitch 10 μm"；本项目正文采用 Hot Chips 口径，分歧留痕见 [`sources/hbm-3d/2026-09-25_semiengineering_hbm4-microbumps-postponing-hb.md`](/sources/hbm-3d/2026-09-25_semiengineering_hbm4-microbumps-postponing-hb.md)
 - 新增修正：SK 海力士 MR-MUF 长文确认"12 层 HBM3E 散热 +10%"的对比基数为 8 层 HBM3（非 HBM3 12 层版），引用时必须写明基数（A级，官方原文）；HBM2E 散热较 HBM2 +36%、Advanced MR-MUF EMC 热导率 1.6× 为新增可引用官方口径
 - 403 说明：TSMC 3DFabric 官方页、JEDEC 新闻稿页直接抓取返回 403（反爬），页面真实存在（搜索引擎索引正文 + 既有归档），引用不受影响
+
+## 10. 2026-09-25 测试模型拆分增补（电路级下钻）
+
+应用户要求把「测试区域 vs GPU 通讯区域」拆为两个独立可下钻模型（各四级，下钻到电路设计与测试程序逻辑），改动与新增证据留痕：
+
+- 新增来源 4 份，归档于 [`public/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md`](/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md)：ADI MAX9979 设计笔记（PMU 六模式/钳位/量程，全文抓取）、Marvin Test KB Q200207（FVMI/FIMV 两模式与 μA 级灵敏量程，全文抓取）、AD5520/AD5522 手册（每引脚 PMU + 钳位 + 窗口比较器，URL 200）、US5365180A（接触测试：对 pin–GND 二极管加流测压降；专利页本机直连不可达，按搜索引擎索引摘要核验并如实标注）
+- 判定链口径：接触开路 → FIMV 加流测压、开路时电压顶到 FI 模式钳位（钳位机制出自 ADI 原文）；「硅 PN 结导通压降约 0.6–0.7 V」按器件物理教科书量级使用，标注 C 级示意；Power Short/Contact/Leakage 三件套与 fail-stop bin 顺序沿用既有归档（Edusemi/三星 EDS/Acco Labs）
+- 组件拆分：HBMTest3D 删除，拆为 HBMTestZone3D（测试区域四级：扎针姿态→版图分区→DFT 电路→测量与判定）与 HBMCommZone3D（GPU 通讯区域四级：装配→通道版图→PHY 电路→眼图与测试边界）；原三模式下的全部已核事实保留并重新归位
+- 验证：astro check 0 错误、bun run build 通过、Playwright 运行时冒烟（4 画布 0 报错、L3 判定链与 8 通道切换渲染正常）
