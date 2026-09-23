@@ -84,7 +84,7 @@ L1 的四个分区（IO/电源/地/DA）在 L2 里对应 base die 上的电路�
 
 依据与口径：接触测试「对 pin 与地间典型存在的二极管强制电流、测压降，接触不良则压降增大」出自 US5365180A 摘要；Power Short / Contact / Leakage 是存储 DC 参数测试的标准三件套（项目既有归档）；fail-stop bin 顺序（Open/Short → Standby Idd → Active Idd → Function → Pause/Disturb Refresh → Margin）与「bin 应读作底层物理损伤的电学症状」出自 Edusemi-Plus（项目既有归档）；三星 EDS 的 ET 测试即对「晶体管/电阻/电容/二极管」做 DC 参数测试。读数中的量级为示意——具体限值随器件 spec 与测试机量程档（±2 μA–±50 mA，ADI MAX9979）变化。
 
-> **原理看不够深？** 配套笔记《[测试电路的三张图：设计 · 逻辑 · 物理](/notes/hbm/test-circuit-diagrams/)》用三张手绘原理图把这套判定链画透：设计图（每个电路为什么存在）、逻辑图（fail-stop 判定流）、物理图（电流实际走哪条路）。
+> **原理看不够深？** 配套笔记《[测试电路的图：三张总图 + 六张失效电路图](/notes/hbm/test-circuit-diagrams/)》把这套判定链画透：三张总图（设计图——每个电路为什么存在、逻辑图——fail-stop 判定流、物理图——电流实际走哪条路），再加六张失效级模拟电路图（3D 场景里每选一种失效，下方即显示对应原理图）。
 
 **测试程序逻辑**（fail-stop：先致命后边角）：Contact → PowerShort → Leakage/Idd → MBiST 功能 + 修复 → Margin。每一步只放行上一步的幸存者——这就是为什么 bin1 的数量能"解释"后面所有 bin 的分母。
 
@@ -184,7 +184,7 @@ L1 的四个分区（IO/电源/地/DA）在 L2 里对应 base die 上的电路�
 
 ## 延伸阅读
 
-- 原理组图（设计/逻辑/物理三张电路图）：《[测试电路的三张图](/notes/hbm/test-circuit-diagrams/)》
+- 原理组图（设计/逻辑/物理三张总图 + 六张失效电路图）：《[测试电路的图](/notes/hbm/test-circuit-diagrams/)》
 - 三代堆叠结构本身：《[HBM 三代堆叠的 3D 对比](/notes/hbm/hbm-generations-3d/)》
 - 通讯区域的宿主环境：《[HBM 堆栈的集成环境](/notes/hbm/integration-context/)》
 - ATE 数据下游（STDF/PAT/良率模型/机器学习）：《[测试数据分析：从 ATE 到筛选决策](/reports/hbm3e-hbm4e/test-data-analytics.html)》

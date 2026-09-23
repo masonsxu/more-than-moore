@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" role="img" aria-label="失效电路图：焊盘对地短路（二极管被旁路）">
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#57534e"/>
+    </marker>
+  </defs>
+  <g font-family="Geist, PingFang SC, Microsoft YaHei, sans-serif">
+    <text x="20" y="24" font-size="15" font-weight="700" fill="#1c1917">失效电路图 ②：焊盘对地短路 —— 二极管被旁路，压差塌到 0</text>
+    <text x="20" y="42" font-size="11" fill="#6f665f">模拟级原理（示意量级）；与①同一 Contact 测试（FIMV），缺陷位置不同 → 读数方向相反（过高 vs 过低）</text>
+
+    <rect x="20" y="60" width="240" height="270" rx="10" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.25)" stroke-dasharray="5 4"/>
+    <text x="36" y="84" font-size="12" font-weight="600" fill="#1c1917">ATE · PMU（FIMV 模式）</text>
+
+    <circle cx="100" cy="150" r="26" fill="#fff" stroke="rgba(28,25,23,0.3)" stroke-width="1.4"/>
+    <line x1="88" y1="156" x2="112" y2="144" stroke="#1c1917" stroke-width="1.6" marker-end="url(#arr)"/>
+    <text x="100" y="192" text-anchor="middle" font-size="10.5" fill="#1c1917">电流源 +100 μA</text>
+
+    <line x1="126" y1="150" x2="300" y2="150" stroke="#57534e" stroke-width="1.4"/>
+    <text x="210" y="140" text-anchor="middle" font-size="9.5" fill="#6f665f">线缆 + 针（接触良好）</text>
+
+    <circle cx="100" cy="270" r="24" fill="#fff" stroke="rgba(28,25,23,0.3)" stroke-width="1.4"/>
+    <text x="100" y="275" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">V</text>
+    <text x="100" y="310" text-anchor="middle" font-size="10" font-weight="600" fill="#c2410c">读数 0.02 V（≈ 0）</text>
+    <line x1="100" y1="246" x2="100" y2="150" stroke="#57534e" stroke-width="1" stroke-dasharray="3 3"/>
+    <text x="36" y="120" font-size="9.5" fill="#c2410c">电流全部从短路人地</text>
+
+    <polygon points="330,140 346,170 314,170" fill="#9aa7b8"/>
+    <line x1="346" y1="155" x2="416" y2="155" stroke="#57534e" stroke-width="1.4"/>
+
+    <rect x="416" y="143" width="44" height="24" rx="4" fill="#d9e2ec" stroke="rgba(28,25,23,0.3)"/>
+    <text x="438" y="185" text-anchor="middle" font-size="10" fill="#1c1917">焊盘</text>
+
+    <!-- 短路桥：焊盘直连 VSS -->
+    <line x1="438" y1="167" x2="438" y2="216" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="438" cy="216" r="9" fill="#dc2626"/>
+    <text x="462" y="212" font-size="10" font-weight="700" fill="#dc2626">金属桥连 / 刻蚀残留</text>
+    <text x="462" y="228" font-size="9.5" fill="#dc2626">二极管 D2 被旁路 → V ≈ 0</text>
+
+    <!-- 正常二极管挂而无效 -->
+    <line x1="460" y1="155" x2="520" y2="155" stroke="#57534e" stroke-width="1.4"/>
+    <polygon points="526,149 512,149 519,163" fill="#4ade80" opacity="0.35"/>
+    <line x1="526" y1="155" x2="526" y2="180" stroke="#57534e" stroke-width="1.4" opacity="0.35"/>
+    <text x="548" y="159" font-size="9.5" fill="#94a3b8">D2（被旁路，不起作用）</text>
+
+    <line x1="526" y1="216" x2="620" y2="216" stroke="#3c4658" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+    <text x="628" y="220" font-size="10.5" font-weight="600" fill="#3c4658">VSS 地轨</text>
+
+    <rect x="700" y="60" width="280" height="150" rx="10" fill="#0f172a"/>
+    <text x="716" y="86" font-size="10" font-weight="700" letter-spacing="1" fill="#22d3ee">PMU 表头（示意量级）</text>
+    <g font-family="Geist Mono, Menlo, monospace" font-size="12">
+      <text x="716" y="112" fill="#94a3b8">强制: <tspan fill="#fbbf24">I = +100 μA</tspan></text>
+      <text x="716" y="134" fill="#94a3b8">读数: <tspan fill="#f87171">V = 0.02 V（被拉平）</tspan></text>
+      <text x="716" y="156" fill="#94a3b8">限值: <tspan fill="#4ade80">V ∈ 0.45 – 0.75 V</tspan></text>
+      <text x="716" y="186" fill="#94a3b8">判定: <tspan fill="#f87171" font-weight="700">✗ FAIL → Bin1 · fail-stop 淘汰</tspan></text>
+    </g>
+
+    <text x="20" y="356" font-size="11" fill="#6f665f">判定逻辑一句话：同一个接触测试，①读数过高=开路、②读数过低=对地短路——「高/低两个方向」把同一 window 的两侧各对应一种物理缺陷。</text>
+  </g>
+</svg>

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" role="img" aria-label="失效电路图：PowerShort（FVMI 加压测流）">
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#57534e"/>
+    </marker>
+  </defs>
+  <g font-family="Geist, PingFang SC, Microsoft YaHei, sans-serif">
+    <text x="20" y="24" font-size="15" font-weight="700" fill="#1c1917">失效电路图 ③：PowerShort —— FVMI 加压测流，R = V/I 塌到 Ω 量级</text>
+    <text x="20" y="42" font-size="11" fill="#6f665f">模拟级原理（示意量级）；Power Short 为存储 DC 参数三件套之一（项目归档：Acco Labs / Edusemi / 三星 EDS）</text>
+
+    <rect x="20" y="60" width="240" height="270" rx="10" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.25)" stroke-dasharray="5 4"/>
+    <text x="36" y="84" font-size="12" font-weight="600" fill="#1c1917">ATE · PMU（FVMI 模式）</text>
+
+    <!-- 电压源 -->
+    <circle cx="100" cy="150" r="26" fill="#fff" stroke="rgba(28,25,23,0.3)" stroke-width="1.4"/>
+    <text x="100" y="146" text-anchor="middle" font-size="11" font-weight="700" fill="#1c1917">0.5 V</text>
+    <text x="100" y="160" text-anchor="middle" font-size="8.5" fill="#6f665f">安全电平</text>
+    <text x="100" y="192" text-anchor="middle" font-size="10.5" fill="#1c1917">电压源（低于额定 VDD）</text>
+    <text x="100" y="207" text-anchor="middle" font-size="9.5" fill="#6f665f">加压（V Force）——防加坏好 die</text>
+
+    <!-- 串联安培计 -->
+    <line x1="126" y1="150" x2="168" y2="150" stroke="#57534e" stroke-width="1.4"/>
+    <circle cx="192" cy="150" r="20" fill="#fff" stroke="rgba(28,25,23,0.3)" stroke-width="1.4"/>
+    <text x="192" y="155" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">A</text>
+    <text x="192" y="128" text-anchor="middle" font-size="10" font-weight="600" fill="#c2410c">读数 180 mA</text>
+
+    <!-- 到电源轨 -->
+    <line x1="212" y1="150" x2="360" y2="150" stroke="#57534e" stroke-width="1.4"/>
+
+    <!-- VDD / VSS 轨 -->
+    <line x1="360" y1="120" x2="640" y2="120" stroke="#e07b39" stroke-width="5" stroke-linecap="round"/>
+    <text x="648" y="124" font-size="10.5" font-weight="600" fill="#c2410c">VDD 轨</text>
+    <line x1="360" y1="290" x2="640" y2="290" stroke="#3c4658" stroke-width="5" stroke-linecap="round"/>
+    <text x="648" y="294" font-size="10.5" font-weight="600" fill="#3c4658">VSS 轨</text>
+    <line x1="360" y1="150" x2="360" y2="120" stroke="#57534e" stroke-width="1.4"/>
+    <line x1="380" y1="150" x2="380" y2="290" stroke="#57534e" stroke-width="1.4"/>
+    <text x="394" y="226" font-size="9.5" fill="#6f665f">回流路径</text>
+
+    <!-- 缺陷桥 -->
+    <line x1="500" y1="120" x2="500" y2="290" stroke="#dc2626" stroke-width="5" stroke-linecap="round" opacity="0.9"/>
+    <circle cx="500" cy="205" r="13" fill="#dc2626"/>
+    <text x="500" y="209" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">R?</text>
+    <text x="516" y="196" font-size="10.5" font-weight="700" fill="#dc2626">缺陷桥连 VDD–VSS</text>
+    <text x="516" y="212" font-size="9.5" fill="#dc2626">R = 0.5V / 180mA ≈ 2.8 Ω（Ω 量级）</text>
+
+    <!-- 健康参照 -->
+    <rect x="700" y="60" width="280" height="170" rx="10" fill="#0f172a"/>
+    <text x="716" y="86" font-size="10" font-weight="700" letter-spacing="1" fill="#22d3ee">PMU 表头（示意量级）</text>
+    <g font-family="Geist Mono, Menlo, monospace" font-size="12">
+      <text x="716" y="112" fill="#94a3b8">强制: <tspan fill="#fbbf24">V = 0.5 V（安全电平）</tspan></text>
+      <text x="716" y="134" fill="#94a3b8">读数: <tspan fill="#f87171">I = 180 mA（远超限）</tspan></text>
+      <text x="716" y="156" fill="#94a3b8">限值: <tspan fill="#4ade80">I ≤ 10 mA</tspan></text>
+      <text x="716" y="178" fill="#94a3b8">健康参照: <tspan fill="#4ade80">μA–mA 级漏电</tspan></text>
+      <text x="716" y="208" fill="#94a3b8">判定: <tspan fill="#f87171" font-weight="700">✗ FAIL → Bin1/2 · fail-stop</tspan></text>
+    </g>
+
+    <!-- 健康对照小图 -->
+    <g font-size="9.5" fill="#6f665f">
+      <text x="360" y="96">好 die：两轨之间只有寄生漏电（μm 级通路）</text>
+    </g>
+
+    <text x="20" y="356" font-size="11" fill="#6f665f">判定逻辑一句话：加安全电压、测轨间电流——超限即判「电源对地短路」；缺陷的 R 由 V/I 现场算出，量级直接指认桥连类型。</text>
+  </g>
+</svg>

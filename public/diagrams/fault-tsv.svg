@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" role="img" aria-label="失效电路图：TSV 开路 / lane 失效与重映射">
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#57534e"/>
+    </marker>
+  </defs>
+  <g font-family="Geist, PingFang SC, Microsoft YaHei, sans-serif">
+    <text x="20" y="24" font-size="15" font-weight="700" fill="#1c1917">失效电路图 ⑥：TSV 开路 / lane 失效 —— 一处断裂，整列失效，lane 重映射兜底</text>
+    <text x="20" y="42" font-size="11" fill="#6f665f">结构与修复口径：TSV 缺陷 → column fail 最常见（Synopsys）、JEDEC lane repair（via semiengineering 2026，摘录已归档）</text>
+
+    <!-- 驱动（base die） -->
+    <rect x="40" y="160" width="110" height="60" rx="8" fill="#0f766e"/>
+    <text x="95" y="186" text-anchor="middle" font-size="11" font-weight="600" fill="#d1fae5">base die</text>
+    <text x="95" y="204" text-anchor="middle" font-size="9.5" fill="#d1fae5">MBiST / 驱动</text>
+
+    <!-- 12 层 -->
+    <g fill="#2f4a6e">
+      <rect x="220" y="70" width="360" height="16" rx="2"/>
+      <rect x="220" y="96" width="360" height="16" rx="2"/>
+      <rect x="220" y="122" width="360" height="16" rx="2"/>
+      <rect x="220" y="148" width="360" height="16" rx="2"/>
+      <rect x="220" y="174" width="360" height="16" rx="2"/>
+      <rect x="220" y="200" width="360" height="16" rx="2"/>
+      <rect x="220" y="226" width="360" height="16" rx="2"/>
+      <rect x="220" y="252" width="360" height="16" rx="2"/>
+      <rect x="220" y="278" width="360" height="16" rx="2"/>
+      <rect x="220" y="304" width="360" height="16" rx="2"/>
+      <rect x="220" y="330" width="360" height="16" rx="2"/>
+    </g>
+    <text x="588" y="78" font-size="9.5" fill="#6f665f">D11（顶）</text>
+    <text x="588" y="345" font-size="9.5" fill="#6f665f">D0（贴 base die）</text>
+
+    <!-- 好的 TSV（左列） -->
+    <line x1="270" y1="76" x2="270" y2="346" stroke="#c9a227" stroke-width="4"/>
+    <text x="270" y="60" text-anchor="middle" font-size="9.5" fill="#9a7b1c">好 TSV：连通 + 延迟在限内</text>
+
+    <!-- 断裂的 TSV（右列） -->
+    <line x1="500" y1="76" x2="500" y2="238" stroke="#c9a227" stroke-width="4"/>
+    <line x1="500" y1="266" x2="500" y2="346" stroke="#c9a227" stroke-width="4" opacity="0.35"/>
+    <g stroke="#dc2626" stroke-width="2.4">
+      <line x1="488" y1="240" x2="512" y2="264"/>
+      <line x1="512" y1="240" x2="488" y2="264"/>
+    </g>
+    <text x="524" y="258" font-size="10.5" font-weight="700" fill="#dc2626">TSV 开路（铜填充空洞 /</text>
+    <text x="524" y="274" font-size="10.5" font-weight="700" fill="#dc2626">减薄露头损伤）</text>
+    <text x="524" y="292" font-size="9.5" fill="#dc2626">断裂点以上全部失联 → 整列 column fail</text>
+
+    <!-- base die 到两列的连线 -->
+    <line x1="150" y1="176" x2="200" y2="176" stroke="#57534e" stroke-width="1.4"/>
+    <line x1="200" y1="176" x2="270" y2="200" stroke="#57534e" stroke-width="1.4" opacity="0"/>
+    <path d="M 150 176 C 210 176 230 240 270 300" stroke="#57534e" stroke-width="1.4" fill="none"/>
+    <path d="M 150 186 C 240 186 380 240 500 330" stroke="#57534e" stroke-width="1.4" fill="none" stroke-dasharray="4 4" opacity="0.5"/>
+
+    <!-- lane repair -->
+    <rect x="660" y="150" width="320" height="120" rx="10" fill="rgba(124,92,214,0.06)" stroke="#7c5cd6" stroke-width="1.5"/>
+    <text x="820" y="176" font-size="12" font-weight="600" fill="#7c5cd6">lane repair（JEDEC 标准行为）</text>
+    <g font-size="10.5" fill="#6f665f">
+      <text x="676" y="200">MBiST 报告坏 lane → fuse box 重映射</text>
+      <text x="676" y="218">到冗余通道；坏 lane 不再参与通讯。</text>
+      <text x="676" y="236">修复信息：晶圆级激光写入，</text>
+      <text x="676" y="254">封装级 e-fuse 补写（跨插入点生效）。</text>
+    </g>
+    <path d="M 660 210 C 620 210 600 230 560 260" stroke="#7c5cd6" stroke-width="1.4" fill="none" marker-end="url(#arr)" opacity="0"/>
+    <line x1="660" y1="236" x2="596" y2="270" stroke="#7c5cd6" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+
+    <!-- 表头 -->
+    <rect x="660" y="60" width="320" height="70" rx="10" fill="#0f172a"/>
+    <g font-family="Geist Mono, Menlo, monospace" font-size="12">
+      <text x="676" y="86" fill="#94a3b8">读数: <tspan fill="#f87171">断裂点以上整列无响应</tspan></text>
+      <text x="676" y="108" fill="#94a3b8">判定: <tspan fill="#c084fc" font-weight="700">✗ FAIL → Bin4 · lane/TSV repair</tspan></text>
+    </g>
+
+    <text x="20" y="366" font-size="11" fill="#6f665f">判定逻辑一句话：TSV 是「纵向共用一根」的电路——一处开路不表现为单个坏位，而表现为「自断点向上一层不剩」的列失效；修复粒度是 lane/列，不是位。</text>
+  </g>
+</svg>

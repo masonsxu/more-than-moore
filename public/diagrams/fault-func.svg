@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" role="img" aria-label="失效电路图：功能位失效（MBiST 写读比较与修复回路）">
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#57534e"/>
+    </marker>
+    <marker id="arrP" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#7c5cd6"/>
+    </marker>
+  </defs>
+  <g font-family="Geist, PingFang SC, Microsoft YaHei, sans-serif">
+    <text x="20" y="24" font-size="15" font-weight="700" fill="#1c1917">失效电路图 ⑤：功能位失效 —— MBiST 写/读/比较，坏位进失效捕获 → 修复回路</text>
+    <text x="20" y="42" font-size="11" fill="#6f665f">数字级原理（示意）；诊断到 bank/行/列粒度出自 Synopsys（via semiengineering 2026），修复手段出自三星 EDS / JEDEC PPR（摘录已归档）</text>
+
+    <!-- APG -->
+    <rect x="20" y="120" width="120" height="64" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <text x="80" y="146" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1c1917">APG 图形发生器</text>
+    <text x="80" y="164" text-anchor="middle" font-size="9.5" fill="#6f665f">写 0 读 1 / 写 1 读 0（March）</text>
+    <line x1="140" y1="152" x2="196" y2="152" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+    <text x="168" y="142" text-anchor="middle" font-size="9.5" fill="#6f665f">写驱动</text>
+
+    <!-- 单元 -->
+    <rect x="200" y="96" width="150" height="112" rx="8" fill="rgba(47,74,110,0.08)" stroke="rgba(28,25,23,0.25)" stroke-width="1.2"/>
+    <text x="275" y="118" text-anchor="middle" font-size="11" font-weight="600" fill="#1c1917">DRAM 单元（1T1C）</text>
+    <line x1="228" y1="132" x2="228" y2="188" stroke="#c9a227" stroke-width="2.5"/>
+    <text x="228" y="132" text-anchor="middle" font-size="9" fill="#9a7b1c">WL 字线</text>
+    <rect x="304" y="150" width="18" height="30" fill="#2f4a6e"/>
+    <text x="313" y="196" text-anchor="middle" font-size="9" fill="#6f665f">电容</text>
+    <line x1="228" y1="165" x2="304" y2="165" stroke="#57534e" stroke-width="1.4"/>
+    <circle cx="266" cy="165" r="9" fill="#fff" stroke="rgba(28,25,23,0.3)" stroke-width="1.2"/>
+    <text x="266" y="169" text-anchor="middle" font-size="9.5" fill="#1c1917">T</text>
+    <text x="275" y="86" text-anchor="middle" font-size="10.5" font-weight="700" fill="#dc2626">缺陷：电容弱电荷</text>
+    <text x="275" y="102" text-anchor="middle" font-size="9.5" fill="#dc2626">（写入后保持不住 / 读出放大器判反）</text>
+
+    <!-- 位线到读出放大器 -->
+    <line x1="322" y1="165" x2="396" y2="165" stroke="#57534e" stroke-width="1.4"/>
+    <text x="358" y="155" text-anchor="middle" font-size="9.5" fill="#6f665f">BL 位线</text>
+    <polygon points="400,138 400,192 452,165" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <text x="418" y="170" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1c1917">读出放大器</text>
+
+    <!-- 比较器 -->
+    <line x1="452" y1="165" x2="500" y2="165" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+    <text x="476" y="152" text-anchor="middle" font-size="9.5" fill="#dc2626">读出 1</text>
+    <rect x="504" y="130" width="140" height="70" rx="8" fill="rgba(220,38,38,0.06)" stroke="#dc2626" stroke-width="1.4"/>
+    <text x="574" y="154" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">比较：读出 vs 期望</text>
+    <text x="574" y="174" text-anchor="middle" font-size="10" fill="#dc2626">期望 0 ≠ 读出 1 → 坏位</text>
+    <text x="574" y="190" text-anchor="middle" font-size="9" fill="#6f665f">期望值由 APG 同步给出</text>
+
+    <!-- 失效捕获 RAM -->
+    <line x1="644" y1="165" x2="700" y2="165" stroke="#57534e" stroke-width="1.4" marker-end="url(#arr)"/>
+    <rect x="704" y="130" width="130" height="70" rx="8" fill="#fff" stroke="rgba(28,25,23,0.22)" stroke-width="1.2"/>
+    <text x="769" y="154" text-anchor="middle" font-size="11" font-weight="600" fill="#1c1917">失效捕获存储</text>
+    <text x="769" y="172" text-anchor="middle" font-size="9.5" fill="#6f665f">位图落账（bank/行/列）</text>
+    <text x="769" y="190" text-anchor="middle" font-size="9" fill="#6f665f">Advantest：修复分析在线完成</text>
+
+    <!-- 修复回路 -->
+    <rect x="704" y="240" width="180" height="58" rx="8" fill="rgba(124,92,214,0.08)" stroke="#7c5cd6" stroke-width="1.5"/>
+    <text x="794" y="262" text-anchor="middle" font-size="11" font-weight="600" fill="#7c5cd6">修复 Steering（fuse box）</text>
+    <text x="794" y="280" text-anchor="middle" font-size="9.5" fill="#7c5cd6">激光 / e-fuse / PPR 每 bank 一行</text>
+    <line x1="769" y1="200" x2="769" y2="240" stroke="#7c5cd6" stroke-width="1.4" marker-end="url(#arrP)"/>
+    <text x="782" y="224" font-size="9.5" fill="#7c5cd6">行/列归因 → 重映射</text>
+    <path d="M 704 269 C 640 269 620 269 600 250" stroke="#7c5cd6" stroke-width="1.4" fill="none" marker-end="url(#arrP)"/>
+    <text x="600" y="242" text-anchor="end" font-size="9.5" fill="#7c5cd6">复验：回到写/读/比较</text>
+
+    <!-- 表头 -->
+    <rect x="200" y="240" width="360" height="100" rx="10" fill="#0f172a"/>
+    <text x="216" y="266" font-size="10" font-weight="700" letter-spacing="1" fill="#22d3ee">数字通道「表头」（示意）</text>
+    <g font-family="Geist Mono, Menlo, monospace" font-size="12">
+      <text x="216" y="292" fill="#94a3b8">强制: <tspan fill="#fbbf24">图形 写 0 → 读 0</tspan></text>
+      <text x="216" y="314" fill="#94a3b8">读数: <tspan fill="#f87171">读出 1（位图坏位）</tspan></text>
+      <text x="216" y="336" fill="#94a3b8">判定: <tspan fill="#c084fc" font-weight="700">✗ FAIL → Bin4 · 冗余替换 → 复验</tspan></text>
+    </g>
+
+    <text x="20" y="366" font-size="11" fill="#6f665f">判定逻辑一句话：DC 三件套全过之后，功能失效不再看连续读数，而看「期望 vs 读出」的离散比对——坏位坐标（行/列）决定走修复还是淘汰。</text>
+  </g>
+</svg>

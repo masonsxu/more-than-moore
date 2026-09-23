@@ -986,6 +986,20 @@ export default function HBMTestZone3D() {
               </div>
             </div>
           )}
+          {/* 失效级模拟电路图：随选中失效切换 */}
+          {spec && (
+            <figure className="mt-3">
+              <img
+                src={`/diagrams/fault-${spec.id}.svg`}
+                alt={`失效电路图：${spec.label}的模拟电路级原理`}
+                className="w-full rounded-lg border border-slate-200 bg-white"
+                loading="lazy"
+              />
+              <figcaption className="mt-1 text-xs text-slate-400">
+                {spec.label}的模拟电路级原理（示意量级）；同图收录在《测试电路的图》第四节，机制依据见该笔记来源清单。
+              </figcaption>
+            </figure>
+          )}
           {/* fail-stop 测试程序流 */}
           <div className="mt-3 flex flex-wrap items-center gap-1.5">
             <span className="mr-1 text-xs font-medium uppercase tracking-widest text-slate-400">fail-stop 流程（先致命后边角）</span>
