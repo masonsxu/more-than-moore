@@ -47,6 +47,9 @@ tags: ['HBM', '3D 封装', '材料收集', '来源清单']
 | SWTest 2025 海报：die carrier 式 HBM 测试单元（FormFactor/Advantest） | 会议一手 | 2025-06 | https://www.swtest.org/library/2025proc/pdf/P01_04_%20LIAO_SWTest-2025.pdf |
 | FormFactor 博客：HBM 早期测试策略 | 测试厂商 | 2026 | https://www.formfactor.com/blog/2026/high-bandwidth-memory-testing-why-early-test-strategies-are-critical-for-yield-cost-and-performance/ |
 | Semiconductor Engineering：DRAM 测试与检查越来越难 | 行业媒体 | 访问 2026-09-25 | https://semiengineering.com/dram-test-and-inspection-just-gets-tougher/ |
+| Advantest T5833 数据手册（晶圆并行 1,024/2,048、KGD 2.4 Gbps、AFM/MRA） | 测试机厂商一手 | 2026-09-25 全文抓取 | https://www3.advantest.com/documents/11348/146262/pdf_datasheet_T5833_8.5x11.pdf/1cdd5237-a694-4e0d-b1d9-6c4eb430519d |
+| Teradyne Magnum 7H 官方新闻稿（HBM 专用测试平台，5 Gbps、9,216+2,560 脚） | 测试机厂商一手 | 2026-09-25 全文抓取 | https://teradyne.cn/releases/magnum-7h/ |
+| CSTIC 2024：HBM Device Test & Repair Solution on T5833 | 会议论文 | 2024 | https://doi.org/10.1109/cstic61820.2024.10532065 |
 | ADI 设计笔记：PMU 电压/电流钳位（MAX9979，FVMI/FIMV 模式与量程） | 芯片厂商一手 | 2026-09-25 全文抓取 | https://www.analog.com/en/resources/design-notes/how-to-set-pmu-voltage-and-current-clamps.html |
 | Marvin Test KB Q200207：DC 参数测试（PMU 两模式、按 spec 判定） | 测试设备商文档 | 2026-09-25 全文抓取 | https://www.marvintest.com/KB/Q200207/DC-Characterization-of-ICs-Using-PXI-Instrumentation |
 | AD5520/AD5522 手册：每引脚 PMU/SMU（钳位 + 窗口比较器，ATE 应用） | 芯片厂商一手 | 2026-09-25 | https://www.analog.com/media/en/technical-documentation/data-sheets/AD5520.pdf |

@@ -200,3 +200,11 @@ tags: ['HBM', '事实核查', '数据可信度']
 - 无新增外部来源——每张图的机制均出自既有归档（①② US5365180A + ADI 钳位；③ Acco Labs 三件套 + Marvin FVMI；④ Marvin μA 灵敏量程口径；⑤ Synopsys 诊断粒度 + 三星 EDS 修复；⑥ Synopsys column fail + JEDEC lane repair），表头读数为示意量级并逐处标注
 - 接入点：3D 模型 L3 失效选择器联动显示对应电路图；笔记《测试电路的图》第四节附逐张读图指南
 - 验证：astro check 0 错误、build 通过、Playwright 验证 9 张图全部加载、六次失效切换均正确换图、0 控制台报错
+
+## 13. 2026-09-25 机台对比与 BinMap 解读增补
+
+应用户提问「T5833 与 M7H 区别 / WPFile 测试项怎么解读 / BinMap 为何混排症状与根因」新增笔记《[T5833 与 Magnum 7H](/notes/hbm/testers-wpfile-binmap/)》：
+
+- **M7H 身份确认**：Teradyne Magnum 7H（2025-08 发布的 HBM 专用测试平台），非键合机；关键参数取自 Teradyne 中文官方新闻稿全文抓取（5 Gbps、9,216 数字 + 2,560 电源脚、HBM2E–HBM4E、KGSD/CoW/切割后单颗、APG+LVM+FLS、产能 +1.6×）；口径差异标注：产品页 TIU 写 4.5 Gbps，新闻稿写数据速率 5 Gbps，引用需注明出处
+- **T5833**：数据手册全文抓取（© 2015；晶圆并行 1,024/2,048、封装 512、KGD 2.4 Gbps、AFM/MRA 选件）；其 HBM 能力引 CSTIC 2024 论文（DOI 10.1109/cstic61820.2024.10532065，摘要可见、正文订阅墙）
+- **核心澄清**：电学 bin（症状）与物理根因标签（Crack/Bridge/SealRing/TSV）是两套命名体系多对多映射；「封装失效多」是 HBM 特点，「都是 TCB 的锅」不成立（SealRing=探针/划片、Crack=减薄/切割、TSV=形成工艺，均有归档出处）；Blocked：WPFile 字段字典与厂内 bin 归因标签规则无公开规范，以厂内文档为准
