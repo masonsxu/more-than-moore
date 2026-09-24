@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KGSD 测试数据看板（修订版）</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 32px 20px 60px;
+  background: #f0f2f5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  color: #1a1d21;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 960px; margin: 0 auto; }
+.head { margin-bottom: 22px; }
+.head h1 { font-size: 19px; font-weight: 650; margin: 0 0 5px; letter-spacing: -0.2px; }
+.head h1 .badge {
+  display: inline-block; vertical-align: 2px; margin-left: 8px;
+  font-size: 10.5px; font-weight: 600; color: #2563eb;
+  background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 2px 7px;
+}
+.head p { font-size: 12.5px; color: #6b7280; margin: 0; line-height: 1.7; }
+.head p b { color: #2563eb; font-weight: 500; }
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 18px 20px 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.card h2 { font-size: 14.5px; font-weight: 600; margin: 0 0 2px; }
+.card h2 .tag {
+  font-size: 10px; font-weight: 600; color: #6b7280;
+  background: #f3f4f6; border-radius: 4px; padding: 2px 6px; margin-left: 7px; vertical-align: 1px;
+}
+.card .desc { font-size: 12px; color: #6b7280; margin: 0 0 12px; line-height: 1.7; }
+.params {
+  font-size: 11.5px;
+  background: #f8f9fb;
+  border: 1px solid #eceef1;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  color: #4b5563;
+  line-height: 1.85;
+}
+.params b { color: #1f2937; font-weight: 600; }
+.params code {
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+  color: #374151;
+}
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11.5px; color: #4b5563; margin-top: 10px; }
+.legend span { display: flex; align-items: center; gap: 5px; }
+.dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.line-demo { width: 18px; height: 0; border-top: 2.5px solid #2563eb; display: inline-block; }
+.line-demo.dash { border-top-style: dashed; }
+.line-demo.dot2 { border-top: 2px dashed #f59e0b; }
+.line-demo.red { border-top: 2px dashed #ef4444; }
+svg { display: block; width: 100%; height: auto; }
+
+/* 徽章行（口径与护栏） */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.chip {
+  font-size: 10.5px; color: #374151; background: #f8f9fb;
+  border: 1px solid #e5e7eb; border-radius: 20px; padding: 3px 10px; line-height: 1.5;
+}
+.chip.ok { color: #047857; background: #ecfdf5; border-color: #a7f3d0; }
+.chip.warn { color: #b45309; background: #fffbeb; border-color: #fde68a; }
+.chip.bad { color: #b91c1c; background: #fef2f2; border-color: #fecaca; }
+
+/* 热力图 */
+.heat-wrap { overflow-x: auto; padding-bottom: 4px; }
+.heat-grid {
+  display: grid;
+  grid-template-columns: 58px repeat(7, 1fr);
+  gap: 3px;
+  font-size: 10px;
+  min-width: 640px;
+}
+.heat-label {
+  display: flex; align-items: center; justify-content: center;
+  color: #6b7280; font-size: 10.5px; font-weight: 500; white-space: nowrap;
+}
+.heat-top { height: 20px; font-size: 10px; }
+.heat-cell {
+  display: flex; align-items: center; justify-content: center;
+  height: 32px; border-radius: 3px;
+  color: #fff; font-size: 10.5px; font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+  cursor: default;
+}
+.heat-scale { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #6b7280; margin-top: 10px; flex-wrap: wrap; }
+.heat-scale .bar { width: 140px; height: 10px; border-radius: 3px; background: linear-gradient(to right, hsl(0,70%,40%), hsl(40,70%,40%), hsl(80,70%,40%), hsl(120,70%,40%)); }
+.td-row { display: grid; grid-template-columns: 58px repeat(7, 1fr); gap: 3px; min-width: 640px; margin-top: 6px; }
+.td-cell { font-size: 10px; color: #6b7280; text-align: center; line-height: 1.5; padding: 3px 2px; }
+.td-cell .clean { color: #b45309; font-weight: 600; background: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; padding: 1px 5px; display: inline-block; }
+
+/* 下钻面板 */
+.drill {
+  margin-top: 12px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;
+  font-size: 11.5px;
+}
+.drill-hd {
+  background: #f8f9fb; padding: 7px 12px; color: #374151; font-weight: 600;
+  border-bottom: 1px solid #eceef1; display: flex; justify-content: space-between; align-items: center;
+}
+.drill-hd .x { cursor: pointer; color: #9ca3af; font-weight: 400; font-size: 11px; }
+.drill table { width: 100%; border-collapse: collapse; }
+.drill th { text-align: left; font-weight: 500; color: #9ca3af; padding: 6px 12px; font-size: 10.5px; border-bottom: 1px solid #f3f4f6; }
+.drill td { padding: 6px 12px; color: #374151; border-bottom: 1px solid #f8f9fb; font-variant-numeric: tabular-nums; }
+.drill .btn {
+  display: inline-block; margin: 8px 12px 10px; font-size: 11px; color: #2563eb;
+  border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 5px; padding: 3px 10px; cursor: pointer;
+}
+.drill-hint { margin-top: 12px; font-size: 11px; color: #9ca3af; text-align: center; padding: 10px; border: 1px dashed #e5e7eb; border-radius: 8px; }
+
+/* 分析层网格 */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+.sub {
+  border: 1px solid #e5e7eb; border-radius: 8px; padding: 13px 14px 14px; background: #fcfcfd;
+}
+.sub h3 { font-size: 12.5px; font-weight: 600; margin: 0 0 3px; }
+.sub .s-desc { font-size: 11px; color: #6b7280; margin: 0 0 10px; line-height: 1.65; }
+.hbar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 10.5px; }
+.hbar-label { width: 74px; color: #4b5563; text-align: right; white-space: nowrap; flex-shrink: 0; }
+.hbar-track { flex: 1; height: 13px; background: #eef0f3; border-radius: 3px; overflow: hidden; }
+.hbar-fill { height: 100%; border-radius: 3px; }
+.hbar-val { width: 64px; color: #374151; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+@media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+.tile { background: #fff; border: 1px solid #e5e7eb; border-radius: 7px; padding: 9px 10px; text-align: center; }
+.tile .tv { font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -0.3px; }
+.tile .tv small { font-size: 11px; font-weight: 500; color: #6b7280; }
+.tile .tl { font-size: 10px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
+.note { font-size: 10.5px; color: #6b7280; line-height: 1.7; margin-top: 8px; }
+.note b { color: #374151; }
+
+/* 例外列表 */
+.exc-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 2px; border-bottom: 1px solid #f3f4f6; font-size: 12px; line-height: 1.65; }
+.exc-row:last-child { border-bottom: none; }
+.exc-sev { flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; color: #fff; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+.exc-body { flex: 1; }
+.exc-title { color: #1f2937; font-weight: 600; }
+.exc-meta { font-size: 10.5px; color: #6b7280; margin-top: 1px; }
+.pill { font-size: 10px; font-weight: 600; border-radius: 20px; padding: 2px 8px; flex-shrink: 0; margin-top: 2px; }
+.pill.open { color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; }
+.pill.done { color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; }
+
+.foot { font-size: 11px; color: #9ca3af; text-align: center; line-height: 1.8; margin-top: 4px; }
+.seg { display: flex; height: 26px; border-radius: 6px; overflow: hidden; font-size: 10px; color: #fff; margin: 8px 0 6px; }
+.seg div { display: flex; align-items: center; justify-content: center; white-space: nowrap; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <h1>KGSD 测试数据看板<span class="badge">修订版 · 口径 V2</span></h1>
+    <p>产品 <b>KGSD-H01</b>（12 层堆栈） · 设备 <b>ATE-T03</b> · 程序 <b>V2.3</b>（MES recipe 权威 / MIR 交叉校验） · Flow <b>F4</b> · 2026-08-01 ~ 2026-08-30<br>
+    口径：FPY/final 分线 · first-fail Pareto · site 混杂检查 · 阈值全部带样本量护栏 · 数据为模拟值</p>
+  </div>
+
+  <!-- 00 今日例外（早会视图） -->
+  <div class="card">
+    <h2>00 · 今日例外<span class="tag">早会视图 · 只看例外</span></h2>
+    <p class="desc">T+1 09:00 自动产出。全部阈值自动判定，无例外时不生成条目——人工只处理下面这几行。昨日行动项闭环 3/3。</p>
+    <div class="exc-row">
+      <div class="exc-sev" style="background:#ef4444">1</div>
+      <div class="exc-body">
+        <div class="exc-title">Bin 1（Open/Short）首失效占比 +5.8pp vs 7 天基线</div>
+        <div class="exc-meta">规则：占比新增 ≥5pp（n=742/718，≥690 ✓） · 与 08-18 recipe V2.2→V2.3 及 Site 3 针卡事件对齐中 · Owner TE-A</div>
+      </div>
+      <span class="pill open">处理中</span>
+    </div>
+    <div class="exc-row">
+      <div class="exc-sev" style="background:#f59e0b">2</div>
+      <div class="exc-body">
+        <div class="exc-title">Site 3 连续 2 格 < 95.5%（混杂检查通过，层内显著）</div>
+        <div class="exc-meta">规则：层内持续 -2pp（格 n≈1,040，±1.4pp） · 换针卡/清洗工单 #EQ-2214 · Owner EQ-B · 08-25 处置后恢复</div>
+      </div>
+      <span class="pill done">已闭环</span>
+    </div>
+    <div class="exc-row">
+      <div class="exc-sev" style="background:#f59e0b">3</div>
+      <div class="exc-body">
+        <div class="exc-title">Contact R p95 +2.3σ 连续 2 日（先于良率报警 3 天）</div>
+        <div class="exc-meta">规则：参数分位数控制图 +2σ × 2 日 · DPAT 抽检 200 die 已完成 · Owner TE-C</div>
+      </div>
+      <span class="pill done">已闭环</span>
+    </div>
+  </div>
+
+  <!-- 图一 -->
+  <div class="card">
+    <h2>① 通过率趋势<span class="tag">FPY / final 双口径</span></h2>
+    <p class="desc">FPY（首插入口径，对工艺漂移敏感）与 final（修复+复测后，决定交付）分开；版本切换按 lot 谱系对齐，不按日期切。点击红色异常日下钻 lot/insert。</p>
+    <div class="params">
+      <b>数据字段：</b>
+      <code>date</code> <code>lot_id</code>/<code>wafer_id</code>/<code>insert</code> <code>yield_rate_fpy</code> <code>yield_rate_final</code> <code>retest_flag</code> <code>test_count</code> <code>program_version</code> <code>flow_version</code> <code>device_id</code> <code>maintenance_event</code>
+    </div>
+    <div id="trendChart"></div>
+    <div class="legend">
+      <span><i class="line-demo"></i>FPY（首插入口径）</span>
+      <span><i class="line-demo dash"></i>final（修复+复测后）</span>
+      <span><i class="line-demo dot2"></i>目标 97.0%</span>
+      <span><i class="line-demo red"></i>recipe 变更（lot 谱系对齐）</span>
+      <span><i class="dot" style="background:#cbd5e1"></i>复测率（底栏）</span>
+    </div>
+    <div class="drill-hint" id="drillHint">点击图中红色异常日，下钻到当日 lot / insert 清单（模拟）</div>
+    <div id="drillPanel"></div>
+  </div>
+
+  <!-- 图二 -->
+  <div class="card">
+    <h2>② Bin Pareto<span class="tag">first-fail 口径</span></h2>
+    <p class="desc">fail-stop 顺序下 raw bin 计数有删失偏——取每颗失败 die 的首失效 bin（它停在哪一步），分母 = 失败 die 数。bin 是电学症状，不是根因；根因归因走 ④D。</p>
+    <div class="params">
+      <b>数据字段：</b>
+      <code>bin_id</code> <code>bin_name</code>（症状命名） <code>first_fail_count</code> <code>percentage</code> <code>cumulative_pct</code> <code>program_version</code>+bin 定义映射表
+    </div>
+    <div class="chips">
+      <span class="chip">口径：首插入口径 · 首失效</span>
+      <span class="chip">分母：失败 die n=742（本周）</span>
+      <span class="chip ok">对比护栏：上周 n=718 / 本周 n=742 ≥ 690/组 ✓</span>
+      <span class="chip">bin 映射 V2.3↔V2.2：1:1 · 2:2 · 3:3 · 4:4 · 5:5 · 7:7</span>
+      <span class="chip warn">Bin 8 speed sort（合格分档）不入失效 Pareto</span>
+    </div>
+    <div id="paretoChart"></div>
+    <div class="legend">
+      <span><i class="dot" style="background:#3b82f6"></i>首失效 die 数</span>
+      <span><i class="dot" style="background:#ef4444"></i>累计占比</span>
+      <span><i class="dot" style="background:#10b981"></i>占比位移 ≤ ±1pp</span>
+      <span><i class="dot" style="background:#ef4444"></i>位移 ≥ +5pp（触发归因流）</span>
+    </div>
+  </div>
+
+  <!-- 图三 -->
+  <div class="card">
+    <h2>③ Site / Head 热力图<span class="tag">含混杂检查与清洗刻度</span></h2>
+    <p class="desc">两日聚合格（每格 n≈1,040，95% CI ±1.2~1.5pp）。先查 site × 径向位置混杂，再谈硬件归因；底部为落针计数与清洗事件刻度。</p>
+    <div class="params">
+      <b>数据字段：</b>
+      <code>site_id</code>/<code>head_id</code> <code>date</code> <code>yield_rate</code> <code>test_count</code> <code>die_x</code>/<code>die_y</code>+径向带（WCR CENTER_X/Y） <code>touchdown_count</code> <code>clean_event</code> <code>device_id</code>
+    </div>
+    <div class="chips">
+      <span class="chip">聚合：2 日/格 · n≈1,040/格</span>
+      <span class="chip">判读线：< 95.5% 红框</span>
+      <span class="chip ok">径向混杂检验：site × 平均径向带 r=0.03 → 无偏斜</span>
+      <span class="chip bad">Site 3：分层后仍显著 → 硬件嫌疑成立</span>
+    </div>
+    <div class="heat-wrap">
+      <div class="heat-grid" id="heatGrid"></div>
+      <div class="td-row" id="tdRow"></div>
+    </div>
+    <div class="heat-scale">
+      <span>低</span>
+      <span class="bar"></span>
+      <span>高</span>
+      <span style="margin-left:8px">通过率 94.5% → 98.0% · <b style="color:#b45309">黄标 = 针卡清洗</b></span>
+    </div>
+    <div class="note"><b>混杂检查读法：</b>8 个 site 的 die 群体平均径向带 0.42~0.47（基本一致，r=0.03），排除"site 分到了边缘 die"的解释；Site 3 在 08-21~24 恶化、08-25 清洗后恢复——时间与清洗事件对齐，硬件（针卡接触）归因成立。</div>
+  </div>
+
+  <!-- KGSD 特有分析层 -->
+  <div class="card">
+    <h2>④ KGSD 特有分析层<span class="tag">A–E · YMS 标准图型之外的价值</span></h2>
+    <p class="desc">三张通用图回答"有没有火"，这一层回答"火从哪来"——多插入点谱系与堆叠结构是 KGSD 区别于平面测试的部分。</p>
+
+    <div class="sub" style="margin-bottom:14px">
+      <h3>A · 跨插入点差分（本周）</h3>
+      <p class="s-desc">谱系主键 (lot, wafer, x, y, insert, 测试序号)，坐标经 WCR 归一化；die→stack 组成表来自 MES/键合 map。"CP 过 → KGSD 挂"就是给键合/减薄工序的工单。</p>
+      <div class="seg">
+        <div style="width:95.6%;background:#2563eb">KGSD 过 11,940（95.6%）</div>
+        <div style="width:2.9%;background:#ef4444" title="键合/减薄类">356</div>
+        <div style="width:1.5%;background:#9ca3af" title="CP 挂，不进堆叠">184</div>
+      </div>
+      <div class="note">入测 12,480 · <b style="color:#b91c1c">CP 过 → KGSD 挂 356（2.9%，键合/减薄类）</b> · CP 挂 184（1.5%，裸片类，不进堆叠）　<span style="border:1px solid #bfdbfe;background:#eff6ff;color:#2563eb;border-radius:5px;padding:2px 9px;cursor:pointer">导出键合/减薄工单 →</span>　前提：上游 CP 逐 die 数据需客户共享协议（数据主权）</div>
+    </div>
+
+    <div class="grid2">
+      <div class="sub">
+        <h3>B · 堆叠层级归因（本周）</h3>
+        <p class="s-desc">per-layer 首失效占比。base die 挂 = 整堆报废的乘数；良率复利：单层 -1pp → 12 层堆栈 -6.4pp。</p>
+        <div id="layerBars"></div>
+        <div class="note">base die 与顶层（减薄应力）是两个热点；工程/周级视图，不进早会。</div>
+      </div>
+      <div class="sub">
+        <h3>C · 口径四件套 + 冗余余量</h3>
+        <div class="tiles">
+          <div class="tile"><div class="tv">95.4<small>%</small></div><div class="tl">FPY 首插入口径</div></div>
+          <div class="tile"><div class="tv">96.8<small>%</small></div><div class="tl">final 含修复复测</div></div>
+          <div class="tile"><div class="tv" style="color:#b91c1c">0.42<small>%</small></div><div class="tl">KGD escape（KGSD 过·SLT 挂）</div></div>
+          <div class="tile"><div class="tv">2.1<small>%</small></div><div class="tl">repair 率（TSV/lane）</div></div>
+        </div>
+        <div id="redBars"></div>
+        <div class="note">repair 率 ≠ repair 余量：<b>>80% 冗余消耗的风险件 0.7%</b>（212 die）——已通过但余量见底，下游重点关注。逃逸口径按每 die 100 DPPM 独立假设，12 层堆叠理论放大约 12 倍。</div>
+      </div>
+      <div class="sub">
+        <h3>D · 失效空间签名（本周 742 die）</h3>
+        <p class="s-desc">位图签名 → 疑似根因（多对多映射，需 FA 闭环确认）。</p>
+        <div id="sigBars"></div>
+        <div class="note">FA 闭环：本周已确认 26 颗，"列签名 → TSV 开路"映射命中 9/11；分类规则随 FA 标注持续重训。</div>
+      </div>
+      <div class="sub">
+        <h3>E · 参数漂移预警（早于良率）</h3>
+        <p class="s-desc">接触电阻 p95 分位数控制图（σ 相对基线）。分布漂移比良率塌陷早约 3 天。</p>
+        <div id="driftChart"></div>
+        <div class="note">红点 = +2σ × 2 日触发（08-21/22）；08-25 针卡清洗后回落。Vmin 本周左移 0.8σ（第二迹象）。与 ② Site 3、例外 #3 同源。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    模拟数据 · 口径与字段以《KGSD 测试看板设计（修订版）》为准 · 遗留待确认：WPFile 复测标志/touchdown 字段（S0 数据字典）· 上游 CP 数据共享协议 · bin→根因映射表维护 · design effect 实测
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   00 今日例外：静态条目（见 HTML）
+   ============================================================ */
+
+/* ============================================================
+   图一：FPY / final 双口径趋势 + 复测率底栏 + 异常日下钻
+   ============================================================ */
+const trend = [
+  {d:'08-01', fpy:97.2, fin:97.6, rt:1.3},
+  {d:'08-02', fpy:97.5, fin:97.9, rt:1.5},
+  {d:'08-03', fpy:97.1, fin:97.5, rt:1.4},
+  {d:'08-04', fpy:97.8, fin:98.2, rt:1.2},
+  {d:'08-05', fpy:97.3, fin:97.7, rt:1.5},
+  {d:'08-06', fpy:97.6, fin:98.0, rt:1.3},
+  {d:'08-07', fpy:97.4, fin:97.8, rt:1.4},
+  {d:'08-08', fpy:97.2, fin:97.6, rt:1.6},
+  {d:'08-09', fpy:97.7, fin:98.1, rt:1.3},
+  {d:'08-10', fpy:97.5, fin:97.9, rt:1.4},
+  {d:'08-11', fpy:97.3, fin:97.7, rt:1.6},
+  {d:'08-12', fpy:97.6, fin:98.0, rt:1.3},
+  {d:'08-13', fpy:97.4, fin:97.8, rt:1.4},
+  {d:'08-14', fpy:97.1, fin:97.5, rt:1.5},
+  {d:'08-15', fpy:97.5, fin:97.9, rt:1.3},
+  {d:'08-16', fpy:97.3, fin:97.7, rt:1.4},
+  {d:'08-17', fpy:97.2, fin:97.6, rt:1.6},
+  {d:'08-18', fpy:96.9, fin:97.4, rt:2.2},
+  {d:'08-19', fpy:96.2, fin:97.4, rt:3.1},
+  {d:'08-20', fpy:95.6, fin:97.0, rt:4.2},
+  {d:'08-21', fpy:95.4, fin:96.9, rt:4.8},
+  {d:'08-22', fpy:95.8, fin:97.2, rt:4.0},
+  {d:'08-23', fpy:96.3, fin:97.5, rt:3.2},
+  {d:'08-24', fpy:96.7, fin:97.6, rt:2.6},
+  {d:'08-25', fpy:96.9, fin:97.5, rt:2.2},
+  {d:'08-26', fpy:97.1, fin:97.5, rt:1.9},
+  {d:'08-27', fpy:97.3, fin:97.6, rt:1.7},
+  {d:'08-28', fpy:97.3, fin:97.6, rt:1.6},
+  {d:'08-29', fpy:97.4, fin:97.6, rt:1.5},
+  {d:'08-30', fpy:97.5, fin:97.7, rt:1.5}
+];
+const RECIPE_SWITCH_IDX = 17;   /* 08-18：V2.2 → V2.3（按 lot 谱系对齐） */
+const CLEAN_DAY_IDX = 24;       /* 08-25：PC-03 针卡清洗 */
+const ANOMALY_LINE = 96.0;      /* 目标 97.0 − 1.0pp：低于此线为异常日 */
+
+const drillLots = {
+  '08-20': [
+    {lot:'K2508-0295', wafer:'W04', insert:'KGSD-2', prog:'V2.3', n:'1,048', fpy:'95.2%', rt:'+1.5pp'},
+    {lot:'K2508-0298', wafer:'W11', insert:'KGSD-2', prog:'V2.3', n:'1,052', fpy:'95.8%', rt:'+1.3pp'}
+  ],
+  '08-21': [
+    {lot:'K2508-0301', wafer:'W07', insert:'KGSD-2', prog:'V2.3', n:'1,048', fpy:'95.1%', rt:'+1.4pp'},
+    {lot:'K2508-0301', wafer:'W09', insert:'KGSD-2', prog:'V2.3', n:'1,052', fpy:'95.7%', rt:'+1.6pp'},
+    {lot:'K2508-0299', wafer:'W12', insert:'KGSD-2', prog:'V2.3', n:'1,044', fpy:'95.3%', rt:'+1.2pp'}
+  ],
+  '08-22': [
+    {lot:'K2508-0304', wafer:'W02', insert:'KGSD-2', prog:'V2.3', n:'1,049', fpy:'95.6%', rt:'+1.4pp'},
+    {lot:'K2508-0306', wafer:'W05', insert:'KGSD-2', prog:'V2.3', n:'1,050', fpy:'96.0%', rt:'+1.1pp'}
+  ]
+};
+
+(function renderTrend() {
+  const W = 900, H = 372;
+  const PAD = { t: 30, r: 30, b: 76, l: 52 };
+  const PW = W - PAD.l - PAD.r;
+  const PH = H - PAD.t - PAD.b;
+  const BAND_H = 30;                       /* 复测率底栏高度 */
+  const plotBottom = PAD.t + PH;           /* 主图底 */
+  const bandTop = plotBottom + 14;
+
+  const yMin = 94, yMax = 100;
+  const yScale = v => PAD.t + (yMax - v) / (yMax - yMin) * PH;
+  const xScale = i => PAD.l + i * (PW / (trend.length - 1));
+  const rtMax = 5;
+  const rtScale = v => bandTop + BAND_H - (v / rtMax) * BAND_H;
+
+  const parts = [];
+
+  /* 网格 + Y 轴 */
+  for (let v = 94; v <= 100; v++) {
+    const y = yScale(v);
+    parts.push(`<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="#eef0f3" stroke-width="1"/>`);
+    parts.push(`<text x="${PAD.l - 10}" y="${y + 4}" text-anchor="end" font-size="10.5" fill="#9ca3af">${v}</text>`);
+  }
+
+  /* 目标线 */
+  const yTarget = yScale(97.0);
+  parts.push(`<line x1="${PAD.l}" y1="${yTarget}" x2="${W - PAD.r}" y2="${yTarget}" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="2,4" opacity="0.9"/>`);
+  parts.push(`<text x="${W - PAD.r - 4}" y="${yTarget - 6}" text-anchor="end" font-size="10.5" fill="#d97706">目标 97.0%</text>`);
+
+  /* 异常判据线 96.0 */
+  const yAnom = yScale(ANOMALY_LINE);
+  parts.push(`<line x1="${PAD.l}" y1="${yAnom}" x2="${W - PAD.r}" y2="${yAnom}" stroke="#ef4444" stroke-width="1" stroke-dasharray="2,5" opacity="0.4"/>`);
+  parts.push(`<text x="${PAD.l + 5}" y="${yAnom + 12}" font-size="9.5" fill="#ef4444" opacity="0.75">异常判据 96.0%（目标 −1.0pp）</text>`);
+
+  /* recipe 变更（lot 谱系对齐） */
+  const xSw = xScale(RECIPE_SWITCH_IDX);
+  parts.push(`<line x1="${xSw}" y1="${PAD.t - 6}" x2="${xSw}" y2="${plotBottom}" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>`);
+  parts.push(`<rect x="${xSw - 46}" y="${PAD.t - 24}" width="92" height="18" rx="4" fill="#fef2f2" stroke="#fecaca"/>`);
+  parts.push(`<text x="${xSw}" y="${PAD.t - 11}" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="600">08-18 recipe V2.2→V2.3</text>`);
+
+  /* 清洗事件 */
+  const xCl = xScale(CLEAN_DAY_IDX);
+  parts.push(`<path d="M ${xCl} ${PAD.t - 14} l 5.5 9 l -11 0 z" fill="#f59e0b"/>`);
+  parts.push(`<text x="${xCl + 8}" y="${PAD.t - 6}" font-size="9.5" fill="#b45309">PC-03 针卡清洗</text>`);
+
+  /* 复测率底栏 */
+  parts.push(`<text x="${PAD.l - 10}" y="${bandTop + 8}" text-anchor="end" font-size="9.5" fill="#9ca3af">复测率</text>`);
+  parts.push(`<line x1="${PAD.l}" y1="${bandTop + BAND_H}" x2="${W - PAD.r}" y2="${bandTop + BAND_H}" stroke="#e5e7eb" stroke-width="1"/>`);
+  trend.forEach((d, i) => {
+    const bw = Math.max(3, PW / trend.length - 4);
+    const color = d.rt > 3 ? '#fca5a5' : '#cbd5e1';
+    parts.push(`<rect x="${xScale(i) - bw / 2}" y="${rtScale(d.rt)}" width="${bw}" height="${bandTop + BAND_H - rtScale(d.rt)}" rx="1.5" fill="${color}"><title>${d.d} 复测率 ${d.rt}%</title></rect>`);
+  });
+  parts.push(`<text x="${W - PAD.r}" y="${bandTop + BAND_H + 11}" text-anchor="end" font-size="9" fill="#9ca3af">0–5%</text>`);
+
+  /* final 虚线（先画，置底） */
+  const finPts = trend.map((d, i) => `${xScale(i)},${yScale(d.fin)}`).join(' ');
+  parts.push(`<polyline points="${finPts}" fill="none" stroke="#93c5fd" stroke-width="1.8" stroke-dasharray="6,4" stroke-linejoin="round" stroke-linecap="round"/>`);
+
+  /* FPY 面积 + 实线 */
+  const linePts = trend.map((d, i) => `${xScale(i)},${yScale(d.fpy)}`).join(' ');
+  const areaPts = `${PAD.l},${plotBottom} ${linePts} ${xScale(trend.length - 1)},${plotBottom}`;
+  parts.push(`<defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#2563eb" stop-opacity="0.14"/>
+    <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+  </linearGradient></defs>`);
+  parts.push(`<polygon points="${areaPts}" fill="url(#areaGrad)"/>`);
+  parts.push(`<polyline points="${linePts}" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`);
+
+  /* 数据点：异常日放大且可点击 */
+  trend.forEach((d, i) => {
+    const isAnom = d.fpy < ANOMALY_LINE;
+    if (isAnom) {
+      parts.push(`<circle cx="${xScale(i)}" cy="${yScale(d.fpy)}" r="5" fill="#ef4444" stroke="#fff" stroke-width="1.5" style="cursor:pointer" onclick="showDrill('${d.d}')"><title>${d.d} FPY ${d.fpy}% · 点击下钻</title></circle>`);
+    } else {
+      parts.push(`<circle cx="${xScale(i)}" cy="${yScale(d.fpy)}" r="2.2" fill="#2563eb" stroke="#fff" stroke-width="1.2"><title>${d.d} FPY ${d.fpy}% / final ${d.fin}%</title></circle>`);
+    }
+  });
+
+  /* X 轴 */
+  trend.forEach((d, i) => {
+    if (i % 5 === 0 || i === trend.length - 1) {
+      parts.push(`<text x="${xScale(i)}" y="${bandTop + BAND_H + 24}" text-anchor="middle" font-size="10.5" fill="#9ca3af">${d.d}</text>`);
+    }
+  });
+
+  document.getElementById('trendChart').innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${parts.join('')}</svg>`;
+})();
+
+function showDrill(day) {
+  const lots = drillLots[day];
+  if (!lots) return;
+  const rows = lots.map(l =>
+    `<tr><td>${l.lot}</td><td>${l.wafer}</td><td>${l.insert}</td><td>${l.prog}</td><td>${l.n}</td><td style="color:#b91c1c;font-weight:600">${l.fpy}</td><td>${l.rt}</td></tr>`
+  ).join('');
+  document.getElementById('drillPanel').innerHTML = `
+    <div class="drill">
+      <div class="drill-hd"><span>${day} · lot / insert 清单（首插入口径）</span><span class="x" onclick="closeDrill()">收起 ×</span></div>
+      <table>
+        <tr><th>lot</th><th>wafer</th><th>插入点</th><th>程序</th><th>首测 die</th><th>FPY</th><th>复测回收</th></tr>
+        ${rows}
+      </table>
+      <span class="btn">查看失效位图 →</span>
+      <span class="btn">跨插入点差分（vs CP）→</span>
+    </div>`;
+  document.getElementById('drillHint').style.display = 'none';
+}
+function closeDrill() {
+  document.getElementById('drillPanel').innerHTML = '';
+  document.getElementById('drillHint').style.display = '';
+}
+
+/* ============================================================
+   图二：first-fail Bin Pareto（含位移与护栏）
+   ============================================================ */
+(function renderPareto() {
+  const bins = [
+    { id:'Bin 1', name:'Open/Short',   count:258, delta:+5.8 },
+    { id:'Bin 4', name:'Function',     count:183, delta:-1.2 },
+    { id:'Bin 2', name:'PowerShort',   count:121, delta:+0.4 },
+    { id:'Bin 3', name:'Idd/Leakage',  count:96,  delta:-0.6 },
+    { id:'Bin 7', name:'Margin',       count:52,  delta:+0.9 },
+    { id:'Bin 5', name:'Refresh',      count:32,  delta:-0.3 }
+  ];
+  const total = bins.reduce((s, b) => s + b.count, 0);
+  let running = 0;
+  bins.forEach(b => { b.pct = b.count / total * 100; running += b.pct; b.cum = running; });
+
+  const W = 900, H = 350;
+  const PAD = { t: 30, r: 58, b: 62, l: 58 };
+  const PW = W - PAD.l - PAD.r;
+  const PH = H - PAD.t - PAD.b;
+
+  const yMax = 300;
+  const yScale = v => PAD.t + PH - (v / yMax) * PH;
+  const yPct = p => PAD.t + PH - (p / 100) * PH;
+  const slot = PW / bins.length;
+  const barW = 72;
+
+  const parts = [];
+
+  [0, 75, 150, 225, 300].forEach(v => {
+    const y = yScale(v);
+    parts.push(`<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="#eef0f3" stroke-width="1"/>`);
+    parts.push(`<text x="${PAD.l - 10}" y="${y + 4}" text-anchor="end" font-size="10.5" fill="#9ca3af">${v}</text>`);
+    parts.push(`<text x="${W - PAD.r + 10}" y="${y + 4}" text-anchor="start" font-size="10.5" fill="#9ca3af">${Math.round(v / yMax * 100)}%</text>`);
+  });
+
+  bins.forEach((b, i) => {
+    const cx = PAD.l + slot * i + slot / 2;
+    const h = (b.count / yMax) * PH;
+    const y = PAD.t + PH - h;
+    const deltaColor = Math.abs(b.delta) >= 5 ? '#ef4444' : '#10b981';
+    const deltaTxt = (b.delta > 0 ? '+' : '') + b.delta.toFixed(1) + 'pp';
+
+    parts.push(`<rect x="${cx - barW / 2}" y="${y}" width="${barW}" height="${h}" rx="3" fill="#3b82f6" opacity="0.88"><title>${b.id} ${b.name}：首失效 ${b.count} die（${b.pct.toFixed(1)}%）· 位移 ${deltaTxt}</title></rect>`);
+    parts.push(`<text x="${cx}" y="${y - 20}" text-anchor="middle" font-size="10.5" fill="#1f2937" font-weight="600">${b.count}</text>`);
+    /* 位移徽章 */
+    const chipW = 46;
+    parts.push(`<rect x="${cx - chipW / 2}" y="${y - 17}" width="${chipW}" height="13" rx="6" fill="${Math.abs(b.delta) >= 5 ? '#fef2f2' : '#ecfdf5'}" stroke="${Math.abs(b.delta) >= 5 ? '#fecaca' : '#a7f3d0'}"/>`);
+    parts.push(`<text x="${cx}" y="${y - 7}" text-anchor="middle" font-size="8.5" fill="${deltaColor}" font-weight="600">${deltaTxt}</text>`);
+    parts.push(`<text x="${cx}" y="${PAD.t + PH + 20}" text-anchor="middle" font-size="10.5" fill="#374151" font-weight="600">${b.id}</text>`);
+    parts.push(`<text x="${cx}" y="${PAD.t + PH + 36}" text-anchor="middle" font-size="10" fill="#9ca3af">${b.name}</text>`);
+    parts.push(`<text x="${cx}" y="${PAD.t + PH + 50}" text-anchor="middle" font-size="9" fill="#9ca3af">${b.pct.toFixed(1)}%</text>`);
+  });
+
+  /* 累计曲线 */
+  const cumPts = bins.map((b, i) => `${PAD.l + slot * i + slot / 2},${yPct(b.cum)}`).join(' ');
+  parts.push(`<polyline points="${cumPts}" fill="none" stroke="#ef4444" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`);
+  bins.forEach((b, i) => {
+    const cx = PAD.l + slot * i + slot / 2;
+    parts.push(`<circle cx="${cx}" cy="${yPct(b.cum)}" r="3.2" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>`);
+    if (i >= 1) {
+      parts.push(`<text x="${cx + 4}" y="${yPct(b.cum) - 8}" text-anchor="middle" font-size="9.5" fill="#dc2626" font-weight="600">${b.cum.toFixed(0)}%</text>`);
+    }
+  });
+
+  const y80 = yPct(80);
+  parts.push(`<line x1="${PAD.l}" y1="${y80}" x2="${W - PAD.r}" y2="${y80}" stroke="#9ca3af" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>`);
+  parts.push(`<text x="${PAD.l + 6}" y="${y80 - 5}" font-size="10" fill="#6b7280">80% 累计线</text>`);
+
+  document.getElementById('paretoChart').innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${parts.join('')}</svg>`;
+})();
+
+/* ============================================================
+   图三：Site 热力图（两日聚合格）+ 落针/清洗刻度
+   ============================================================ */
+(function renderHeatmap() {
+  const sites = ['Site 1','Site 2','Site 3','Site 4','Site 5','Site 6','Site 7','Site 8'];
+  const cols = ['08/17-18','08/19-20','08/21-22','08/23-24','08/25-26','08/27-28','08/29-30'];
+  const base = [97.5, 97.3, 97.5, 97.4, 97.6, 97.4, 97.5, 97.6];
+  const site3 = [97.4, 96.1, 95.2, 95.8, 96.6, 97.3, 97.5];   /* 08-21 起恶化，08-25 清洗后恢复 */
+  const touch = ['3.1k', '3.2k', '3.3k', '3.4k', '1.6k', '0.5k', '0.5k'];
+  const cleanAt = 4;  /* 第 5 格前：08-25 PC-03 清洗（列头下方黄标） */
+
+  const matrix = [];
+  for (let s = 0; s < sites.length; s++) {
+    const row = [];
+    for (let d = 0; d < cols.length; d++) {
+      if (s === 2) { row.push(site3[d]); continue; }
+      const wave = ((s * 5 + d * 11) % 5 - 2) * 0.12;
+      row.push(Math.round((base[s] + wave) * 100) / 100);
+    }
+    matrix.push(row);
+  }
+
+  function cellColor(v) {
+    const t = Math.max(0, Math.min(1, (v - 94.5) / 3.5));
+    return `hsl(${t * 120}, 70%, 40%)`;
+  }
+
+  const cells = [];
+  cells.push(`<div class="heat-label heat-top"></div>`);
+  cols.forEach(c => cells.push(`<div class="heat-label heat-top">${c}</div>`));
+
+  for (let s = 0; s < sites.length; s++) {
+    cells.push(`<div class="heat-label">${sites[s]}</div>`);
+    for (let d = 0; d < cols.length; d++) {
+      const v = matrix[s][d];
+      const isWarn = v < 95.5;
+      cells.push(`<div class="heat-cell" style="background:${cellColor(v)};${isWarn ? 'outline:1.5px solid #ef4444;outline-offset:-1.5px;' : ''}" title="${sites[s]} · ${cols[d]} · ${v.toFixed(1)}% · n≈1,040（2 日聚合）· 95% CI ±1.4pp">${v.toFixed(1)}</div>`);
+    }
+  }
+  document.getElementById('heatGrid').innerHTML = cells.join('');
+
+  /* 落针/清洗刻度行 */
+  const tds = [`<div class="td-cell" style="text-align:right;color:#9ca3af">落针/清洗</div>`];
+  cols.forEach((c, i) => {
+    const clean = (i === cleanAt) ? `<span class="clean">PC-03 清洗 08-25</span><br>` : '';
+    tds.push(`<div class="td-cell">${clean}TD ${touch[i]}</div>`);
+  });
+  document.getElementById('tdRow').innerHTML = tds.join('');
+})();
+
+/* ============================================================
+   ④B 堆叠层级归因（横向条形）
+   ============================================================ */
+(function renderLayers() {
+  const layers = [
+    {n:'base die', v:0.92, hot:true},
+    {n:'L1', v:0.18}, {n:'L2', v:0.22}, {n:'L3', v:0.19}, {n:'L4', v:0.21},
+    {n:'L5', v:0.31}, {n:'L6', v:0.24}, {n:'L7', v:0.20}, {n:'L8', v:0.23},
+    {n:'L9', v:0.19}, {n:'L10', v:0.22}, {n:'L11', v:0.26}, {n:'L12', v:0.41, hot:true}
+  ];
+  const max = 1.0;
+  const html = layers.map(l => `
+    <div class="hbar-row">
+      <div class="hbar-label" style="${l.hot ? 'color:#b91c1c;font-weight:600' : ''}">${l.n}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${l.v / max * 100}%;background:${l.hot ? '#ef4444' : '#3b82f6'};opacity:${l.hot ? 0.9 : 0.65}"></div></div>
+      <div class="hbar-val">${l.v.toFixed(2)}%</div>
+    </div>`).join('');
+  document.getElementById('layerBars').innerHTML = html;
+})();
+
+/* ============================================================
+   ④C 冗余消耗度分布（3 档直方）
+   ============================================================ */
+(function renderRedundancy() {
+  const segs = [
+    {n:'< 50%', v:94.6, c:'#10b981'},
+    {n:'50–80%', v:4.7, c:'#f59e0b'},
+    {n:'> 80%（风险件）', v:0.7, c:'#ef4444'}
+  ];
+  const html = segs.map(s => `
+    <div class="hbar-row">
+      <div class="hbar-label" style="${s.v < 1 ? 'color:#b91c1c;font-weight:600' : ''}">${s.n}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${Math.max(s.v, 0.8)}%;background:${s.c}"></div></div>
+      <div class="hbar-val">${s.v}%</div>
+    </div>`).join('');
+  document.getElementById('redBars').innerHTML = html;
+})();
+
+/* ============================================================
+   ④D 空间签名（横向条形）
+   ============================================================ */
+(function renderSignatures() {
+  const sigs = [
+    {n:'列 → TSV/lane', v:38, c:'#ef4444'},
+    {n:'点 → 随机缺陷', v:31, c:'#3b82f6'},
+    {n:'边环 → SealRing/切割', v:22, c:'#f59e0b'},
+    {n:'聚簇 → 工艺局部', v:9, c:'#8b5cf6'}
+  ];
+  const html = sigs.map(s => `
+    <div class="hbar-row">
+      <div class="hbar-label" style="width:118px">${s.n}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${s.v}%;background:${s.c}"></div></div>
+      <div class="hbar-val">${s.v}%</div>
+    </div>`).join('');
+  document.getElementById('sigBars').innerHTML = html;
+})();
+
+/* ============================================================
+   ④E 参数漂移：Contact R p95 分位数控制图（小 SVG）
+   ============================================================ */
+(function renderDrift() {
+  const days = ['08-17','08-18','08-19','08-20','08-21','08-22','08-23','08-24','08-25','08-26','08-27','08-28'];
+  const sigma = [0.3, 0.5, 1.4, 1.9, 2.3, 2.1, 1.6, 0.9, 0.4, 0.2, 0.2, 0.1];
+  const W = 420, H = 150;
+  const PAD = { t: 18, r: 14, b: 24, l: 34 };
+  const PW = W - PAD.l - PAD.r, PH = H - PAD.t - PAD.b;
+  const yScale = v => PAD.t + (3 - v) / 3 * PH;
+  const xScale = i => PAD.l + i * (PW / (days.length - 1));
+  const parts = [];
+
+  [-1, 0, 1, 2, 3].forEach(v => {
+    const y = yScale(v);
+    const strong = (v === 2 || v === 0);
+    parts.push(`<line x1="${PAD.l}" y1="${y}" x2="${W - PAD.r}" y2="${y}" stroke="${strong ? '#d1d5db' : '#eef0f3'}" stroke-width="1" ${v === 2 ? 'stroke-dasharray="4,3"' : ''}/>`);
+    parts.push(`<text x="${PAD.l - 6}" y="${y + 3.5}" text-anchor="end" font-size="9" fill="#9ca3af">${v}σ</text>`);
+  });
+
+  const pts = sigma.map((v, i) => `${xScale(i)},${yScale(v)}`).join(' ');
+  parts.push(`<polyline points="${pts}" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>`);
+  sigma.forEach((v, i) => {
+    const hot = v >= 2;
+    parts.push(`<circle cx="${xScale(i)}" cy="${yScale(v)}" r="${hot ? 4 : 2.5}" fill="${hot ? '#ef4444' : '#2563eb'}" stroke="#fff" stroke-width="1.2"><title>${days[i]}：${v >= 0 ? '+' : ''}${v}σ${hot ? ' · 触发 +2σ×2 日' : ''}</title></circle>`);
+  });
+
+  days.forEach((d, i) => {
+    if (i % 2 === 1) parts.push(`<text x="${xScale(i)}" y="${H - 8}" text-anchor="middle" font-size="8.5" fill="#9ca3af">${d.slice(3)}</text>`);
+  });
+  parts.push(`<text x="${W - PAD.r}" y="${PAD.t - 6}" text-anchor="end" font-size="9" fill="#b91c1c" font-weight="600">红点：+2σ × 2 日 → 例外 #3</text>`);
+
+  document.getElementById('driftChart').innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${parts.join('')}</svg>`;
+})();
+</script>
+</body>
+</html>
