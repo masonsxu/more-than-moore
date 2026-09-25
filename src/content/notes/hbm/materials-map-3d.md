@@ -54,10 +54,13 @@ tags: ['HBM', '3D 封装', '材料收集', '来源清单']
 | Marvin Test KB Q200207：DC 参数测试（PMU 两模式、按 spec 判定） | 测试设备商文档 | 2026-09-25 全文抓取 | https://www.marvintest.com/KB/Q200207/DC-Characterization-of-ICs-Using-PXI-Instrumentation |
 | AD5520/AD5522 手册：每引脚 PMU/SMU（钳位 + 窗口比较器，ATE 应用） | 芯片厂商一手 | 2026-09-25 | https://www.analog.com/media/en/technical-documentation/data-sheets/AD5520.pdf |
 | US5365180A：接触电阻测量（对 pin–GND 二极管加流测压降） | 专利 | 2026-09-25 索引核验 | https://patents.google.com/patent/US5365180A/en |
+| STDF V4 规范（pystdf 转载）：PRR 的 PART_FLG 位定义（bit3：0=pass、1=fail）与 bin 数字范围 | 标准文本 | 2026-09-26 全文核验 | https://github.com/cmars/pystdf/blob/master/pystdf/V4.py |
+| Semi-ATE binning 文档：SBin 1–9 默认全为 pass grades 的惯例反例 | 工具文档 | 2026-09-26 | https://semi-ate.github.io/Semi-ATE/binning.html |
+| 韩媒 HBM 测试/检查耗时集（THE ELEC burn-in ~10h、三星 3D CT 5–6h、C-SAM 1h/片） | 行业媒体引研报 | 2026-09-26 摘录归档 | https://www.thelec.kr/news/articleView.html?idxno=52502 |
 
-（以上电路级来源的摘录与可引用论断集中归档于 [`public/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md`](/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md)；这些来源的教学化重组见笔记《[测试电路的三张图](/notes/hbm/test-circuit-diagrams/)》。）
+（以上电路级来源的摘录与可引用论断集中归档于 [`public/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md`](/sources/hbm-test/2026-09-25_ate-pmu-dc-parametric.md)；韩媒耗时口径归档于 [`public/sources/hbm-test/2026-09-26_korea-press_hbm-test-duration.md`](/sources/hbm-test/2026-09-26_korea-press_hbm-test-duration.md)；这些来源的教学化重组见笔记《[测试电路的三张图](/notes/hbm/test-circuit-diagrams/)》。）
 
-对应笔记：《[HBM 测试的 3D 结构](/notes/hbm/hbm-test-3d/)》（含 10 项来源的完整表）。
+对应笔记：《[HBM 测试的 3D 结构](/notes/hbm/hbm-test-3d/)》（含 10 项来源的完整表）；测试入门误区裁定见《[测试入门四个高频误区的技术裁定](/notes/hbm/test-beginner-four-questions/)》。
 
 ## 主题四：集成环境（2.5D 中介层 / bridge——定位为外围语境）
 

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>量产低良 Case 全流程处置手册</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #ffffff; --color-paper-2: #ffffff;
+      --color-ink: #1c1917; --color-muted: #57534e; --color-soft: #6f665f;
+      --color-rule: rgba(28,25,23,0.12);
+      --color-accent: #c2410c; --color-accent-tint: rgba(194,65,12,0.12);
+      --color-link: #4e6e81; --color-mustard: #a16207; --color-sage: #5c7444; --color-rust: #9a3412;
+      --font-sans: 'Geist','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+      --font-serif: 'Instrument Serif','Noto Serif SC','Songti SC',serif;
+      --font-mono: 'Geist Mono','PingFang SC',ui-monospace,Menlo,monospace;
+    }
+    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink); min-height: 100vh; padding: 3rem 2rem 4rem; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 2.5rem; }
+    .header-eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.75rem; }
+    h1 { font-family: var(--font-serif); font-size: clamp(1.9rem, 3vw + 1rem, 2.75rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 0.75rem; }
+    .subtitle { font-size: 0.95rem; line-height: 1.65; color: var(--color-muted); max-width: 68ch; }
+    .subtitle strong { color: var(--color-ink); font-weight: 600; }
+    .metrics { display: grid; grid-template-columns: 0.9fr 1.05fr 1fr 1.1fr; gap: 1rem; margin-bottom: 3.5rem; }
+    .metric { background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: 6px; padding: 1.1rem 1.25rem 1rem; }
+    .m-eyebrow { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-soft); margin-bottom: 0.6rem; }
+    .m-value { font-family: var(--font-serif); font-size: 1.6rem; line-height: 1.15; margin-bottom: 0.35rem; }
+    .m-value em { font-style: normal; color: var(--color-accent); }
+    .m-note { font-size: 0.75rem; color: var(--color-soft); line-height: 1.5; }
+    section { margin-bottom: 3.5rem; }
+    .sec-eyebrow { font-family: var(--font-mono); font-size: 0.64rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-soft); margin-bottom: 0.5rem; }
+    section h2 { font-family: var(--font-serif); font-size: clamp(1.35rem, 1.6vw + 0.7rem, 1.75rem); font-weight: 400; letter-spacing: -0.01em; margin-bottom: 0.6rem; }
+    .sec-intro { font-size: 0.875rem; line-height: 1.7; color: var(--color-muted); max-width: 72ch; margin-bottom: 1.5rem; }
+    .sec-intro strong { color: var(--color-ink); font-weight: 600; }
+    svg { display: block; width: 100%; }
+    .diagram-container { overflow-x: auto; border: 1px solid var(--color-rule); border-radius: 8px; padding: 1.25rem; background: var(--color-paper-2); }
+    .diagram-container svg { min-width: 760px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; line-height: 1.6; margin: 1rem 0 0.5rem; }
+    th { text-align: left; font-family: var(--font-mono); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-soft); padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--color-rule); vertical-align: bottom; }
+    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid rgba(28,25,23,0.07); color: var(--color-muted); vertical-align: top; }
+    td strong { color: var(--color-ink); font-weight: 600; }
+    td code, .sec-intro code, li code { font-family: var(--font-mono); font-size: 0.72rem; background: rgba(28,25,23,0.05); padding: 0.1rem 0.35rem; border-radius: 3px; color: var(--color-ink); }
+    .cards { display: grid; gap: 1rem; margin-top: 1.25rem; }
+    .cards.two { grid-template-columns: 1.1fr 1fr; }
+    .cards.three { grid-template-columns: 1fr 1.05fr 1.12fr; }
+    .cards.four { grid-template-columns: repeat(4, 1fr); }
+    @media (max-width: 860px) { .metrics, .cards.two, .cards.three, .cards.four { grid-template-columns: 1fr; } }
+    .card { background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: 6px; padding: 1.1rem 1.2rem 1.15rem; }
+    .card.focal { border-color: rgba(194,65,12,0.55); }
+    .card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
+    .card-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .card-dot.ink { background: var(--color-ink); } .card-dot.muted { background: var(--color-muted); }
+    .card-dot.coral { background: var(--color-accent); } .card-dot.mustard { background: var(--color-mustard); }
+    .card-dot.sage { background: var(--color-sage); } .card-dot.dusty { background: var(--color-link); }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card p, .card ul { color: var(--color-muted); font-size: 0.8125rem; line-height: 1.6; list-style: none; }
+    .card li { margin-bottom: 0.35rem; padding-left: 0.9rem; position: relative; }
+    .card li::before { content: '—'; position: absolute; left: 0; color: rgba(28,25,23,0.25); }
+    .callout { border-left: 2px solid var(--color-accent); background: var(--color-accent-tint); border-radius: 0 6px 6px 0; padding: 0.9rem 1.1rem; font-size: 0.8125rem; line-height: 1.65; color: var(--color-muted); margin-top: 1.25rem; }
+    .callout strong { color: var(--color-rust); }
+    .checklist { list-style: none; margin-top: 1rem; }
+    .checklist li { font-size: 0.8125rem; line-height: 1.65; color: var(--color-muted); padding: 0.5rem 0 0.5rem 1.75rem; position: relative; border-bottom: 1px solid rgba(28,25,23,0.07); }
+    .checklist li::before { content: ''; position: absolute; left: 0; top: 0.72rem; width: 0.8rem; height: 0.8rem; border: 1px solid var(--color-muted); border-radius: 3px; }
+    .pill { display: inline-block; font-family: var(--font-mono); font-size: 0.58rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 3px; padding: 0.14rem 0.45rem; margin-right: 0.4rem; vertical-align: 1px; }
+    .pill.c { color: #9a3412; background: rgba(154,52,18,0.08); border: 1px solid rgba(154,52,18,0.25); }
+    .pill.b { color: #a16207; background: rgba(161,98,7,0.08); border: 1px solid rgba(161,98,7,0.25); }
+    .pill.a { color: #5c7444; background: rgba(92,116,68,0.10); border: 1px solid rgba(92,116,68,0.3); }
+    .footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--color-rule); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--color-soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+    .footer a { color: var(--color-link); text-decoration: none; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <p class="header-eyebrow">HBM · KGSD · 量产测试运营 Playbook</p>
+    <h1>量产低良 Case 全流程处置手册</h1>
+    <p class="subtitle">警报触发后工程师<strong>真实打开的数据</strong>、分析方法、8D 报告写法、验证实验与关闭判据。适用封测 / OSAT 量产测试端（CP / PSWT / KGSD / FT），角色视角为 TE / YE / 测试数据工程师。机制依据为标准与一手文档；<span class="pill c">C</span> 全部时间节奏与关闭数值为行业惯例示例，落地前以厂内 QE 与客户协议为准。</p>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><p class="m-eyebrow">Containment</p><div class="m-value">0–2<em>h</em></div><p class="m-note">围堵完成：hold 涉事 lot、隔离在制品、冻结原始证据链</p></div>
+    <div class="metric"><p class="m-eyebrow">Day 1 Data Views</p><div class="m-value"><em>10</em> 类</div><p class="m-note">良率口径 / first-fail bin / wafer map / site / tester / retest / 参数 / 4M / 谱系 / 条件</p></div>
+    <div class="metric"><p class="m-eyebrow">Root Cause ×2</p><div class="m-value">发生 <em>+</em> 流出</div><p class="m-note">为什么发生 + 为什么没拦住——只答发生根因的 8D 会被 QE 退回</p></div>
+    <div class="metric"><p class="m-eyebrow">Closure Gate</p><div class="m-value">7 <em>项</em></div><p class="m-note">有效性数据、SPC 受控、体系化、横展、签核链全部满足方可关闭</p></div>
+  </div>
+
+  <section>
+    <p class="sec-eyebrow">01 · Lifecycle</p>
+    <h2>Case 生命周期与阶段门</h2>
+    <p class="sec-intro">未达<strong>出口判据</strong>不进入下一阶段；证伪回到假设清单重排，是循环不是失败。形状承载语义：椭圆起止、矩形步骤、菱形判定，焦橙仅标记证实路径与根因对策。</p>
+    <div class="diagram-container">
+      <svg viewBox="0 0 1000 896" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="kgsd-lifecycle-title kgsd-lifecycle-desc" font-family="'Geist','PingFang SC','Microsoft YaHei',sans-serif">
+        <title id="kgsd-lifecycle-title">量产低良 Case 生命周期</title>
+        <desc id="kgsd-lifecycle-desc">低良警报触发后：冻结证据与 hold，数据有效性核查（不通过则关数据工单），基本盘七问与十类数据视图形成假设清单，围堵 ICA，证据三角验证（证伪则回到假设，证实进入双根因与永久对策），最后有效性确认并关闭。</desc>
+        <defs>
+          <marker id="kgsd-lc-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#57534e"/></marker>
+          <marker id="kgsd-lc-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#c2410c"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#ffffff"/>
+        <line x1="440" y1="88" x2="440" y2="120" stroke="#57534e" stroke-width="1.2" marker-end="url(#kgsd-lc-arrow)"/>
+        <line x1="440" y1="176" x2="440" y2="200" stroke="#57534e" stroke-width="1.2" marker-end="url(#kgsd-lc-arrow)"/>
+        <line x1="564" y1="252" x2="724" y2="252" stroke="#57534e" stroke-width="1.2" marker-end="url(#kgsd-lc-arrow)"/>
+        <line x1="440" y1="304" x2="440" y2="336" stroke="#57534e" stroke-width="1.2" marker-end="url(#kgsd-lc-arrow)"/>
+        <line x1="440" y1="400" x2="440" y2="424" stroke="#57534e" stroke-width="1.2" marker-end="url(#kgsd-lc-arrow)"/>
+        <line x1="440" y1="472" x2="440" y2="496" stroke="#57534e" stroke-width="1.2" marker-end="url(#kgsd-lc-arrow)"/>
+        <path d="M 316 548 L 168 548 Q 160 548 160 540 L 160 376 Q 160 368 168 368 L 316 368" fill="none" stroke="#57534e" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#kgsd-lc-arrow)"/>
+        <line x1="440" y1="600" x2="440" y2="632" stroke="#c2410c" stroke-width="1.4" marker-end="url(#kgsd-lc-arrow-accent)"/>
+        <line x1="440" y1="696" x2="440" y2="728" stroke="#57534e" stroke-width="1.2" marker-end="url(#kgsd-lc-arrow)"/>
+        <rect x="628" y="232" width="32" height="12" rx="2" fill="#ffffff"/>
+        <text x="644" y="241" fill="#6f665f" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.12em">NO</text>
+        <rect x="416" y="308" width="48" height="12" rx="2" fill="#ffffff"/>
+        <text x="440" y="317" fill="#6f665f" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.12em">YES</text>
+        <rect x="172" y="508" width="116" height="12" rx="2" fill="#ffffff"/>
+        <text x="230" y="517" fill="#6f665f" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">证伪 → 重排假设</text>
+        <rect x="416" y="606" width="48" height="12" rx="2" fill="#ffffff"/>
+        <text x="440" y="615" fill="#c2410c" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.12em">证实</text>
+        <rect x="320" y="40" width="240" height="48" rx="24" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+        <text x="440" y="61" fill="#1c1917" font-size="12" font-weight="600" text-anchor="middle">低良警报</text>
+        <text x="440" y="77" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">SPC 判异 / YMS 告警 / PAT 超限</text>
+        <rect x="320" y="120" width="240" height="56" rx="6" fill="#ffffff" stroke="#1c1917" stroke-width="1"/>
+        <text x="440" y="142" fill="#1c1917" font-size="12" font-weight="600" text-anchor="middle">冻结证据 + Hold 涉事 lot</text>
+        <text x="440" y="158" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">0–2h · WPFile/STDF · recipe 快照 · 针卡 TD</text>
+        <polygon points="440,200 564,252 440,304 316,252" fill="#ffffff" stroke="#1c1917" stroke-width="1"/>
+        <text x="440" y="246" fill="#1c1917" font-size="11" font-weight="600" text-anchor="middle">数据有效性</text>
+        <text x="440" y="260" fill="#1c1917" font-size="11" font-weight="600" text-anchor="middle">核查通过？</text>
+        <rect x="724" y="228" width="240" height="48" rx="24" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+        <text x="844" y="248" fill="#1c1917" font-size="12" font-weight="600" text-anchor="middle">关数据工单</text>
+        <text x="844" y="264" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">非产品 case · 修数据链路</text>
+        <rect x="320" y="336" width="240" height="64" rx="6" fill="#ffffff" stroke="#1c1917" stroke-width="1"/>
+        <text x="440" y="358" fill="#1c1917" font-size="12" font-weight="600" text-anchor="middle">基本盘七问 + 十类数据视图</text>
+        <text x="440" y="374" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">趋势 · bin · map · site · retest · 参数</text>
+        <text x="440" y="390" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">→ 假设清单 + 优先级排序</text>
+        <rect x="320" y="424" width="240" height="48" rx="6" fill="#ffffff" stroke="#1c1917" stroke-width="1"/>
+        <text x="440" y="446" fill="#1c1917" font-size="12" font-weight="600" text-anchor="middle">围堵 ICA</text>
+        <text x="440" y="462" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">hold / 分选 / 加严 · 24h 内初报</text>
+        <polygon points="440,496 564,548 440,600 316,548" fill="#ffffff" stroke="#1c1917" stroke-width="1"/>
+        <text x="440" y="544" fill="#1c1917" font-size="11" font-weight="600" text-anchor="middle">证据三角</text>
+        <text x="440" y="558" fill="#1c1917" font-size="11" font-weight="600" text-anchor="middle">闭合？</text>
+        <rect x="320" y="632" width="240" height="64" rx="6" fill="rgba(194,65,12,0.08)" stroke="#c2410c" stroke-width="1"/>
+        <text x="440" y="654" fill="#1c1917" font-size="12" font-weight="600" text-anchor="middle">双根因 → 永久对策</text>
+        <text x="440" y="670" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">发生根因 + 流出根因</text>
+        <text x="440" y="686" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">D5 对策 · D7 预防体系化</text>
+        <rect x="320" y="728" width="240" height="56" rx="28" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+        <text x="440" y="752" fill="#1c1917" font-size="12" font-weight="600" text-anchor="middle">有效性确认 → 关闭</text>
+        <text x="440" y="768" fill="#6f665f" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">连续 3 lot 达基线 · QE 签核</text>
+        <line x1="40" y1="824" x2="960" y2="824" stroke="rgba(28,25,23,0.10)" stroke-width="0.8"/>
+        <text x="40" y="840" fill="#57534e" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.18em">LEGEND · SHAPE CARRIES TYPE</text>
+        <rect x="40" y="854" width="24" height="12" rx="6" fill="rgba(28,25,23,0.03)" stroke="rgba(28,25,23,0.30)" stroke-width="1"/>
+        <text x="72" y="864" fill="#57534e" font-size="8" font-family="'Geist Mono',monospace">起止</text>
+        <rect x="140" y="854" width="24" height="12" rx="2" fill="#ffffff" stroke="#1c1917" stroke-width="1"/>
+        <text x="172" y="864" fill="#57534e" font-size="8" font-family="'Geist Mono',monospace">步骤</text>
+        <polygon points="264,854 278,860 264,866 250,860" fill="#ffffff" stroke="#1c1917" stroke-width="1"/>
+        <text x="288" y="864" fill="#57534e" font-size="8" font-family="'Geist Mono',monospace">判定</text>
+        <rect x="352" y="852" width="24" height="16" rx="4" fill="rgba(194,65,12,0.08)" stroke="#c2410c" stroke-width="1"/>
+        <text x="384" y="864" fill="#57534e" font-size="8" font-family="'Geist Mono',monospace">根因/对策</text>
+        <line x1="472" y1="860" x2="496" y2="860" stroke="#c2410c" stroke-width="1.4"/>
+        <text x="504" y="864" fill="#57534e" font-size="8" font-family="'Geist Mono',monospace">证实路径</text>
+        <line x1="580" y1="860" x2="604" y2="860" stroke="#57534e" stroke-width="1.2" stroke-dasharray="5,4"/>
+        <text x="612" y="864" fill="#57534e" font-size="8" font-family="'Geist Mono',monospace">证伪回路</text>
+      </svg>
+    </div>
+    <table>
+      <tr><th>阶段</th><th>关键动作</th><th>出口判据</th></tr>
+      <tr><td><strong>触发 → 冻结</strong></td><td>告警确认；hold 涉事 lot；冻结原始数据</td><td>证据链完整（WPFile/STDF、KLARF、recipe 快照、针卡 TD 计数）</td></tr>
+      <tr><td><strong>有效性核查</strong></td><td>§03 六项检查</td><td>确认数据真实，才进入产品归因</td></tr>
+      <tr><td><strong>基本盘 + 视图</strong></td><td>七问 + §04 十类视图</td><td>影响面量化、单点性定位、假设清单成形</td></tr>
+      <tr><td><strong>围堵 ICA</strong></td><td>hold / 分选 / 加严 / 全检</td><td>已流出面清点完毕，逃逸风险受控</td></tr>
+      <tr><td><strong>验证</strong></td><td>再现 / 消除 / 剂量响应</td><td>假设逐条关闭，至少一条被证实</td></tr>
+      <tr><td><strong>对策与预防</strong></td><td>D5 对策 + D7 体系化</td><td>根因—对策对应关系成立</td></tr>
+      <tr><td><strong>关闭</strong></td><td>有效性确认 + 签核</td><td>§07 关闭判据全部满足</td></tr>
+    </table>
+    <div class="callout"><strong>时间轴纪律</strong>（<span class="pill c">C</span> 行业惯例示例）：0–2h 围堵完成；24h 内初报（事实 + 围堵）；72h 内根因假设清单；终报带 FA 证据。case 时钟从触发起算，每日 15 分钟站会直至关闭。</div>
+  </section>
+
+  <section>
+    <p class="sec-eyebrow">02 · Trigger &amp; Triage</p>
+    <h2>触发来源与前两小时：先核查数据，再怀疑产品</h2>
+    <p class="sec-intro">新手最大的坑是把"测试系统说谎"当成"产品坏了"。警报确认后先做<strong>数据有效性六项核查</strong>，再做基本盘七问——初报的事实骨架由七问构成，不由猜测构成。</p>
+    <div class="cards two">
+      <div class="card">
+        <div class="card-header"><span class="card-dot muted"></span><h3>数据有效性核查（六项）</h3></div>
+        <ul>
+          <li><strong>datalog 完整性</strong>：文件数 vs 机台产出数；解析器报错</li>
+          <li><strong>程序 / limit 版本</strong>：JOB_REV vs MES 工单绑定；limit diff</li>
+          <li><strong>分母定义</strong>：gross/net die、edge exclusion 口径与基线一致</li>
+          <li><strong>复测记录</strong>：retest 标志解析；同 die 多条 PRR 去重规则</li>
+          <li><strong>机台状态</strong>：校准到期、温度实际值、prober 对准零点</li>
+          <li><strong>报表复算</strong>：手工重算一个 lot 良率，排除 YMS 统计 bug</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-dot coral"></span><h3>基本盘七问</h3></div>
+        <ul>
+          <li><strong>掉多少</strong>：基线 X% → Y%，差 Z pp；影响 N lot / M wafer</li>
+          <li><strong>何时开始</strong>：第一颗异常 wafer 的测试结束时间（END_T），不是发现时间</li>
+          <li><strong>哪里掉</strong>：产品 × 插入点 × 工站逐层定位</li>
+          <li><strong>是否单点</strong>：单 lot / wafer / tester / 针卡 / site——单点性是假设骨架</li>
+          <li><strong>有何改动</strong>：4M 清单（机 / 料 / 法 / 人），回溯 72h</li>
+          <li><strong>系统是否撒谎</strong>：左侧六项</li>
+          <li><strong>客户影响</strong>：已放行？追回？</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-eyebrow">03 · Day 1 Data Views</p>
+    <h2>Day 1：工程师真实打开的十类数据视图</h2>
+    <p class="sec-intro">每类视图三段式：<strong>来源字段 → 看什么 → 判定指向</strong>。看图顺序即优先级——先分清"测试问题还是产品问题"，再谈根因。</p>
+    <table>
+      <tr><th style="width:16%">视图</th><th style="width:22%">来源字段</th><th style="width:30%">看什么</th><th>判定指向</th></tr>
+      <tr><td><strong>1 良率趋势</strong></td><td><code>PRR</code> 聚合 + MES 谱系</td><td>by <strong>lot</strong>（非 by day）：跳变从哪个 lot 起</td><td>阶跃对齐 4M 变更 → 变更归因；渐变 → 磨损 / 漂移</td></tr>
+      <tr><td><strong>2 First-fail bin Pareto</strong></td><td>bin + first-fail 归一，分母 = 失败 die</td><td>top bin 占比位移 vs 30 天基线；≥5pp 且 n≥690/组才有统计意义</td><td>bin1↑ 接触类；bin4↑ 阵列 / 键合类；bin2/3↑ 短路漏电类。fail-stop 删失必须用 first-fail 口径</td></tr>
+      <tr><td><strong>3 Wafer map</strong></td><td><code>X_COORD/Y_COORD</code> + KLARF</td><td>随机点 / 边缘环 / 列行 / 聚簇 / 径向渐变</td><td>环→边缘工艺·探扎；列→TSV·lane·冗余；簇→局部工艺；径向→减薄·共面性</td></tr>
+      <tr><td><strong>4 Site × yield</strong></td><td><code>HEAD_NUM/SITE_NUM</code></td><td>哪个 site 系统性差；先做 site × 径向位置混杂检验</td><td>层内显著 → 针卡 site 针尖 / pogo / 通道；全 site 同步 → 产品或共同条件</td></tr>
+      <tr><td><strong>5 Tester × yield</strong></td><td>同产品跨机台良率</td><td>同 lot 分批跨 tester 差异是否显著（差 2pp 需 n≈1,900 die/组）</td><td>单机台差 → 测试系统；全差 → 产品 / 物料 / 共同变更</td></tr>
+      <tr><td><strong>6 Retest recovery</strong></td><td>同 die 多次 PRR（PART_FLG 覆盖位）</td><td>fail die 复测回收率；回收 die 集中在哪个 bin / site</td><td><strong>高回收（&gt;60%，C 级阈值）→ 接触类，非真实失效</strong>；低回收 → 转产品归因</td></tr>
+      <tr><td><strong>7 参数直方图 / DPAT</strong></td><td><code>PTR</code> 实测值</td><td>整体漂移 vs 尾部离群；方向（接触电阻↑ / Vmin 左移 / Idd↑）</td><td>分布漂移先于良率塌陷；同时是加严分选的依据</td></tr>
+      <tr><td><strong>8 4M 变更清单</strong></td><td>MES 维修 / recipe 历史；EAP 装卸事件；物料批次</td><td>异常起点前 72h 全部变更，按谱系距离排序</td><td>变更与跳变对齐 → 变更归因；无变更 → 磨损 / 漂移 / 批次</td></tr>
+      <tr><td><strong>9 谱系 join</strong></td><td>MES 谱系 + EAP 日志</td><td>失效 die 的键合机台 / 减薄批次 / 针卡 TD / 凸点批次</td><td>fail 率 vs TD 计数剂量-响应 = 针卡类根因最强证据</td></tr>
+      <tr><td><strong>10 测试条件矩阵</strong></td><td>程序数据 + 机台 log</td><td>hot/cold 哪个挂；VDD corner；测试时长异常</td><td>仅 cold 挂 → 接触 / 温度敏感；仅 VDD min 挂 → 弱件；时长突增 → 程序行为</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <p class="sec-eyebrow">04 · Method</p>
+    <h2>分析方法：从假设清单到双根因</h2>
+    <p class="sec-intro">先 <strong>Is / Is-Not 矩阵</strong>（KT 法）收窄原因域，再按<strong>先验概率 × 验证成本</strong>排序假设。任何"A 比 B 差"必须过两比例检验（差值 + 95% CI + n）；多 site / 多 tester 比较做多校正（FDR 或 α/n）。</p>
+    <div class="cards three">
+      <div class="card">
+        <div class="card-header"><span class="card-dot ink"></span><h3>Is / Is-Not（示例）</h3></div>
+        <ul>
+          <li><strong>什么</strong>：bin1 3.9%，bin4 正常 → 接触类</li>
+          <li><strong>哪里</strong>：tester 2 的 site 3/7 → site 相关</li>
+          <li><strong>何时</strong>：08-21 起 → 变更点在前夜</li>
+          <li><strong>程度</strong>：FPY −4.4pp、final −1.2pp → 回收高，接触类</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-dot mustard"></span><h3>假设优先级 <span class="pill c">C</span></h3></div>
+        <ul>
+          <li>针卡磨损 / 污染（先验最高）</li>
+          <li>接触 / 共面性、程序 limit 变更</li>
+          <li>机台校准、物料批次</li>
+          <li>真实工艺异常（排除法最后一档）</li>
+        </ul>
+      </div>
+      <div class="card focal">
+        <div class="card-header"><span class="card-dot coral"></span><h3>双根因（D4 硬要求）</h3></div>
+        <ul>
+          <li><strong>发生根因</strong>：为什么坏（针尖磨损 + 清洗周期过长）</li>
+          <li><strong>流出根因</strong>：为什么没拦住（SPC 没监控 TD、site 级无告警）</li>
+          <li>只答发生根因的 8D 会被 QE 退回</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><strong>五个常见陷阱</strong>：① 先入为主只找支持证据——用 Is/Is-Not 强制对称；② raw bin Pareto 误读 fail-stop 删失；③ 复测回收混入 FPY 掩盖接触类问题；④ n=40 失效就宣称 bin"翻倍"；⑤ 只做统计不做实物——缺 FA 证据链的 case 关不掉。</div>
+  </section>
+
+  <section>
+    <p class="sec-eyebrow">05 · Report</p>
+    <h2>分析报告：8D 逐节写法</h2>
+    <p class="sec-intro">客户 case 必须出正式 8D；内部 case 可简化为异常单但结构相同。初报当天发（事实 + 围堵），终报带 FA 证据。</p>
+    <table>
+      <tr><th style="width:12%">节</th><th style="width:34%">内容</th><th style="width:30%">必含要素</th><th>常见退回原因</th></tr>
+      <tr><td><strong>D0</strong></td><td>征兆响应</td><td>触发规则、发现时间线</td><td>缺时间线</td></tr>
+      <tr><td><strong>D1</strong></td><td>CFT 团队</td><td>TE/QE/设备/产品/计划 + Champion</td><td>单部门闭门造车</td></tr>
+      <tr><td><strong>D2</strong></td><td>问题描述</td><td>5W2H + Is/Is-Not；基线、分母口径、影响面、客户影响</td><td>良率口径不清</td></tr>
+      <tr><td><strong>D3</strong></td><td>临时围堵 ICA</td><td>覆盖范围、已流出清点与召回、ICA 有效性数据</td><td>只写"已 hold"不写流出面</td></tr>
+      <tr><td><strong>D4</strong></td><td>根因（双）</td><td>发生 + 流出；每条假设的证实/证伪结果</td><td>只有发生根因；假设未逐条关闭</td></tr>
+      <tr><td><strong>D5</strong></td><td>永久对策</td><td>对策与根因一一对应；多选一的比较依据</td><td>对策与根因无对应</td></tr>
+      <tr><td><strong>D6</strong></td><td>实施与验证</td><td>验证实验设计、连续 N lot 数据、SPC 恢复证据</td><td>无量化有效性</td></tr>
+      <tr><td><strong>D7</strong></td><td>预防</td><td>FMEA 更新、SPC 规则、SOP、培训、横展清单</td><td>无横展</td></tr>
+      <tr><td><strong>D8</strong></td><td>关闭</td><td>QE 签核；（客户 case）客户书面同意</td><td>缺客户批准</td></tr>
+    </table>
+    <div class="cards two">
+      <div class="card">
+        <div class="card-header"><span class="card-dot dusty"></span><h3>报告最低配图（5 张）</h3></div>
+        <ul>
+          <li>by-lot 良率趋势（标基线带 + 变更点）</li>
+          <li>first-fail bin Pareto（含 n 与 CI）</li>
+          <li>异常 / 正常 wafer map 对比</li>
+          <li>site / tester 分解</li>
+          <li>关键相关性图（如 fail 率 vs TD 计数）</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-dot muted"></span><h3>判定措辞分级</h3></div>
+        <ul>
+          <li><strong>已证实</strong>：统计相关 + 物理 FA + 再现/消除实验，三角闭合</li>
+          <li><strong>高度可能</strong>：统计相关 + 机理，缺再现实验</li>
+          <li><strong>待验证</strong>：仅相关，样本量不足或存在未排除混杂</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-eyebrow">06 · Verification</p>
+    <h2>验证：证据三角，缺一角关不掉</h2>
+    <div class="cards three">
+      <div class="card">
+        <div class="card-header"><span class="card-dot ink"></span><h3>统计相关</h3></div>
+        <p>假设因子与失效显著相关：差值 + CI + n；剂量-响应（失效率 ∝ 暴露量，如 TD 计数）是最强形态；警惕针卡与机台绑定的混杂。</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-dot mustard"></span><h3>物理证据 FA</h3></div>
+        <p>X-ray（键合空洞 / 对准）、SAT（分层 / 裂纹）、显微 / SEM（针尖磨损形貌）、切片 + EDX（污染成分）。FA 结果必须与电测签名兼容。</p>
+      </div>
+      <div class="card focal">
+        <div class="card-header"><span class="card-dot coral"></span><h3>再现 / 消除实验</h3></div>
+        <p><strong>再现</strong>：故意用嫌疑因子打良 lot，签名复现；<strong>消除</strong>：更换因子，良率回基线。<span class="pill c">C</span> 对策有效性：连续 ≥3 lot FPY 回基线 ±0.5pp、retest 回落、SPC 连续 ≥25 点受控。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-eyebrow">07 · Closure</p>
+    <h2>确认与关闭：判据清单</h2>
+    <ul class="checklist">
+      <li>双根因均被证据三角证实；流出根因对应的全部逃逸 lot 已完成围堵处置</li>
+      <li>D6 有效性达标：连续 3 lot / 20 wafer 回基线 ±0.5pp（<span class="pill c">C</span>）</li>
+      <li>SPC 连续 ≥25 点受控，无新增判异</li>
+      <li>围堵措施撤除后一个生产周期内无复发</li>
+      <li>D7 完成：FMEA 行更新、SPC / 警报规则导入、SOP 修订、横展清单关闭</li>
+      <li>知识库归档：case 编号、时间线、数据快照、FA 报告</li>
+      <li>签核链：TE → QE；客户 case 加客户书面批准</li>
+    </ul>
+    <div class="callout"><strong>重开条件</strong>：监控窗口（惯例 30 / 60 / 90 天，按严重度）内同根因复发 → 立即重开并升级一级。复发说明 D4 / D5 至少一项不成立——禁止"二次围堵了事"。</div>
+  </section>
+
+  <section>
+    <p class="sec-eyebrow">08 · Walkthrough</p>
+    <h2>迷你案例走查（合成数据，节奏为真实惯例）</h2>
+    <table>
+      <tr><th style="width:14%">时刻</th><th>动作与数据</th></tr>
+      <tr><td>D0 14:30</td><td>YMS 告警：KGSD 插入 FPY 96.2% → 91.8%（阈值 95%，单点出限）</td></tr>
+      <tr><td>D0 15:00</td><td>非数据问题（datalog 完整、recipe 未变）；hold 3 lot；冻结 WPFile 与针卡记录</td></tr>
+      <tr><td>D0 16:00</td><td>08-21 起 3 lot 阶跃；bin1 first-fail 0.8%→3.9%（+3.1pp，n=612，CI ±2.4pp）；site 3/7 差；tester 1/2 无差异</td></tr>
+      <tr><td>D0 17:00</td><td>Is/Is-Not → 接触类；ICA：涉事针卡停用、经手 lot 全数复测分选</td></tr>
+      <tr><td>D1 10:00</td><td>retest recovery 71%（回收集中 bin1、site 3/7）→ 接触类成立；TD 12.4k 超清洗周期 8k；fail 率 vs TD 回归 r²=0.78</td></tr>
+      <tr><td>D1 15:00</td><td>假设清单：① 针尖磨损/污染（相关 + 回收 + site 分布）② 键合机台变更（无交集，排除）③ 物料批次（跨批次均发生，排除）</td></tr>
+      <tr><td>D2 11:00</td><td>再现：超期针卡打良 lot → 签名复现；消除：换新卡 → 回基线；显微：针尖磨损失圆，EDX = Al 残屑</td></tr>
+      <tr><td>D2–D5</td><td>双根因：发生 = 磨损 + 固定清洗周期过长；流出 = SPC 无 TD 监控、无 site 级告警。D5：APC 按需清洗试点 + TD SPC + site 级告警上线</td></tr>
+      <tr><td>D5+14</td><td>有效性：连续 3 lot FPY 回基线 ±0.4pp；SPC 25 点受控</td></tr>
+      <tr><td>D5+15</td><td>关闭：QE 签核；横展同型针卡 ×3；知识库归档</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <p class="sec-eyebrow">09 · Sources</p>
+    <h2>来源与可信度</h2>
+    <div class="cards three">
+      <div class="card">
+        <div class="card-header"><span class="card-dot sage"></span><h3><span class="pill a">A</span>标准 / 一手</h3></div>
+        <ul>
+          <li>STDF V4：PRR 字段、PART_FLG 位、TEST_T 单位</li>
+          <li>Western Electric / Nelson SPC 判异规则</li>
+          <li>AEC-Q001（PAT）/ AEC-Q002（SPC）</li>
+          <li>Global 8D 手册体例；KT Is/Is-Not 方法论</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-dot mustard"></span><h3><span class="pill b">B</span>行业口径</h3></div>
+        <ul>
+          <li>SemiEngineering 2026-05：多插入点、测试左移</li>
+          <li>项目归档：SWTest 2017/2019、IPFA 2021、Edusemi bin 体系</li>
+          <li>Advantest APC 按需清洗实践</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-dot coral"></span><h3><span class="pill c">C</span>惯例 / 示例</h3></div>
+        <ul>
+          <li>时间轴节奏、关闭判据数值、回收率阈值</li>
+          <li>假设先验排序；迷你案例数据为合成</li>
+          <li>落地前以厂内 QE 与客户协议为准</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">
+    <span>KGSD · LOW-YIELD CASE PLAYBOOK · 2026-09-26</span>
+    <span><a href="/notes/hbm/low-yield-case-playbook/">笔记版</a> · <a href="/reports/dashboard/kgsd_test_design.html">KGSD 看板</a> · <a href="/notes/hbm/hbm-test-3d/">HBM 测试 3D 结构</a></span>
+  </div>
+
+</div>
+</body>
+</html>
