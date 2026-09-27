@@ -19,7 +19,7 @@ tags: ['HBM', '测试', '电路设计', '测试程序', 'PMU', '模拟电路', '
 
 ## 一、设计电路图：这些电路为什么存在
 
-![设计电路图：PMU 测量环路 + 被测电路的设计意图](/diagrams/test-design-circuit.svg)
+![设计电路图：PMU 测量环路 + 被测电路的设计意图](/diagrams/hbm-test/test-design-circuit.svg)
 
 **左半边（ATE 侧，"问"的电路）四件套：**
 
@@ -38,7 +38,7 @@ tags: ['HBM', '测试', '电路设计', '测试程序', 'PMU', '模拟电路', '
 
 ## 二、逻辑图：测试程序怎么一步步判 bin
 
-![逻辑图：测试程序 fail-stop 判定流](/diagrams/test-logic-flow.svg)
+![逻辑图：测试程序 fail-stop 判定流](/diagrams/hbm-test/test-logic-flow.svg)
 
 看这张图抓三个要点：
 
@@ -50,7 +50,7 @@ bin 顺序与物理含义（Bin1–7）出自 Edusemi-Plus（项目既有归档�
 
 ## 三、物理电路图：电流实际走哪条路
 
-![物理电路图：探针到阵列的实物路径剖面](/diagrams/test-physical-circuit.svg)
+![物理电路图：探针到阵列的实物路径剖面](/diagrams/hbm-test/test-physical-circuit.svg)
 
 主剖面是 **PSWT（堆叠后晶圆测试）** 的姿态：探针从 base die 背面扎铝焊盘，电流的真实路径是：
 
@@ -66,37 +66,37 @@ ATE·PMU → 线缆 → 探针卡 → 针尖 → 铝焊盘 → ESD 二极管对 
 
 ### ① 接触开路（FIMV：加流测压，电压顶到钳位）
 
-![接触开路：电流无路可走，电压顶到钳位](/diagrams/fault-open.svg)
+![接触开路：电流无路可走，电压顶到钳位](/diagrams/hbm-test/fault-open.svg)
 
 看图要点：电流源推 +100 μA，但针尖–焊盘断开，电流无处可去 → 节点电压被推高到 FI 模式的钳位（1.50 V）→ 落在限值窗（0.45–0.75 V）上方 → Bin1，不进修复。
 
 ### ② 焊盘对地短路（同一测试，读数反向）
 
-![焊盘对地短路：二极管被旁路，压差塌到 0](/diagrams/fault-padshort.svg)
+![焊盘对地短路：二极管被旁路，压差塌到 0](/diagrams/hbm-test/fault-padshort.svg)
 
 看图要点：与①同一个测试、同一个限值窗，只是缺陷换成「焊盘–地金属桥」→ 电流全从桥走、二极管被旁路 → 读数 0.02 V 落在窗口下方。**①②合起来说明：一个 window 的上下两侧各对应一种物理缺陷。**
 
 ### ③ PowerShort（FVMI：加压测流，R = V/I 现场算）
 
-![PowerShort：电源轨间缺陷桥连，电流远超限](/diagrams/fault-powershort.svg)
+![PowerShort：电源轨间缺陷桥连，电流远超限](/diagrams/hbm-test/fault-powershort.svg)
 
 看图要点：换成加压测流——电源轨加 0.5 V 安全电平（防加坏好 die），好 die 只有 μA–mA 级寄生漏电，缺陷桥连时读数 180 mA → R = 0.5/0.18 ≈ 2.8 Ω，Ω 量级直接指认「桥连」而非「漏电」。
 
 ### ④ 输入漏电超标（灵敏量程才看得见）
 
-![输入漏电：μA 级电流被灵敏量程抓出](/diagrams/fault-leak.svg)
+![输入漏电：μA 级电流被灵敏量程抓出](/diagrams/hbm-test/fault-leak.svg)
 
 看图要点：结构与①共用焊盘，但电流小六个数量级（12 μA vs 限值 1 μA）——PMU 必须切 μA 灵敏档才「看得见」。这就是 DC 三件套把 Leakage 单列一步的原因：量程不同、缺陷域不同。
 
 ### ⑤ 功能位失效（数字级：期望 vs 读出的离散比对）
 
-![功能位失效：MBiST 写读比较与修复回路](/diagrams/fault-func.svg)
+![功能位失效：MBiST 写读比较与修复回路](/diagrams/hbm-test/fault-func.svg)
 
 看图要点：DC 全过后不再看连续读数，而是 APG 图形的「期望 vs 读出」比对——弱电荷单元读出 1 ≠ 期望 0 → 坏位坐标进失效捕获存储 → 按 bank/行/列归因 → 可修走 fuse box 重映射并**回到写读比较复验**（图中唯一一条回路）。
 
 ### ⑥ TSV 开路 / lane 失效（一处断裂 = 整列失联）
 
-![TSV 开路：断裂点以上整列 column fail，lane 重映射兜底](/diagrams/fault-tsv.svg)
+![TSV 开路：断裂点以上整列 column fail，lane 重映射兜底](/diagrams/hbm-test/fault-tsv.svg)
 
 看图要点：TSV 是纵向共用的——断一处不是坏一个位，而是「自断点向上整列无响应」；修复粒度是 lane/列而非位。这解释了数据里 column fail 为什么总与 TSV/修复率一起统计。
 

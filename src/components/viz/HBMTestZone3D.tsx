@@ -990,7 +990,7 @@ export default function HBMTestZone3D() {
           {spec && (
             <figure className="mt-3">
               <img
-                src={`/diagrams/fault-${spec.id}.svg`}
+                src={`/diagrams/hbm-test/fault-${spec.id}.svg`}
                 alt={`失效电路图：${spec.label}的模拟电路级原理`}
                 className="w-full rounded-lg border border-slate-200 bg-white"
                 loading="lazy"
