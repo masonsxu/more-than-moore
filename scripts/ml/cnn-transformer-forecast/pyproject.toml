@@ -1,0 +1,12 @@
+[project]
+name = "cnn-transformer-forecast"
+version = "0.1.0"
+description = "CNN + Transformer 时间序列预测：公众号文章算法的本地复现"
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib>=3.9",
+    "numpy>=2.0",
+    "scikit-learn>=1.5",
+    "seaborn>=0.13",
+    "torch>=2.4",
+]

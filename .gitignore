@@ -12,3 +12,7 @@ node_modules/
 # wrangler
 .wrangler/
 .playwright-cli/
+# python repro (scripts/ml/)
+.venv/
+__pycache__/
+metrics*.json
